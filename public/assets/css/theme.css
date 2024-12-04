@@ -8745,21 +8745,21 @@ a.pswp__share--download:hover {
 @media (max-width: 1199px) {
   .header__logo {
     margin-right: 30px;
-    width: 30px;
+    /* width: 30px; */
   }
 }
 
 @media (max-width: 1098px) {
   .header__logo {
     font-size: 26px;
-    width: 30px;
+    /* width: 30px; */
   }
 }
 
 @media (max-width: 991px) {
   .header__logo {
     font-size: 22px;
-    width: 30px;
+    /* width: 30px; */
   }
 }
 
@@ -8850,7 +8850,7 @@ a.pswp__share--download:hover {
 .header_page_nav {
   border: 0px solid #ddd
 }
-}
+
 
 .header_page_nav>li {
   margin: 0px 5px;
@@ -30463,10 +30463,14 @@ body:not(.absolute-header) .header--type-4 .header__right>li>a span {
   -webkit-transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);
 }
-
 /*.header--type-6 .header__logo img {*/
 /*  width: 230px!important;*/
 /*}*/
+
+
+.header--type-6 .header__logo img {
+  width: 30px;
+}
 
 .header--type-6 .header__logo a {
   color: #685d33;
