@@ -1,0 +1,39 @@
+/*your custom css goes here*/
+
+.text-decoration-line-through {
+    text-decoration: line-through !important;
+}
+
+.text-decoration-underline {
+    text-decoration: underline !important;
+}
+
+.text-decoration-none {
+    text-decoration: none !important;
+}
+
+.active-category{
+    color: #ac8660 !important;
+}
+
+.ml-1{
+    margin-left: 1rem !important;
+}
+
+.ml-2{
+    margin-left: 2rem !important;
+}
+.mb-1{
+    margin-bottom: 1rem !important;
+}
+.mb-2{
+    margin-bottom: 2rem !important;
+}
+
+.lnr-heart.active {
+    color: red !important;
+}
+
+.red{
+    color: red !important;
+}
