@@ -61,7 +61,7 @@
                                                         <p class="cart-product__price">{{ $key + 1}}</p>
                                                     </td>
                                                     <td>
-                                                        <p class="text-muted mb-1">{{__('messages.saleq')}}</p>
+                                                        <p class="text-muted mb-1">{{__('messages.sale')}}</p>
                                                     </td>
                                                     <td>
                                                         <p class="text-muted mb-1">{{$order->code}}</p>
