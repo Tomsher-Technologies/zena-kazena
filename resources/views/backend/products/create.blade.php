@@ -50,7 +50,7 @@
                                 <label class="col-md-3 col-from-label">{{ trans('messages.category') }} <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
                                     <select class="form-control aiz-selectpicker" name="category_id" id="category_id"
-                                        data-live-search="true" required>
+                                        data-live-search="true" required  title="Select an option" >
                                         @foreach ($categories as $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}
                                             </option>
@@ -64,14 +64,14 @@
                                 </div>
                             </div>
                             <div class="form-group row" id="brand">
-                                <label class="col-md-3 col-from-label">{{ trans('messages.brand') }}</label>
+                                <label class="col-md-3 col-from-label">{{ trans('messages.brand') }}<span class="text-danger">*</span></label>
                                 <div class="col-md-8">
                                     @php   
                                         $brands = \App\Models\Brand::where('is_active',1)->orderBy('name','asc')->get();
                                     @endphp
                                     <select class="form-control aiz-selectpicker" name="brand_id" id="brand_id"
-                                        data-live-search="true">
-                                        <option value="">{{ trans('messages.select').' '.trans('messages.brand') }}</option>
+                                        data-live-search="true" required  title="Select an option" >
+                                        {{-- <option value="">{{ trans('messages.select').' '.trans('messages.brand') }}</option> --}}
                                         @foreach ($brands as $brand)
                                             <option value="{{ $brand->id }}">{{ $brand->name }}
                                             </option>
@@ -80,14 +80,14 @@
                                 </div>
                             </div>
                             <div class="form-group row" id="occasion">
-                                <label class="col-md-3 col-from-label">{{ trans('messages.occasion') }}</label>
+                                <label class="col-md-3 col-from-label">{{ trans('messages.occasion') }}<span class="text-danger">*</span></label>
                                 <div class="col-md-8">
                                     @php   
                                         $occasions = \App\Models\Occasion::where('is_active',1)->orderBy('name','asc')->get();
                                     @endphp
                                     <select class="form-control aiz-selectpicker" name="occasion_id" id="occasion_id"
-                                        data-live-search="true">
-                                        <option value="">{{ trans('messages.select').' '.trans('messages.occasion') }}</option>
+                                        data-live-search="true" required  title="Select an option" >
+                                        {{-- <option value="">{{ trans('messages.select').' '.trans('messages.occasion') }}</option> --}}
                                         @foreach ($occasions as $occasion)
                                             <option value="{{ $occasion->id }}">{{ $occasion->name }}
                                             </option>

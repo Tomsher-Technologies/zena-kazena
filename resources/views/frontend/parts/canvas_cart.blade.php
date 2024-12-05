@@ -9,7 +9,7 @@
                 <!-- Heading -->
                 <div class="canvas-cart__heading d-flex align-items-center">
                     <!-- H3 -->
-                    <h3 class="canvas-cart__h3">{{ trans('messages.cart') }} ({{ cartCount() }})</h3>
+                    <h3 class="canvas-cart__h3">{{ trans('messages.cart') }} (<span class="canvasCartcount">{{ cartCount() }}</span>)</h3>
                     <!-- End h3 -->
                     <!-- Close -->
                     <div class="canvas-cart__close"><a href="#" class="js-close-canvas-cart"><i
