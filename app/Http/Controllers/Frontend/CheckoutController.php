@@ -720,7 +720,7 @@ class CheckoutController
         $reason   = $request->reason ?? '';
         $user = getUser();
         if ($order_id != '') {
-            $order = Order::find($order_id);
+            $order = RentOrder::find($order_id);
             if ($order) {
                 if ($order->cancel_request == 0 && $order->delivery_status == "pending") {
                     $order->cancel_request = 1;

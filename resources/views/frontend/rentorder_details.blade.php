@@ -188,7 +188,7 @@
                     </div>
                 </div>
 
-                {{-- <div class="action-buttons">
+                <div class="action-buttons">
                     @if ($order->delivery_status == 'pending' || $order->delivery_status == 'confirmed')
                         @if ($order->cancel_request == 0)
                             <button class="btn btn-cancel cancel-order-btn" data-order-id="{{$order->id}}">{{ trans('messages.cancel').' '.trans('messages.order') }}</button>
@@ -206,9 +206,9 @@
                         @endif
 
                     @endif
-                </div> --}}
+                </div>
             </div>
-            {{-- <div id="cancelModal" class="modal" style="display:none;">
+            <div id="cancelModal" class="modal" style="display:none;">
                 <div class="modal-content">
                     <span class="close-modal close-modal-cancel">&times;</span>
                     <h3>Cancel Order</h3>
@@ -225,7 +225,7 @@
                     <textarea id="returnReason" placeholder="Type your reason for returning the order here..."></textarea>
                     <button id="submitReturnReason" class="submit-btn">Submit</button>
                 </div>
-            </div> --}}
+            </div>
         </section>
 
 
@@ -235,7 +235,7 @@
 @endsection
 
 @section('header')
-    <style>
+    {{-- <style>
         .modal {
             position: fixed;
             top: 50%;
@@ -266,7 +266,7 @@
             margin-bottom: 10px;
             padding: 10px;
         }
-    </style>
+    </style> --}}
 @endsection
 
 @section('script')
@@ -295,7 +295,7 @@
 
                 // Send the AJAX request
                 $.ajax({
-                    url: "/cancel-order", // Backend route
+                    url: "/rent/cancel-order", // Backend route
                     type: "POST",
                     data: {
                         order_id: orderId,
@@ -304,11 +304,13 @@
                     },
                     success: function(response) {
                         if (response.status == true) {
+                            console.log = response.message;
                             toastr.success(response.message,
                             "{{ trans('messages.success') }}");
                             $("#cancelModal").fadeOut();
                             window.location.reload();
                         } else {
+                            console.log = response.message;
                             toastr.error(response.message, "{{ trans('messages.error') }}");
                         }
 

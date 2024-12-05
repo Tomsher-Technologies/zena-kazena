@@ -81,6 +81,7 @@ Route::group(['middleware' => ['auth']], function () {
     
     Route::post('cancel-order', [CheckoutController::class, 'cancelOrderRequest'])->name('cancel-order');
     Route::post('return-order', [CheckoutController::class, 'returnOrderRequest'])->name('return-order');
+    Route::post('rent/cancel-order', [CheckoutController::class, 'cancelRentOrderRequest'])->name('rent.cancel-order');
 
     Route::get('account', [ProfileController::class, 'getUserAccountInfo'])->name('account');
     Route::post('/account/update', [ProfileController::class, 'update'])->name('account.update'); 
