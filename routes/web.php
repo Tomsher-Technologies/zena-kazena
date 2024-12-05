@@ -30,6 +30,8 @@ Route::get('/terms', [FrontendController::class, 'terms'])->name('terms');
 Route::get('/privacy', [FrontendController::class, 'privacy'])->name('privacy');
 Route::get('/contact', [FrontendController::class, 'contact'])->name('contact');
 Route::post('/contact-us', [FrontendController::class, 'submitContactForm'])->name('contact.submit');
+Route::get('/mortgage', [FrontendController::class, 'mortgage'])->name('mortgage');
+Route::post('/submit-mortgage-form', [FrontendController::class, 'submitMortgageForm'])->name('submit-mortgage');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product-detail', [ProductController::class, 'productDetails'])->name('product-detail');
