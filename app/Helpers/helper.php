@@ -445,6 +445,8 @@ function uploadImage($type, $imageUrl, $filename = null){
     
     if($type == 'page'){
         $path = 'pages/';
+    }else if($type == 'mortgage'){
+        $path = 'mortgages/';
     }else{
         $path = 'others/';
     }
