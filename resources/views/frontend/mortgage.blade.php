@@ -33,18 +33,16 @@
                         </div>
                         <!-- End image -->
                         <!-- Title -->
-                        <h2 class="about-company__title">First time buyer, remortgage or self-employed - we can help! We are
-                            your fees-free broker.</h2>
+                        <h2 class="about-company__title">How Mortgages Work</h2>
                         <!-- End title -->
                         <!-- Description -->
                         <div class="about-company__description">
                         
-                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Provident ipsam ipsa similique
-                                veniam aliquid minus, incidunt cupiditate aut quasi est unde explicabo perspiciatis, enim
-                                illum debitis temporibus placeat, aperiam qui?
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem nemo similique, quae
-                                architecto quam sapiente dolores eum, voluptatum adipisci tempore cum ab ducimus? Numquam,
-                                corporis sequi doloribus a suscipit nemo?
+                            <p>Individuals and businesses use mortgages to buy real estate without paying the entire purchase price upfront. The borrower repays the loan plus interest over a specified number of years until they own the property free and clear. Most traditional mortgages are fully amortized. This means that the regular payment amount will stay the same, but different proportions of principal vs. interest will be paid over the life of the loan with each payment. Typical mortgage terms are for 15 or 30 years, but some mortages can run for longer terms.
+
+                                Mortgages are also known as liens against property or claims on property. If the borrower stops paying the mortgage, the lender can foreclose on the property.
+                                
+                                For example, a residential homebuyer pledges their house to their lender, which then has a claim on the property. This ensures the lender’s interest in the property should the buyer default on their financial obligation. In the case of foreclosure, the lender may evict the residents, sell the property, and use the money from the sale to pay off the mortgage debt.
                             </p>
                         </div>
                         <!-- End description -->
@@ -65,23 +63,15 @@
                         </div>
                         <!-- End image -->
                         <!-- Title -->
-                        <h2 class="about-company__title">Lorem ipsum dolor sit amet consectetur adipisicing elit. Saepe sit
-                            deserunt dolor, nobis enim ab. Fugiat sapiente dolorem possimus dolorum earum ducimus veniam
-                            quam omnis, aliquid, vel debitis blanditiis doloremque.</h2>
+                        <h2 class="about-company__title">The Mortgage Process</h2>
                         <!-- End title -->
                         <!-- Description -->
                         <div class="about-company__description">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod explicabo reprehenderit
-                                voluptatem omnis fugit eligendi. Ipsum hic labore deleniti recusandae sunt, neque libero
-                                necessitatibus iste inventore quas ratione. Doloremque, praesentium.</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus fugit nobis repellat
-                                officiis commodi! Suscipit numquam, deleniti blanditiis sunt maxime porro praesentium omnis
-                                sint molestias illo accusamus, aliquid iste quidem? Lorem ipsum dolor sit amet consectetur
-                                adipisicing elit. Corporis, illo quae! Tempore obcaecati illo repellendus ratione corporis
-                                accusamus facere rem dignissimos eveniet fugiat placeat incidunt nulla odit autem, sunt
-                                dolore. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minima error, optio ipsum
-                                iusto tenetur quidem veniam accusantium itaque, quibusdam inventore voluptates corporis
-                                molestias quos aliquid quae facilis esse eum cum!</p>
+                            <p>Would-be borrowers begin the process by applying to one or more mortgage lenders. The lender will ask for evidence that the borrower is capable of repaying the loan. This may include bank and investment statements, recent tax returns, and proof of current employment. The lender will generally run a credit check as well.
+
+                                If the application is approved, the lender will offer the borrower a loan of up to a certain amount and at a particular interest rate. Homebuyers can apply for a mortgage after they have chosen a property to buy or even while they are still shopping for one, thanks to a process known as pre-approval. Being pre-approved for a mortgage can give buyers an edge in a tight housing market because sellers will know that they have the money to back up their offer.
+                                
+                                Once a buyer and seller agree on the terms of their deal, they or their representatives will meet at what’s called a closing. This is when the borrower makes their down payment to the lender. The seller will transfer ownership of the property to the buyer and receive the agreed-upon sum of money, and the buyer will sign any remaining mortgage documents. The lender may charge fees for originating the loan (sometimes in the form of points) at the closing.</p>
 
                         </div>
                         <!-- End description -->
