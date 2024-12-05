@@ -250,7 +250,7 @@
     </div>
     <!-- End our products -->
     <!-- New in -->
-    <div class="shoppable-new-coll">
+    {{-- <div class="shoppable-new-coll">
         <!-- Container -->
         <div class="container-fluid">
             <!-- Title and action -->
@@ -284,7 +284,7 @@
             <!-- End row -->
         </div>
         <!-- End container -->
-    </div>
+    </div> --}}
     <!-- End new in -->
     <!-- Deal week -->
    
@@ -503,6 +503,7 @@
                             <a href="{{ route('products.index',['brand' => [$shop_by_brands->getTranslation('slug', $lang)]]) }}">
                                 <img alt="Image" src="{{ uploaded_asset($shop_by_brands->getTranslation('logo',$lang)) }}" class="lazyload" />
                             </a>
+                            
                         </div>
                         <!-- End item -->
                     @endforeach

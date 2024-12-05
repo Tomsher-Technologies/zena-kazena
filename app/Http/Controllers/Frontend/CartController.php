@@ -412,7 +412,8 @@ class CartController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => trans('messages.cart_item_removed_success'),
-                'updatedCartSummary' => $summary
+                'updatedCartSummary' => $summary,
+                'cart_count' => $this->cartCount(),
             ], 200);
         } else {
             return response()->json([
