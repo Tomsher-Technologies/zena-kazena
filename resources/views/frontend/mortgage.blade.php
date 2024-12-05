@@ -8,11 +8,7 @@
             <h1 class="about-page__title">Mortgage</h1>
             <!-- End title -->
             <!-- Description -->
-            <div class="about-page__description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-                accusamus fuga velit cumque consectetur et commodi earum voluptate? Minus tempore, esse illo qui quibusdam
-                et delectus illum assumenda rerum culpa. Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum nemo
-                voluptates commodi quasi nulla pariatur magni excepturi, error nostrum voluptatum porro tempore eveniet
-                quam! Perspiciatis illo ratione delectus eos molestiae!</div>
+            <div class="about-page__description">A mortgage is a loan used to purchase real estate, where the property itself serves as collateral. It allows buyers to finance the majority of the purchase price while making an initial down payment. Borrowers agree to repay the loan in regular installments over a set term, typically 15 to 30 years, with each payment including both principal and interest. Mortgages can have fixed or adjustable interest rates, influencing the total cost of the loan. If the borrower fails to meet the repayment obligations, the lender has the right to foreclose on the property. Mortgages are essential for most homebuyers, providing a practical way to own property without needing the full purchase price upfront.</div>
             <!-- End description -->
             <div class="mb-5 text-center">
                 <a href="#" class="eighth-button" data-toggle="modal" data-target="#mortgageModal">Start mortgage</a>
@@ -42,10 +38,7 @@
                         <!-- End title -->
                         <!-- Description -->
                         <div class="about-company__description">
-                            <p><span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium obcaecati,
-                                    excepturi necessitatibus numquam tenetur molestias dolorem ex, totam aliquam,
-                                    consequuntur omnis sint deserunt repudiandae sit aspernatur corrupti nisi vel
-                                    odit!</span></p>
+                        
                             <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Provident ipsam ipsa similique
                                 veniam aliquid minus, incidunt cupiditate aut quasi est unde explicabo perspiciatis, enim
                                 illum debitis temporibus placeat, aperiam qui?
@@ -56,9 +49,9 @@
                         </div>
                         <!-- End description -->
 
-                        <div class="mt-5 text-left">
+                        {{-- <div class="mt-5 text-left">
                             <a href="#" class="eighth-button " data-toggle="modal" data-target="#mortgageModal">Start mortgage</a>
-                        </div>
+                        </div> --}}
                     </div>
                     <!-- End company -->
                     <!-- Leader -->
