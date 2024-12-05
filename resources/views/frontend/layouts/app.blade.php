@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/lineicons-regular.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/icon-font.min.css') }}">
     <link href="{{ asset('assets/css/custom-style.css') }}" rel="stylesheet" type="text/css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet"> --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     @yield('header')
@@ -473,6 +473,7 @@
     </script>
     
     @yield('script')
+    
     
 </body>
 
