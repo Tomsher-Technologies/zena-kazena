@@ -249,7 +249,8 @@
                     <!-- End options -->
                     <!-- Product action -->
                     <div class="product__action js-product-action">
-                        <!-- Product quantity and add to cart -->
+                        <form action="{{ route('rent.product-order') }}" method="POST">
+                            @csrf 
                         <div class="product__quantity-and-add-to-cart d-flex align-items-center">
                             <!-- Quantity -->
                             <div class="product__quantity">
@@ -273,10 +274,13 @@
                                 <input type="date" id="end_date" name="end_date" class="form-control"
                                     placeholder="{{ trans('messages.end_date') }}" min="{{ now()->format('Y-m-d') }}">
                             </div>
-                            {{-- <input type="hidden"name="sku"value="{{$response['sku']}}">
-                            <input type="hidden"name="product_id"value="{{$$product_stock->product->id}}">
+                            <input type="hidden"name="sku"value="{{$response['sku']}}">
+                            <input type="hidden"name="product_id"value="{{$product_stock->product->id}}">
                             <input type="hidden"name="deposit"value="{{$response['deposit']}}">
-                            <input type="hidden"name="price"value="{{$response['main_price']}}"> --}}
+                            <input type="hidden"name="category_id"value="{{$response['category']['id']}}">
+                            <input type="hidden"name="price"value="{{$response['main_price']}}">
+                            <input type="hidden"name="current_stock"value="{{$response['current_stock']}}">
+                            <input type="hidden"name="slug"value="{{$response['slug']}}">
 
                            
                         </div>
@@ -284,7 +288,7 @@
                         <!-- Buy now -->
                         <div class="product__buy-now">
                             @if ($response['quantity'] > 0)
-                                <a href="#" class="second-button">{{ trans('messages.order_now') }}</a>
+                                <input type="submit" class="second-button" value="{{ trans('messages.order_now') }}">
                             @else
                                 <span class="status__value ">{{ trans('messages.out_of_stock') }}</span>
                             @endif
@@ -726,7 +730,7 @@
                             <!-- Image -->
                             <div class="result-product__image">
                                 <a
-                                    href="{{ route('rent.product-detail', ['slug' => $relProd->slug, 'sku' => $relProd->sku]) }}">
+                                    href="{{ route('product-detail', ['slug' => $relProd->slug, 'sku' => $relProd->sku]) }}">
                                     <img alt="Image" data-sizes="auto" data-srcset="{{ $imageRel }}"
                                         src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                         class="lazyload" />
@@ -735,7 +739,7 @@
                             <!-- End image -->
                             <!-- Product name -->
                             <div class="result-product__name"><a
-                                    href="{{ route('rent.product-detail', ['slug' => $relProd->slug, 'sku' => $relProd->sku]) }}">{{ $relProd->getTranslation('name', $lang) }}</a>
+                                    href="{{ route('product-detail', ['slug' => $relProd->slug, 'sku' => $relProd->sku]) }}">{{ $relProd->getTranslation('name', $lang) }}</a>
                             </div>
                             <!-- End product name -->
                             <!-- Product price -->
@@ -1053,7 +1057,7 @@
                 if (matchingVariant) {
                     const sku = Object.keys(matchingVariant)[0];
                     $('#product-stock').html(`<p>SKU: ${sku}</p>`);
-                    var url = '/rent/product-detail?slug=' + encodeURIComponent(slug) + '&sku=' + encodeURIComponent(
+                    var url = '/rent/product-details?slug=' + encodeURIComponent(slug) + '&sku=' + encodeURIComponent(
                         sku);
 
                     // Redirect to the URL

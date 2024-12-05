@@ -63,6 +63,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/order/success/{order_id}', [CheckoutController::class, 'success'])->name('order.success');
     Route::get('/order/failed', [CheckoutController::class, 'failed'])->name('order.failed');
+    Route::get('/rent/order/success/{order_id}', [CheckoutController::class, 'successRentOrder'])->name('rent.order.success');
+    Route::get('/rent/order/failed', [CheckoutController::class, 'failedRentOrder'])->name('rent.order.failed');
     
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -74,6 +76,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('orders', [ProfileController::class, 'orderList'])->name('orders.index');
     Route::get('order-details', [ProfileController::class, 'orderDetails'])->name('order-details');
+    Route::get('rent/order-details', [ProfileController::class, 'rentOrderDetails'])->name('rent.order-details');
     Route::get('order/returns', [ProfileController::class, 'orderReturnList'])->name('orders.returns');
     
     Route::post('cancel-order', [CheckoutController::class, 'cancelOrderRequest'])->name('cancel-order');
@@ -82,6 +85,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('account', [ProfileController::class, 'getUserAccountInfo'])->name('account');
     Route::post('/account/update', [ProfileController::class, 'update'])->name('account.update'); 
     Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('account.changePassword');
+    
+    Route::post('/rent/product-order', [CheckoutController::class, 'rentProductOrder'])->name('rent.product-order');
+    Route::post('/rent/product-order/process', [CheckoutController::class, 'placeRentOrder'])->name('rent.checkout.process');
 });
 
 Route::post('/subscribe', [FrontendController::class, 'subscribe'])->name('newsletter.subscribe');

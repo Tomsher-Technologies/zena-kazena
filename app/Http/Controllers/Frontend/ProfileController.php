@@ -11,6 +11,8 @@ use App\Models\Wishlist;
 use App\Models\OrderTracking;
 use Illuminate\Http\Request;
 use App\Models\Cart;
+use App\Models\RentOrder;
+use App\Models\RentOrderTracking;
 use Hash;
 use Illuminate\Support\Facades\File;
 use Storage;
@@ -317,8 +319,10 @@ class ProfileController extends Controller
            
             $total_count = $orders->count();
             $orderList = $orders->get();
+            $rentorders= RentOrder::where('user_id',$user->id)->orderBy('created_at', 'desc')->get();
+            $rentordercount = $rentorders->count();
         }
-        return view('frontend.orders',compact('orderList','total_count'));
+        return view('frontend.orders',compact('orderList','total_count', 'rentorders','rentordercount'));
     }
     
     public function orderReturnList(Request $request){
@@ -377,5 +381,44 @@ class ProfileController extends Controller
     public function getUserAccountInfo(){
         $user = Auth::user();
         return view('frontend.account', compact('user'));
+    }
+    
+    public function rentOrderDetails(Request $request)
+    {
+        $order_code = $request->code ?? '';
+        $user_id = (!empty(auth()->user())) ? auth()->user()->id : '';
+        $track_list = [];
+        $lang = getActiveLanguage();
+        $order = [];
+
+        if($order_code != ''){
+            $order = RentOrder::where('order_code',$order_code)->where('user_id',$user_id)->first();
+            if($order){
+                $tracks = RentOrderTracking::where('order_id', $order->id)->orderBy('id','ASC')->get();
+                
+                if ($tracks) {
+                    foreach ($tracks as $key=>$value) {
+                        $temp = array();
+                        $temp['id'] = $value->id;
+                        $temp['status'] = $value->status;
+                        $temp['date'] = date("d-m-Y H:i a", strtotime($value->status_date));
+                        $track_list[] = $temp;
+                    }
+                }    
+            }
+        }
+
+        if(!empty($track_list)){
+            $dataByStatus = array_column($track_list, null, 'status');
+        }else{
+            $dataByStatus = [];
+        }
+        // dd($order);
+        // echo '<pre>';
+        // print_r($track_list);
+        // print_r($dataByStatus);
+        // die;
+
+        return view('frontend.rentorder_details',compact('lang','order','track_list','dataByStatus'));
     }
 }
