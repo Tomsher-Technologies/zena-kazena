@@ -235,7 +235,7 @@
 @endsection
 
 @section('header')
-    <style>
+    {{-- <style>
         .modal {
             position: fixed;
             top: 50%;
@@ -266,7 +266,7 @@
             margin-bottom: 10px;
             padding: 10px;
         }
-    </style>
+    </style> --}}
 @endsection
 
 @section('script')
@@ -295,7 +295,7 @@
 
                 // Send the AJAX request
                 $.ajax({
-                    url: "/cancel-order", // Backend route
+                    url: "/rent/cancel-order", // Backend route
                     type: "POST",
                     data: {
                         order_id: orderId,
@@ -304,11 +304,13 @@
                     },
                     success: function(response) {
                         if (response.status == true) {
+                            console.log = response.message;
                             toastr.success(response.message,
                             "{{ trans('messages.success') }}");
                             $("#cancelModal").fadeOut();
                             window.location.reload();
                         } else {
+                            console.log = response.message;
                             toastr.error(response.message, "{{ trans('messages.error') }}");
                         }
 
