@@ -21,6 +21,10 @@ use App\Utility\SendSMSUtility;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
 use App\Mail\EmailManager;
+use App\Models\Category;
+use App\Models\RentOrder;
+use App\Models\RentOrderTracking;
+use Carbon\Carbon;
 use Mail;
 
 class CheckoutController
@@ -553,5 +557,208 @@ class CheckoutController
     public function failed()
     {
         return view('frontend.order_failed');
+    }
+    
+    public function rentProductOrder(Request $request)
+    {
+        $lang = getActiveLanguage();
+        $user = Auth::user();
+        $product_stock = ProductStock::leftJoin('products', 'products.id', '=', 'product_stocks.product_id')
+            ->where('products.published', 1)
+            ->where('product_stocks.status', 1)
+            ->select('product_stocks.*')
+            ->where('products.slug', $request['slug'])
+            ->where('product_stocks.sku', $request['sku'])
+            ->first();
+        $category = Category::find($request->category_id);
+        $startDate = Carbon::parse($request->start_date);
+        $endDate = Carbon::parse($request->end_date);
+        $days = $startDate->diffInDays($endDate) + 1;
+        $quantity_price = $product_stock->offer_price * $request['product_quantity'];
+        $subtotal = $quantity_price * $days;
+        $total = $subtotal + $request['deposit'];
+        // dd($product_stock);
+        //  dd($days, $request['price'],  $subtotal, $request['deposit'], $total, $request->all());
+        $order = RentOrder::create([
+            'user_id' => $user->id,
+            'product_id' => $request->product_id,
+            'product_stock_id' => $product_stock->id,
+            'sku' => $request->sku,
+            'quantity' => $request->product_quantity,
+            // 'shipping_address' => $shipping_address_json,
+            // 'billing_address' => $billing_address_json,
+            // 'order_notes' => $request->order_note ?? '',
+            // 'delivery_status' => 'pending',
+            // 'payment_type' => $request->payment_method ?? '',
+            // 'payment_status' => 'un_paid',
+            'shipping_type' => 'free_shipping',
+            'shipping_cost' => 0,
+            'deposit' => $request->deposit,
+            'grand_total' =>  $total,
+            'tax' => 0,
+            'sub_total' => $subtotal,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'no_of_days' => $days,
+            'offer_discount' => 0,
+            'coupon_discount' => 0,
+            'order_code' => date('Ymd-His') . rand(10, 99),
+            'order_date' => strtotime('now'),
+            'delivery_viewed' => 0
+        ]);
+
+        $products = Product::find($request->product_id);
+        $product = [
+            'id' => $products->id,
+            'product_variant_id' => $product_stock->id,
+            'name' => $products->getTranslation('name', $lang),
+            'brand' => $products->brand ? $products->brand->getTranslation('name', $lang) : '',
+            'slug' => $products->slug,
+            'sku' => $product_stock->sku,
+            'image' => get_product_image($products->thumbnail_img, '300'),
+            'attributes' => getProductAttributes($product_stock->attributes),
+            'price' => $product_stock->offer_price,
+        ];
+
+        // return view('frontend.rentcheckout', compact('response', 'user'));
+        return view('frontend.rentcheckout', compact('order', 'user', 'product'));
+    }
+    public function placeRentOrder(Request $request)
+    {
+        $validatedData = $request->validate([
+            'billing_name' => 'required|string|max:255',
+            'billing_address' => 'required|string|max:255',
+            'billing_city' => 'required|string|max:255',
+            'billing_zipcode' => 'required|string|max:10',
+            'billing_phone' => 'required|string|max:15',  // Add phone validation
+            'billing_email' => 'required|email|max:255', // Add email validation
+            'shipping_name' => 'nullable|string|max:255',
+            'shipping_address' => 'nullable|string|max:255',
+            'shipping_city' => 'nullable|string|max:255',
+            'shipping_zipcode' => 'nullable|string|max:10',
+            'shipping_phone' => 'nullable|string|max:15',
+        ], [
+            'billing_name.required' => 'This field is required.',
+            'billing_address.required' => 'This field is required.',
+            'billing_city.required' => 'This field is required.',
+            'billing_zipcode.required' => 'This field is required.',
+            'billing_phone.required' => 'This field is required.',
+            'billing_phone.max' => 'The phone number must not exceed 15 characters.',
+            'billing_email.required' => 'This field is required.',
+            'billing_email.email' => 'The email address must be a valid email.',
+            'billing_email.max' => 'The email address must not exceed 255 characters.',
+        ]);
+
+        // $address_id = $request->address_id ?? null;
+        $billing_shipping_same = $request->same_as_billing ?? null;
+
+        $shipping_address = [];
+        $billing_address = [];
+
+        $user = getUser();
+        $user_id = $user['users_id'];
+
+        $billing_address['name']        = $request->billing_name;
+        $billing_address['email']       = $request->billing_email;
+        $billing_address['address']     = $request->billing_address;
+        $billing_address['zipcode']     = $request->billing_zipcode;
+        $billing_address['city']        = $request->billing_city;
+        $billing_address['phone']       = $request->billing_phone;
+
+        if ($billing_shipping_same != 'on') {
+            $shipping_address['name']        = $request->shipping_name;
+            $shipping_address['email']       = $request->billing_email;
+            $shipping_address['address']     = $request->shipping_address;
+            $shipping_address['zipcode']     = $request->shipping_zipcode;
+            $shipping_address['city']        = $request->shipping_city;
+            $shipping_address['phone']       = $request->shipping_phone;
+        } else {
+            $shipping_address = $billing_address;
+        }
+
+        $shipping_address_json = json_encode($shipping_address);
+        $billing_address_json = json_encode($billing_address);
+
+        $order = RentOrder::find($request->order_id);
+        $order->update([
+            'shipping_address' => $shipping_address_json,
+            'billing_address' => $billing_address_json,
+            'order_notes' => $request->order_note ?? '',
+            'delivery_status' => 'pending',
+            'payment_type' => $request->payment_method ?? '',
+            'payment_status' => 'un_paid',
+        ]);
+
+        $track = new RentOrderTracking();
+        $track->order_id = $order->id;
+        $track->status = 'pending';
+        $track->description = "The order has been placed successfully";
+        $track->status_date = date('Y-m-d H:i:s');
+        $track->save();
+
+        if ($order) {
+
+            if ($order->payment_type == 'cod') {
+                $product_stock = ProductStock::find($order->product_stock_id);
+                // dd($product_stock->qty , $order->quantity);
+                $product_stock->qty -= $order->quantity;
+                // dd($product_stock->qty);
+                // reduceProductQuantity($order->quantity);
+                // dd($order->id);
+                return redirect()->route('rent.order.success', $order->id);
+            } else {
+                
+            return redirect()->route('rent.order.failed');
+            }
+        } else {
+            return redirect()->route('rent.order.failed');
+        }
+    }
+    public function cancelRentOrderRequest(Request $request)
+    {
+        $order_id = $request->order_id ?? '';
+        $reason   = $request->reason ?? '';
+        $user = getUser();
+        if ($order_id != '') {
+            $order = Order::find($order_id);
+            if ($order) {
+                if ($order->cancel_request == 0 && $order->delivery_status == "pending") {
+                    $order->cancel_request = 1;
+                    $order->cancel_request_date = date('Y-m-d H:i:s');
+                    $order->cancel_reason = $reason;
+                    $order->save();
+                    return response()->json([
+                        'status' => true,
+                        'message' => trans('messages.request_success')
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => trans('messages.request_already_send')
+                    ], 200);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => trans('messages.not_found')
+                ], 200);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => trans('messages.not_found')
+            ], 200);
+        }
+    }
+    public function successRentOrder($order_id)
+    {
+        $order = RentOrder::findOrFail($order_id);
+        return view('frontend.rentorder_success', compact('order'));
+    }
+
+    // Handle the failed page
+    public function failedRentOrder()
+    {
+        return view('frontend.rentorder_failed');
     }
 }
