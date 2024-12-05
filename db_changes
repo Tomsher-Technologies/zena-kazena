@@ -81,3 +81,16 @@
 -- ALTER TABLE `orders` ADD `return_request` TINYINT(1) NULL DEFAULT '0' AFTER `cancel_reason`, ADD `return_request_date` INT NOT NULL AFTER `return_request`, ADD `return_approval` INT NOT NULL AFTER `return_request_date`, ADD `return_approval_date` INT NOT NULL AFTER `return_approval`, ADD `return_reason` INT NOT NULL AFTER `return_approval_date`;
 
 -- ALTER TABLE `orders` CHANGE `return_request_date` `return_request_date` DATETIME NULL DEFAULT NULL, CHANGE `return_approval` `return_approval` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0 - Pending, 1 - Approved', CHANGE `return_approval_date` `return_approval_date` DATETIME NULL DEFAULT NULL, CHANGE `return_reason` `return_reason` TEXT NULL DEFAULT NULL;
+
+CREATE TABLE IF NOT EXISTS `mortgage` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(191) DEFAULT NULL,
+  `description` text,
+  `id_image` varchar(255) DEFAULT NULL,
+  `product_image` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -262,6 +262,61 @@ class FrontendController extends Controller
         return view('frontend.privacy_policy',compact('page','lang'));
     }
 
+    public function mortgage(){
+        $lang = getActiveLanguage();
+        return view('frontend.mortgage', compact('lang'));
+    }
+
+    public function submitMortgageForm(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'required|digits_between:10,15',
+            'description' => 'required|string',
+            'idimage' => 'required|image|mimes:jpeg,png,jpg,gif', // Max size 2MB
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',  // Optional image
+        ]);
+    
+        try {
+            // Process uploaded files
+            $idImagePath = null;
+            if ($request->hasFile('idimage')) {
+                $idimage = $request->file('idimage');
+                $uniqueFileNameId = time() . '_' . uniqid() . '.' . $idimage->getClientOriginalExtension();
+                $idImagePath = uploadImage('page', $request->idimage, $uniqueFileNameId);
+            }
+
+            $productImagePath = null;
+            if ($request->hasFile('image')) {
+                $image = $request->file('idimage');
+                $uniqueFileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $productImagePath = uploadImage('page', $request->image, $uniqueFileName);
+            }
+
+            // Save data to the database (example model: FormSubmission)
+            $formData = [
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'phone' => $request->input('phone'),
+                'description' => $request->input('description'),
+                'id_image_path' => $idImagePath,
+                'product_image_path' => $productImagePath,
+            ];
+
+            // Assuming you have a FormSubmission model
+            \App\Models\Mortgages::create($formData);
+
+            // Respond with success
+            return response()->json(['message' => trans('messages.contact_success_msg')]);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => trans('messages.something_went_wrong')]);
+        }
+
+        // Handle the form submission logic here
+        
+    }
 
     public function contact()
     {
