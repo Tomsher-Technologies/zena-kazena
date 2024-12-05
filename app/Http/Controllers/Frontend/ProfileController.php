@@ -77,7 +77,7 @@ class ProfileController extends Controller
     public function updateImage(Request $request)
     {
         $user = User::find(auth()->user()->id);
-        if(!$user){
+        if(!$user) {
             return response()->json([
                 'result' => false,
                 'message' => translate("User not found."),
@@ -189,7 +189,7 @@ class ProfileController extends Controller
     public function imageUpload(Request $request)
     {
         $user = User::find(auth()->user()->id);
-        if(!$user){
+        if (!$user) {
             return response()->json([
                 'result' => false,
                 'message' => translate("User not found."),
@@ -298,16 +298,17 @@ class ProfileController extends Controller
         }
     }
 
-    public function orderList(Request $request){
+    public function orderList(Request $request)
+    {
         $user_id = (!empty(auth()->user())) ? auth()->user()->id : '';
         $user = User::find($user_id);
         $total_count = 0;
         $orderList = [];
-        if($user){
+        if ($user) {
             $sort_search = null;
             $delivery_status = null;
 
-            $orders = Order::with(['orderDetails'])->select('id','code','delivery_status','payment_type','coupon_code','grand_total','created_at')->orderBy('id', 'desc')->where('user_id',$user_id);
+            $orders = Order::with(['orderDetails'])->select('id', 'code', 'delivery_status', 'payment_type', 'coupon_code', 'grand_total', 'created_at')->orderBy('id', 'desc')->where('user_id', $user_id);
             if ($request->has('search')) {
                 $sort_search = $request->search;
                 $orders = $orders->where('code', 'like', '%' . $sort_search . '%');
@@ -316,74 +317,37 @@ class ProfileController extends Controller
                 $orders = $orders->where('delivery_status', $request->delivery_status);
                 $delivery_status = $request->delivery_status;
             }
-           
+
             $total_count = $orders->count();
             $orderList = $orders->get();
-            $rentorders= RentOrder::where('user_id',$user->id)->orderBy('created_at', 'desc')->get();
+            RentOrder::where('user_id', $user->id)
+                ->whereNull('shipping_address')
+                ->whereNull('payment_type')
+                ->delete();
+
+            $rentorders = RentOrder::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
             $rentordercount = $rentorders->count();
         }
-        return view('frontend.orders',compact('orderList','total_count', 'rentorders','rentordercount'));
+        return view('frontend.orders', compact('orderList', 'total_count', 'rentorders', 'rentordercount'));
     }
-    
-    public function orderReturnList(Request $request){
+
+    public function orderReturnList(Request $request)
+    {
         $user_id = (!empty(auth()->user())) ? auth()->user()->id : '';
         $user = User::find($user_id);
         $total_count = 0;
         $orderList = [];
-        if($user){
+        if ($user) {
             $sort_search = null;
             $delivery_status = null;
 
-            $orders = Order::with(['orderDetails'])->select('id','code','delivery_status','payment_type','coupon_code','grand_total','created_at')->orderBy('id', 'desc')->where('user_id',$user_id)->where('return_request',1);
-           
+            $orders = Order::with(['orderDetails'])->select('id', 'code', 'delivery_status', 'payment_type', 'coupon_code', 'grand_total', 'created_at')->orderBy('id', 'desc')->where('user_id', $user_id)->where('return_request', 1);
+
             $orderList = $orders->get();
         }
-        return view('frontend.order-returns',compact('orderList'));
+        return view('frontend.order-returns', compact('orderList'));
     }
-    public function orderDetails(Request $request){
-        $order_code = $request->code ?? '';
-        $user_id = (!empty(auth()->user())) ? auth()->user()->id : '';
-        $track_list = [];
-        $lang = getActiveLanguage();
-        $order = [];
-
-        if($order_code != ''){
-            $order = Order::where('code',$order_code)->where('user_id',$user_id)->first();
-            if($order){
-                $tracks = OrderTracking::where('order_id', $order->id)->orderBy('id','ASC')->get();
-                
-                if ($tracks) {
-                    foreach ($tracks as $key=>$value) {
-                        $temp = array();
-                        $temp['id'] = $value->id;
-                        $temp['status'] = $value->status;
-                        $temp['date'] = date("d-m-Y H:i a", strtotime($value->status_date));
-                        $track_list[] = $temp;
-                    }
-                }    
-            }
-        }
-
-        if(!empty($track_list)){
-            $dataByStatus = array_column($track_list, null, 'status');
-        }else{
-            $dataByStatus = [];
-        }
-        
-        // echo '<pre>';
-        // print_r($track_list);
-        // print_r($dataByStatus);
-        // die;
-
-        return view('frontend.order_details',compact('lang','order','track_list','dataByStatus'));
-    }
-
-    public function getUserAccountInfo(){
-        $user = Auth::user();
-        return view('frontend.account', compact('user'));
-    }
-    
-    public function rentOrderDetails(Request $request)
+    public function orderDetails(Request $request)
     {
         $order_code = $request->code ?? '';
         $user_id = (!empty(auth()->user())) ? auth()->user()->id : '';
@@ -391,26 +355,72 @@ class ProfileController extends Controller
         $lang = getActiveLanguage();
         $order = [];
 
-        if($order_code != ''){
-            $order = RentOrder::where('order_code',$order_code)->where('user_id',$user_id)->first();
-            if($order){
-                $tracks = RentOrderTracking::where('order_id', $order->id)->orderBy('id','ASC')->get();
-                
+        if ($order_code != '') {
+            $order = Order::where('code', $order_code)->where('user_id', $user_id)->first();
+            if ($order) {
+                $tracks = OrderTracking::where('order_id', $order->id)->orderBy('id', 'ASC')->get();
+
                 if ($tracks) {
-                    foreach ($tracks as $key=>$value) {
+                    foreach ($tracks as $key => $value) {
                         $temp = array();
                         $temp['id'] = $value->id;
                         $temp['status'] = $value->status;
                         $temp['date'] = date("d-m-Y H:i a", strtotime($value->status_date));
                         $track_list[] = $temp;
                     }
-                }    
+                }
             }
         }
 
-        if(!empty($track_list)){
+        if (!empty($track_list)) {
             $dataByStatus = array_column($track_list, null, 'status');
-        }else{
+        } else {
+            $dataByStatus = [];
+        }
+
+        // echo '<pre>';
+        // print_r($track_list);
+        // print_r($dataByStatus);
+        // die;
+
+        return view('frontend.order_details', compact('lang', 'order', 'track_list', 'dataByStatus'));
+    }
+
+    public function getUserAccountInfo()
+    {
+        $user = Auth::user();
+        return view('frontend.account', compact('user'));
+    }
+
+    public function rentOrderDetails(Request $request)
+    {
+
+        $order_code = $request->code ?? '';
+        $user_id = (!empty(auth()->user())) ? auth()->user()->id : '';
+        $track_list = [];
+        $lang = getActiveLanguage();
+        $order = [];
+
+        if ($order_code != '') {
+            $order = RentOrder::where('order_code', $order_code)->where('user_id', $user_id)->first();
+            if ($order) {
+                $tracks = RentOrderTracking::where('order_id', $order->id)->orderBy('id', 'ASC')->get();
+
+                if ($tracks) {
+                    foreach ($tracks as $key => $value) {
+                        $temp = array();
+                        $temp['id'] = $value->id;
+                        $temp['status'] = $value->status;
+                        $temp['date'] = date("d-m-Y H:i a", strtotime($value->status_date));
+                        $track_list[] = $temp;
+                    }
+                }
+            }
+        }
+
+        if (!empty($track_list)) {
+            $dataByStatus = array_column($track_list, null, 'status');
+        } else {
             $dataByStatus = [];
         }
         // dd($order);
@@ -419,6 +429,6 @@ class ProfileController extends Controller
         // print_r($dataByStatus);
         // die;
 
-        return view('frontend.rentorder_details',compact('lang','order','track_list','dataByStatus'));
+        return view('frontend.rentorder_details', compact('lang', 'order', 'track_list', 'dataByStatus'));
     }
 }
