@@ -81,7 +81,7 @@ Route::group(['middleware' => ['auth']], function () {
     
     Route::post('cancel-order', [CheckoutController::class, 'cancelOrderRequest'])->name('cancel-order');
     Route::post('return-order', [CheckoutController::class, 'returnOrderRequest'])->name('return-order');
-    Route::post('rent/cancel-order', [CheckoutController::class, 'cancelRentOrderRequest'])->name('rent.cancel-order');
+    Route::post('/rent/cancel-order', [CheckoutController::class, 'cancelRentOrderRequest'])->name('rent.cancel-order');
 
     Route::get('account', [ProfileController::class, 'getUserAccountInfo'])->name('account');
     Route::post('/account/update', [ProfileController::class, 'update'])->name('account.update'); 
@@ -102,6 +102,9 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.sendResetLink');
 Route::get('/password/reset/{email}/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('password.reset.form');
 Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('password.reset');
+Route::post('/vendor/forgot-password', [ForgotPasswordController::class, 'sendVendorResetLink'])->name('vendor.password.sendResetLink');
+Route::get('/vendor/password/reset/{email}/{token}', [ForgotPasswordController::class, 'showVendorResetPasswordForm'])->name('vendor.password.reset.form');
+Route::post('/vendor/password/reset', [ForgotPasswordController::class, 'resetVendorPassword'])->name('vendor.password.reset');
 
 Route::group(['middleware' => ['vendor.guest']], function () {
     Route::controller(VendorController::class)->group(function () {
@@ -125,6 +128,16 @@ Route::group(['middleware' => ['vendor.auth']], function () {
         Route::get('vendor/product/view/{id}', 'viewProduct')->name('vendor.product.view');
         Route::post('vendor/update', 'vendorUpdate')->name('vendor.update.info');
     });
+    Route::post('vendor/change-password', [VendorController::class, 'changePassword'])->name('vendor.account.changePassword');
+
+    Route::get('/vendor/products/all', [VendorController::class, 'vendorAll_products'])->name('vendor.products.all');
+    Route::get('/vendor/products/create', [VendorController::class, 'vendorProductCreate'])->name('vendor.products.create');
+    Route::post('/vendor/products/store/', [VendorController::class, 'vendorProductStore'])->name('vendor.products.store');
+    Route::post('/vendor/products/update/{id}', [VendorController::class, 'vendorProductUpdate'])->name('vendor.products.update');
+    Route::post('/vendor/products/add-attributes', [VendorController::class, 'vendorProductGet_attribute_values'])->name('vendor.products.add-attributes');
+    Route::post('/vendor/products/delete-variant-image', [VendorController::class, 'vendorProductDelete_variant_image'])->name('vendor.products.delete_varient_image');
+    Route::post('/vendor/products/delete-thumbnail', [VendorController::class, 'vendorProductDelete_thumbnail'])->name('vendor.products.delete_thumbnail');
+    Route::post('/vendor/products/delete_gallery', [VendorController::class, 'vendorProductDelete_gallery'])->name('vendor.products.delete_gallery');
 
 });
 

@@ -11,6 +11,7 @@ use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -77,7 +78,6 @@ class VendorController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-
         if ($validator->fails()) {
             return redirect()->route('vendor.login')
                 ->withErrors($validator)
@@ -86,7 +86,6 @@ class VendorController extends Controller
 
         // Attempt to log the user in
         if (Auth::guard('vendor')->attempt($request->only('email', 'password'))) {
-
             $vendor = Auth::guard('vendor')->user();
             if ($vendor->is_active == 0) {
                 Auth::guard('vendor')->logout(); // Log out the vendor
@@ -252,6 +251,29 @@ class VendorController extends Controller
         flash(trans('messages.vendor') . ' ' . trans('messages.updated_msg'))->success();
         return redirect()->route('vendor.myprofile');
     }
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+        $authvendor = auth()->guard('vendor')->user();
+        $vendor = Vendor::find($authvendor->id);
+        // Check if the current password matches
+        if (!Hash::check($request->current_password, $vendor->password)) {
+            session()->flash('message', trans('messages.current_password_incorrect'));
+            session()->flash('alert-type', 'error');
+            return redirect()->back();
+        }
+
+        // Update the password
+        $vendor->password = $request->new_password;
+        $vendor->save();
+
+        session()->flash('message', trans('messages.password_updated_successfully'));
+        session()->flash('alert-type', 'success');
+        return redirect()->back();
+    }
     public function destroy($id)
     {
         Vendor::destroy($id);
@@ -291,17 +313,15 @@ class VendorController extends Controller
         }
         return Storage::download($path);
     }
-    public function products(Request $request)
+    public function vendorAll_products(Request $request)
     {
         $col_name = null;
         $query = null;
         $seller_id = null;
         $sort_search = null;
-        $id = auth()->guard('vendor')->id();
-        $products = Product::where('vendor_id', $id)->orderBy('created_at', 'desc');
-
+        $products = Product::orderBy('created_at', 'desc');
         $category = ($request->has('category')) ? $request->category : '';
-
+        
         if ($request->type != null) {
             $var = explode(",", $request->type);
             $col_name = $var[0];
@@ -318,16 +338,16 @@ class VendorController extends Controller
             $childIds = [];
             $categoryfilter = $request->category;
             $childIds[] = array($request->category);
-
-            if ($categoryfilter != '') {
+            
+            if($categoryfilter != ''){
                 $childIds[] = getChildCategoryIds($categoryfilter);
             }
 
-            if (!empty($childIds)) {
+            if(!empty($childIds)){
                 $childIds = array_merge(...$childIds);
                 $childIds = array_unique($childIds);
             }
-
+            
             $products = $products->whereHas('category', function ($q) use ($childIds) {
                 $q->whereIn('id', $childIds);
             });
@@ -342,26 +362,717 @@ class VendorController extends Controller
                 });
         }
 
-
+       
 
         $products = $products->paginate(15);
         $type = 'All';
 
-        return view('frontend.vendor.product.index', compact('category', 'products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
+        return view('backend.products.index', compact('category','products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
     }
-
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function addProduct()
+    public function vendorProductCreate()
     {
         $categories = Category::where('parent_id', 0)
             ->with('childrenCategories')
             ->get();
 
-        return view('frontend.vendor.product.add', compact('categories'));
+        return view('frontend.vendor.product.create', compact('categories'));
     }
+    public function vendorProductGet_attribute_values(Request $request)
+    {
+        $all_attribute_values = AttributeValue::with('attribute')->where('is_active',1)->where('attribute_id', $request->attribute_id)->get();
+
+        $html = '';
+
+        foreach ($all_attribute_values as $row) {
+            $html .= '<option value="' . $row->id . '">' . $row->getTranslatedName(env('DEFAULT_LANGUAGE', 'en')) . '</option>';
+        }
+
+        echo json_encode($html);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function vendorProductStore(Request $request)
+    {
+        // echo '<pre>';
+        // echo env('DEFAULT_LANGUAGE', 'en');
+        // // print_r($request->all());
+        // die;
+        $skuMain = '';
+        if($request->has('products')){
+            $products = $request->products;
+            if(isset($products[0])){
+                $skuMain = $products[0]['sku'];
+            }
+        }
+       
+        $product = new Product;
+        $product->type= $request->type;
+        $product->deposit = $request->has('deposit') ? $request->deposit : 0;
+        $product->name = $request->name;
+        $product->category_id = $request->category_id;
+        $product->brand_id = $request->brand_id;
+        $product->user_id = Auth::user()->id;
+        $product->occasion_id = $request->occasion_id;
+        $product->min_qty = $request->min_qty;
+        $product->vat = $request->vat;
+        $product->sku = cleanSKU($skuMain);
+        $product_type = ($request->product_type == 'variant') ? 1 : 0;
+        $product->product_type = $product_type;
+        $product->video_provider = $request->video_provider;
+        $product->video_link = $request->video_link;
+        $product->discount = $request->discount;
+        $product->discount_type = $request->discount_type;
+        $product->unit_price = $request->has('price') ? $request->price : 0;
+
+        if ($request->date_range != null) {
+            $date_var               = explode(" to ", $request->date_range);
+            $product->discount_start_date = strtotime($date_var[0]);
+            $product->discount_end_date   = strtotime($date_var[1]);
+        }
+
+        // if ($request->hasFile('pdf')) {
+        //     $product->pdf = $request->pdf->store('uploads/products/pdf');
+        // }
+       
+        $slug = $request->slug ? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
+        $same_slug_count = Product::where('slug', 'LIKE', $slug . '%')->count();
+        $slug_suffix = $same_slug_count ? '-' . $same_slug_count + 1 : '';
+        $slug .= $slug_suffix;
+
+        $product->slug = $slug;
+
+        // $choice_options = array();
+
+        // if ($request->has('main_attributes')) {
+        //     foreach ($request->main_attributes as $key => $no) {
+        //         $str = 'choice_options_' . $no;
+
+        //         $item['attribute_id'] = $no;
+
+        //         $data = array();
+        //         // foreach (json_decode($request[$str][0]) as $key => $eachValue) {
+        //         foreach ($request[$str] as $key => $eachValue) {
+        //             // array_push($data, $eachValue->value);
+        //             array_push($data, $eachValue);
+        //         }
+
+        //         $item['values'] = $data;
+        //         array_push($choice_options, $item);
+        //     }
+        // }
+
+        if (!empty($request->main_attributes)) {
+            $product->attributes = json_encode($request->main_attributes);
+        } else {
+            $product->attributes = json_encode(array());
+        }
+
+        // $product->choice_options = json_encode($choice_options, JSON_UNESCAPED_UNICODE);
+
+        $product->published = 1;
+        if ($request->button == 'draft') {
+            $product->published = 0;
+        }
+
+        if ($request->has('featured')) {
+            $product->featured = 1;
+        }
+
+        if ($request->has('return_refund')) {
+            $product->return_refund = 1;
+        }
+
+        $product->save();
+
+        $tags = array();
+        if ($request->tags[0] != null) {
+            foreach (json_decode($request->tags[0]) as $key => $tag) {
+                array_push($tags, $tag->value);
+            }
+        }
+
+        $product_translation                       = ProductTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE', 'en'), 'product_id' => $product->id]);
+        $product_translation->name = $request->name;
+        $product_translation->unit = $request->unit;
+        $product_translation->tags = implode(',', $tags);
+        $product_translation->description = $request->description;
+        $product_translation->save();
+
+        $gallery = [];
+        if ($request->hasfile('gallery_images')) {
+            if ($product->photos == null) {
+                $count = 1;
+                $old_gallery = [];
+            } else {
+                $old_gallery = explode(',', $product->photos);
+                $count = count($old_gallery) + 1;
+            }
+
+            foreach ($request->file('gallery_images') as $key => $file) {
+                $gallery[] = $this->downloadAndResizeImage('main_product',$file, $product->sku, false, $count + $key);
+            }
+            $product->photos = implode(',', array_merge($old_gallery, $gallery));
+        }
+
+        if ($request->hasFile('thumbnail_image')) {
+            if ($product->thumbnail_img) {
+                if (Storage::exists($product->thumbnail_img)) {
+                    $info = pathinfo($product->thumbnail_img);
+                    $file_name = basename($product->thumbnail_img, '.' . $info['extension']);
+                    $ext = $info['extension'];
+
+                    $sizes = config('app.img_sizes');
+                    foreach ($sizes as $size) {
+                        $path = $info['dirname'] . '/' . $file_name . '_' . $size . 'px.' . $ext;
+                        if (Storage::exists($path)) {
+                            Storage::delete($path);
+                        }
+                    }
+                    Storage::delete($product->thumbnail_img);
+                }
+            }
+            $gallery = $this->downloadAndResizeImage('main_product',$request->file('thumbnail_image'), $product->sku, true);
+            $product->thumbnail_img = $gallery;
+        }
+
+        $product->save();
+
+        // SEO
+        $seo = ProductSeo::firstOrNew(['lang' => env('DEFAULT_LANGUAGE', 'en'), 'product_id' => $product->id]);
+
+        $seo->meta_title        = $request->meta_title;
+        $seo->meta_description  = $request->meta_description;
+
+        $keywords = array();
+        if ($request->meta_keywords[0] != null) {
+            foreach (json_decode($request->meta_keywords[0]) as $key => $keyword) {
+                array_push($keywords, $keyword->value);
+            }
+        }
+        $seo->meta_keywords = implode(',', $keywords);
+
+        $seo->og_title        = $request->og_title;
+        $seo->og_description  = $request->og_description;
+
+        $seo->twitter_title        = $request->twitter_title;
+        $seo->twitter_description  = $request->twitter_description;
+
+        if ($request->meta_title == null) {
+            $seo->meta_title = $product->name;
+        }
+        if ($request->og_title == null) {
+            $seo->og_title = $product->name;
+        }
+        if ($request->twitter_title == null) {
+            $seo->twitter_title = $product->name;
+        }
+
+        $seo->save();
+
+        // Tabs
+        if ($request->has('tabs')) {
+            foreach ($request->tabs as $tab) {
+                $p_tab = $product->tabs()->create([
+                    'lang'    => env('DEFAULT_LANGUAGE', 'en'),
+                    'heading' => $tab['tab_heading'],
+                    'content' => $tab['tab_description'],
+                ]);
+            }
+        }
+
+        if($request->has('products')){
+            $products = $request->products;
+            $product_attributes = array();
+            foreach($products as $prod){
+
+                $product_stock = new ProductStock;
+                $product_stock->product_id = $product->id;
+                $product_stock->sku = $prod['sku'];
+                $product_stock->price = $prod['price'];// $prod['price'];
+                $product_stock->qty = $prod['current_stock'];
+
+                $offertag       = '';
+                $productOrgPrice = $prod['price'];
+                $discountPrice = $productOrgPrice;
+               
+                $discount_applicable = false;
+                if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                    if ($product->discount_type == 'percent') {
+                        $discountPrice = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
+                        $offertag = $product->discount . '% OFF';
+                    } elseif ($product->discount_type == 'amount') {
+                        $discountPrice = $productOrgPrice - $product->discount;
+                        $offertag = 'AED '.$product->discount.' OFF';
+                    }
+                }
+                
+                $product_stock->price       = $productOrgPrice;
+                $product_stock->offer_price = $discountPrice;
+                $product_stock->offer_tag   = $offertag;
+            
+                $variantImage = (isset($prod['variant_images'])) ? $this->downloadAndResizeImage('varient',$prod['variant_images'], $prod['sku'], false) : NULL;
+                $product_stock->image = $variantImage;
+
+                $product_stock->save();
+                
+                if ($request->has('main_attributes')) {
+                    foreach ($request->main_attributes as $key => $no) {
+                        $attrId = 'choice_options_' . $no;
+                        $product_attributes[] = [
+                            'product_id' => $product->id,
+                            'product_varient_id' => $product_stock->id,
+                            'attribute_id' => $no,
+                            'attribute_value_id' => $prod[$attrId]
+                        ];
+                    }
+                }
+               
+            }
+            if(!empty($product_attributes)){
+                ProductAttributes::insert($product_attributes);
+            }
+        }
+
+        flash(trans('messages.product').' '.trans('messages.created_msg'))->success();
+
+        Artisan::call('view:clear');
+        Artisan::call('cache:clear');
+
+        return redirect()->route('products.all');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function vendorProductShow($id)
+    {
+        //
+    }
+    public function vendorProductUpdate(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        $skuMain = '';
+        if($request->has('oldproduct')){
+            $oldproduct = $request->oldproduct;
+            if(isset($oldproduct[0])){
+                $skuMain = $oldproduct[0]['sku'];
+            }
+        }
+
+        if ($request->lang == env("DEFAULT_LANGUAGE",'en')) {
+            $product->name = $request->name;
+        }
+        
+        $product->category_id = $request->category_id;
+        $product->brand_id = $request->brand_id;
+        $product->user_id = Auth::user()->id;
+        $product->occasion_id = $request->occasion_id;
+        $product->min_qty = $request->min_qty;
+        $product->vat = $request->vat;
+        $product->sku = cleanSKU($skuMain);
+        $product_type = ($request->product_type == 'variant') ? 1 : 0;
+        $product->product_type = $product_type;
+        $product->video_provider = $request->video_provider;
+        $product->video_link = $request->video_link;
+        $product->discount = $request->discount;
+        $product->discount_type = $request->discount_type;
+        $product->unit_price = $request->has('price') ? $request->price : 0;
+        $product->published                 = ($request->has('published')) ? 1 : 0;
+
+        $tags = array();
+        if ($request->tags[0] != null) {
+            foreach (json_decode($request->tags[0]) as $key => $tag) {
+                array_push($tags, $tag->value);
+            }
+        }
+        $product->video_provider            = $request->video_provider;
+        $product->video_link                = $request->video_link;
+        $product->discount                  = $request->discount;
+        $product->discount_type             = $request->discount_type;
+
+        if ($request->date_range != null) {
+            $date_var               = explode(" to ", $request->date_range);
+            $product->discount_start_date   = strtotime($date_var[0]);
+            $product->discount_end_date     = strtotime($date_var[1]);
+        }
+
+        $slug               = $request->slug ? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
+        $same_slug_count    = Product::where('slug', 'LIKE', $slug . '%')->where('id','!=',$id)->count();
+        $slug_suffix        = $same_slug_count ? '-' . $same_slug_count + 1 : '';
+        $slug .= $slug_suffix;
+
+        $product->slug = $slug;
+
+
+        if (!empty($request->main_attributes)) {
+            $product->attributes = json_encode($request->main_attributes);
+        } else {
+            $product->attributes = json_encode(array());
+        }
+
+        if ($request->has('return_refund')) {
+            $product->return_refund = 1;
+        }
+
+        // $product->save();
+
+        $gallery = [];
+        if ($request->hasfile('gallery_images')) {
+            if ($product->photos == null) {
+                $count = 1;
+                $old_gallery = [];
+            } else {
+                $old_gallery = explode(',', $product->photos);
+                $count = count($old_gallery) + 1;
+            }
+
+            foreach ($request->file('gallery_images') as $key => $file) {
+                $gallery[] = $this->downloadAndResizeImage('main_product',$file, $product->sku, false, $count + $key);
+            }
+            $product->photos = implode(',', array_merge($old_gallery, $gallery));
+        }
+
+        if ($request->hasFile('thumbnail_image')) {
+            if ($product->thumbnail_img) {
+                if (Storage::exists($product->thumbnail_img)) {
+                    $info = pathinfo($product->thumbnail_img);
+                    $file_name = basename($product->thumbnail_img, '.' . $info['extension']);
+                    $ext = $info['extension'];
+
+                    $sizes = config('app.img_sizes');
+                    foreach ($sizes as $size) {
+                        $path = $info['dirname'] . '/' . $file_name . '_' . $size . 'px.' . $ext;
+                        if (Storage::exists($path)) {
+                            Storage::delete($path);
+                        }
+                    }
+                    Storage::delete($product->thumbnail_img);
+                }
+            }
+            $gallery = $this->downloadAndResizeImage('main_product',$request->file('thumbnail_image'), $product->sku, true);
+            $product->thumbnail_img = $gallery;
+        }
+        $product->save();
+
+
+        $product_translation                       = ProductTranslation::firstOrNew(['lang' => $request->lang, 'product_id' => $product->id]);
+        $product_translation->name = $request->name;
+        $product_translation->unit = $request->unit;
+        $product_translation->tags = implode(',', $tags);
+        $product_translation->description = $request->description;
+        $product_translation->save();
+
+
+        $seo = ProductSeo::firstOrNew(['lang' => $request->lang, 'product_id' => $product->id]);
+
+        $seo->meta_title        = $request->meta_title;
+        $seo->meta_description  = $request->meta_description;
+
+        $keywords = array();
+        if ($request->meta_keywords[0] != null) {
+            foreach (json_decode($request->meta_keywords[0]) as $key => $keyword) {
+                array_push($keywords, $keyword->value);
+            }
+        }
+        $seo->meta_keywords = implode(',', $keywords);
+
+        $seo->og_title        = $request->og_title;
+        $seo->og_description  = $request->og_description;
+
+        $seo->twitter_title        = $request->twitter_title;
+        $seo->twitter_description  = $request->twitter_description;
+
+        if ($request->meta_title == null) {
+            $seo->meta_title = $product->name;
+        }
+        if ($request->og_title == null) {
+            $seo->og_title = $product->name;
+        }
+        if ($request->twitter_title == null) {
+            $seo->twitter_title = $product->name;
+        }
+
+        $seo->save();
+
+
+        if ($request->has('tabs')) {
+            ProductTabs::where('lang', $request->lang)->where('product_id', $product->id)->delete();
+           foreach ($request->tabs as $tab) {
+                $p_tab = $product->tabs()->create([
+                    'lang'    => $request->lang,
+                    'heading' => $tab['tab_heading'],
+                    'content' => $tab['tab_description'],
+                ]);
+            }
+        }
+       
+        if($request->has('oldproduct')){
+            $oldproduct = $request->oldproduct;
+            $oldproduct_attributes = array();
+            foreach($oldproduct as $prodOld){
+                $product_stock                      = ProductStock::find($prodOld['stock_id']);
+                $product_stock->product_id          = $product->id;
+                $product_stock->product_id = $product->id;
+                $product_stock->sku = $prodOld['sku'];
+                $product_stock->price = $prodOld['price'];// $prod['price'];
+                $product_stock->qty = $prodOld['current_stock'];
+                $product_stock->status              = $prodOld['status'];
+
+                $price  = 0;
+                $offertag       = '';
+                $productOrgPrice = $prodOld['price'];
+                $discountPrice = $productOrgPrice;
+                
+                $discount_applicable = false;
+                if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                    if ($product->discount_type == 'percent') {
+                        $discountPrice  = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
+                        $offertag       = $product->discount . '% OFF';
+                    } elseif ($product->discount_type == 'amount') {
+                        $discountPrice  = $productOrgPrice - $product->discount;
+                        $offertag       = 'AED '.$product->discount.' OFF';
+                    }
+                }
+                $product_stock->price       = $productOrgPrice;
+                $product_stock->offer_price = $discountPrice;
+                $product_stock->offer_tag   = $offertag;
+
+
+                if (isset($prodOld['variant_images'])) {
+                    if ($product_stock->image) {
+                        if (Storage::exists($product_stock->image)) {
+                            $info = pathinfo($product_stock->image);
+                            $file_name = basename($product_stock->image, '.' . $info['extension']);
+                            $ext = $info['extension'];
+        
+                            $sizes = config('app.img_sizes');
+                            foreach ($sizes as $size) {
+                                $path = $info['dirname'] . '/' . $file_name . '_' . $size . 'px.' . $ext;
+                                if (Storage::exists($path)) {
+                                    Storage::delete($path);
+                                }
+                            }
+                            Storage::delete($product_stock->image);
+                        }
+                    }
+                    $gallery = $this->downloadAndResizeImage('varient',$prodOld['variant_images'], $prodOld['sku'], false);
+                    $product_stock->image = $gallery;
+                }
+            
+                $product_stock->save();
+
+                if ($request->has('main_attributes')) {
+                    ProductAttributes::where('product_id',$product->id)->delete();
+                    foreach ($request->main_attributes as $key => $no) {
+                        $attrId = 'choice_options_' . $no;
+                        $oldproduct_attributes[] = [
+                            'product_id' => $product->id,
+                            'product_varient_id' => $product_stock->id,
+                            'attribute_id' => $no,
+                            'attribute_value_id' => $prodOld[$attrId]
+                        ];
+                    }
+                }
+               
+            }
+            if(!empty($oldproduct_attributes)){
+                ProductAttributes::insert($oldproduct_attributes);
+            }
+        }
+
+        if($request->has('products')){
+            $products = $request->products;
+            $product_attributes = array();
+            foreach($products as $prod){
+
+                $product_stock = new ProductStock;
+                $product_stock->product_id = $product->id;
+                $product_stock->sku = $prod['sku'];
+                $product_stock->price = $prod['price'];// $prod['price'];
+                $product_stock->qty = $prod['current_stock'];
+
+                $offertag       = '';
+                $productOrgPrice = $prod['price'];
+                $discountPrice = $productOrgPrice;
+
+                $discount_applicable = false;
+                if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                    if ($product->discount_type == 'percent') {
+                        $discountPrice = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
+                        $offertag = $product->discount . '% OFF';
+                    } elseif ($product->discount_type == 'amount') {
+                        $discountPrice = $productOrgPrice - $product->discount;
+                        $offertag = 'AED '.$product->discount.' OFF';
+                    }
+                }
+
+                $product_stock->price       = $productOrgPrice;
+                $product_stock->offer_price = $discountPrice;
+                $product_stock->offer_tag   = $offertag;
+
+            
+                $variantImage = (isset($prod['variant_images'])) ? $this->downloadAndResizeImage('varient',$prod['variant_images'], $prod['sku'], false) : NULL;
+                $product_stock->image = $variantImage;
+
+                $product_stock->save();
+                
+                if ($request->has('main_attributes')) {
+                    foreach ($request->main_attributes as $key => $no) {
+                        $attrId = 'choice_options_' . $no;
+                        $product_attributes[] = [
+                            'product_id' => $product->id,
+                            'product_varient_id' => $product_stock->id,
+                            'attribute_id' => $no,
+                            'attribute_value_id' => $prod[$attrId]
+                        ];
+                    }
+                }
+               
+            }
+            if(!empty($product_attributes)){
+                ProductAttributes::insert($product_attributes);
+            }
+            
+        }
+
+        flash(trans('messages.product').' '.trans('messages.updated_msg'))->success();
+        
+        Artisan::call('view:clear');
+        Artisan::call('cache:clear');
+
+        return redirect()->route('products.all');
+    }
+   
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function vendorProductDestroy($id)
+    {
+        $product = Product::findOrFail($id);
+        // foreach ($product->product_translations as $key => $product_translations) {
+        //     $product_translations->delete();
+        // }
+
+        foreach ($product->stocks as $key => $stock) {
+            $stock->delete();
+        }
+
+        if (Product::destroy($id)) {
+            Cart::where('product_id', $id)->delete();
+
+            flash(translate('Product has been deleted successfully'))->success();
+
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
+
+            return back();
+        } else {
+            flash(translate('Something went wrong'))->error();
+            return back();
+        }
+    }
+    public function vendorProductDelete_thumbnail(Request $request)
+    {
+        $product = Product::where('id', $request->id)->first();
+
+        $fil_url = str_replace('/storage/', '', $product->thumbnail_img);
+        $fil_url = $path = Storage::disk('public')->path($fil_url);
+
+        if (File::exists($fil_url)) {
+            $info = pathinfo($fil_url);
+            $file_name = basename($fil_url, '.' . $info['extension']);
+            $ext = $info['extension'];
+
+            $sizes = config('app.img_sizes');
+            foreach ($sizes as $size) {
+                $path = $info['dirname'] . '/' . $file_name . '_' . $size . 'px.' . $ext;
+                // if (Storage::exists($path)) {
+                //     Storage::delete($path);
+                // }
+                unlink($path);
+            }
+
+            // Storage::delete($product->thumbnail_img);1
+            unlink($fil_url);
+            $product->thumbnail_img = null;
+            $product->save();
+            return 1;
+        }
+    }
+
+    public function vendorProductDelete_variant_image(Request $request)
+    {
+        // $product = ProductStock::where('id', $request->id)->first();
+
+        // $fil_url = str_replace('/storage/', '', $product->image);
+        // $fil_url = $path = Storage::disk('public')->path($fil_url);
+
+        // if (File::exists($fil_url)) {
+        //     $info = pathinfo($fil_url);
+        //     $file_name = basename($fil_url, '.' . $info['extension']);
+        //     $ext = $info['extension'];
+
+        //     $sizes = config('app.img_sizes');
+        //     foreach ($sizes as $size) {
+        //         $path = $info['dirname'] . '/' . $file_name . '_' . $size . 'px.' . $ext;
+        //         // if (Storage::exists($path)) {
+        //         //     Storage::delete($path);
+        //         // }
+        //         unlink($path);
+        //     }
+
+        //     // Storage::delete($product->thumbnail_img);1
+        //     unlink($fil_url);
+        //     $product->thumbnail_img = null;
+        //     $product->save();
+        //     return 1;
+        // }
+    }
+
+    public function vendorProductDelete_gallery(Request $request)
+    {
+        $product = Product::where('id', $request->id)->first();
+        $fil_url = str_replace('/storage/', '', $request->url);
+        $fil_url = $path = Storage::disk('public')->path($fil_url);
+        if (File::exists($fil_url)) {
+            $info = pathinfo($fil_url);
+            $file_name = basename($fil_url, '.' . $info['extension']);
+            $ext = $info['extension'];
+
+            $sizes = config('app.img_sizes');
+            foreach ($sizes as $size) {
+                $path = $info['dirname'] . '/' . $file_name . '_' . $size . 'px.' . $ext;
+                unlink($path);
+            }
+
+            unlink($fil_url);
+
+            $thumbnail_img = explode(',', $product->photos);
+            $thumbnail_img =  array_diff($thumbnail_img, [$request->url]);
+            if ($thumbnail_img) {
+                $product->photos = implode(',', $thumbnail_img);
+            } else {
+                $product->photos = null;
+            }
+
+            $product->save();
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
 }

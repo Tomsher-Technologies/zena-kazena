@@ -273,57 +273,6 @@
 
 @section('script')
     <script>
-        // $(document).ready(function() {
-        //     // Open the modal
-        //     $(".cancel-order-btn").click(function() {
-        //         const orderId = $(this).data("order-id"); // Get the order ID from the button
-        //         $("#cancelModal").data("order-id", orderId).fadeIn(); // Pass order ID to modal
-        //     });
-
-        //     // Close the modal
-        //     $(".close-modal-cancel").click(function() {
-        //         $("#cancelModal").fadeOut();
-        //     });
-
-        //     // Submit the cancellation reason
-        //     $("#submitCancelReason").click(function() {
-        //         const orderId = $("#cancelModal").data("order-id"); // Get the order ID
-        //         const reason = $("#cancelReason").val().trim(); // Get the reason
-
-        //         if (!reason) {
-        //             toastr.error("{{ trans('messages.reason_for_cancel') }}", 'Error');
-        //             return;
-        //         }
-
-        //         // Send the AJAX request
-        //         $.ajax({
-        //             url: "/rent/cancel-order", // Backend route
-        //             type: "POST",
-        //             data: {
-        //                 order_id: orderId,
-        //                 reason: reason,
-        //                 _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
-        //             },
-        //             success: function(response) {
-        //                 if (response.status == true) {
-        //                     console.log = response.message;
-        //                     toastr.success(response.message,
-        //                         "{{ trans('messages.success') }}");
-        //                     $("#cancelModal").fadeOut();
-        //                     window.location.reload();
-        //                 } else {
-        //                     console.log = response.message;
-        //                     toastr.error(response.message, "{{ trans('messages.error') }}");
-        //                 }
-
-        //             },
-        //             error: function(xhr) {
-        //                 toastr.error("{{ trans('messages.something_went_wrong') }}",
-        //                     "{{ trans('messages.error') }}");
-        //             }
-        //         });
-        //     });
-        // });
         $(document).ready(function() {
             // Open the modal
             $(".cancel-order-btn").click(function() {
@@ -342,13 +291,9 @@
                 const reason = $("#cancelReason").val().trim(); // Get the reason
 
                 if (!reason) {
-                    toastr.error("{{ trans('messages.reason_for_cancel') }}",
-                        "{{ trans('messages.error') }}");
+                    toastr.error("{{ trans('messages.reason_for_cancel') }}", 'Error');
                     return;
                 }
-
-                // Disable the submit button to prevent multiple clicks
-                $(this).prop("disabled", true);
 
                 // Send the AJAX request
                 $.ajax({
@@ -360,28 +305,83 @@
                         _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
                     },
                     success: function(response) {
-                        if (response.status) {
-                            console.log(response.message);
+                        if (response.status == true) {
+                            console.log = response.message;
                             toastr.success(response.message,
-                            "{{ trans('messages.success') }}");
+                                "{{ trans('messages.success') }}");
                             $("#cancelModal").fadeOut();
                             window.location.reload();
                         } else {
-                            console.error(response.message);
+                            console.log = response.message;
                             toastr.error(response.message, "{{ trans('messages.error') }}");
                         }
+
                     },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX Error:", error);
+                    error: function(xhr) {
                         toastr.error("{{ trans('messages.something_went_wrong') }}",
                             "{{ trans('messages.error') }}");
-                    },
-                    complete: function() {
-                        // Re-enable the submit button after the request completes
-                        $("#submitCancelReason").prop("disabled", false);
                     }
                 });
             });
         });
+        // $(document).ready(function() {
+        //     // Open the modal
+        //     $(".cancel-order-btn").click(function() {
+        //         const orderId = $(this).data("order-id"); // Get the order ID from the button
+        //         $("#cancelModal").data("order-id", orderId).fadeIn(); // Pass order ID to modal
+        //     });
+
+        //     // Close the modal
+        //     $(".close-modal-cancel").click(function() {
+        //         $("#cancelModal").fadeOut();
+        //     });
+
+        //     // Submit the cancellation reason
+        //     $("#submitCancelReason").click(function() {
+        //         const orderId = $("#cancelModal").data("order-id"); // Get the order ID
+        //         const reason = $("#cancelReason").val().trim(); // Get the reason
+
+        //         if (!reason) {
+        //             toastr.error("{{ trans('messages.reason_for_cancel') }}",
+        //                 "{{ trans('messages.error') }}");
+        //             return;
+        //         }
+
+        //         // Disable the submit button to prevent multiple clicks
+        //         $(this).prop("disabled", true);
+
+        //         // Send the AJAX request
+        //         $.ajax({
+        //             url: "/rent/cancel-order", // Backend route
+        //             type: "POST",
+        //             data: {
+        //                 order_id: orderId,
+        //                 reason: reason,
+        //                 _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
+        //             },
+        //             success: function(response) {
+        //                 if (response.status) {
+        //                     console.log(response.message);
+        //                     toastr.success(response.message,
+        //                     "{{ trans('messages.success') }}");
+        //                     $("#cancelModal").fadeOut();
+        //                     window.location.reload();
+        //                 } else {
+        //                     console.error(response.message);
+        //                     toastr.error(response.message, "{{ trans('messages.error') }}");
+        //                 }
+        //             },
+        //             error: function(xhr, status, error) {
+        //                 console.error("AJAX Error:", error);
+        //                 toastr.error("{{ trans('messages.something_went_wrong') }}",
+        //                     "{{ trans('messages.error') }}");
+        //             },
+        //             complete: function() {
+        //                 // Re-enable the submit button after the request completes
+        //                 $("#submitCancelReason").prop("disabled", false);
+        //             }
+        //         });
+        //     });
+        // });
     </script>
 @endsection

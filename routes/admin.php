@@ -144,14 +144,25 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/cancel-request-status', [OrderController::class, 'cancelRequestStatus'])->name('cancel-request-status');
     Route::get('/cancel_orders/{id}/show', [OrderController::class, 'cancel_orders_show'])->name('cancel_orders.show');
     Route::post('/orders/update_delivery_status', [OrderController::class, 'update_delivery_status'])->name('orders.update_delivery_status');
-    Route::post('/orders/update_payment_status', [OrderController::class, 'update_payment_status'])->name('orders.update_payment_status');
+    Route::post('/orders/update_payment_status', [OrderController::class, 'update_payment_status'])->name('orders.update_payment_status'); 
     Route::post('/orders/update_tracking_code', [OrderController::class, 'update_tracking_code'])->name('orders.update_tracking_code');
+
+    Route::get('/rent/all_orders', [OrderController::class, 'rentAll_orders'])->name('rent.all_orders.index');
+    Route::get('/rent/all_orders/{id}/show', [OrderController::class, 'rentAll_orders_show'])->name('rent.all_orders.show');
+    Route::get('/rent/cancel_requests', [OrderController::class, 'rentAllCancelRequests'])->name('rent.cancel_requests.index');
+    Route::post('/rent/cancel-request-status', [OrderController::class, 'rentCancelRequestStatus'])->name('rent.cancel-request-status');
+    Route::get('/rent/cancel_orders/{id}/show', [OrderController::class, 'rentCancel_orders_show'])->name('rent.cancel_orders.show');
+    Route::post('/rent/orders/update_delivery_status', [OrderController::class, 'rentUpdate_delivery_status'])->name('rent.orders.update_delivery_status');
+    Route::post('/rent/orders/update_payment_status', [OrderController::class, 'rentUpdate_payment_status'])->name('rent.orders.update_payment_status');
+    Route::post('/rent/orders/update_tracking_code', [OrderController::class, 'rentUpdate_tracking_code'])->name('rent.orders.update_tracking_code');
+
 
     Route::get('/return_requests', [OrderController::class, 'allReturnRequests'])->name('return_requests.index');
     Route::post('/return-request-status', [OrderController::class, 'returnRequestStatus'])->name('return-request-status');
     Route::get('/return_orders/{id}/show', [OrderController::class, 'return_orders_show'])->name('return_orders.show');
 
     Route::get('invoice/{order_id}', [InvoiceController::class, 'invoice_download'])->name('invoice.download');
+    Route::get('rent/invoice/{order_id}', [InvoiceController::class, 'rentInvoice_download'])->name('rent.invoice.download');
 
     Route::resource('customers', CustomerController::class);
     Route::get('customers_ban/{customer}', [CustomerController::class, 'ban'])->name('customers.ban');

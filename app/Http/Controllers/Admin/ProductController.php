@@ -31,7 +31,6 @@ use DB;
 class ProductController extends Controller
 {
 
-
     public function all_products(Request $request)
     {
         $col_name = null;
@@ -89,7 +88,6 @@ class ProductController extends Controller
         return view('backend.products.index', compact('category','products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
     }
 
-
     /**
      * Show the form for creating a new resource.
      *
@@ -138,6 +136,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+       
         // echo '<pre>';
         // echo env('DEFAULT_LANGUAGE', 'en');
         // // print_r($request->all());
