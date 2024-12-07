@@ -263,10 +263,23 @@ class FrontendController extends Controller
     }
 
     public function mortgage(){
+        $page = Page::where('type','mortgage')->first();
         $lang = getActiveLanguage();
-        return view('frontend.mortgage', compact('lang'));
+        $seo = [
+            'title'                 => $page->getTranslation('title', $lang),
+            'meta_title'            => $page->getTranslation('meta_title', $lang),
+            'meta_description'      => $page->getTranslation('meta_description', $lang),
+            'keywords'              => $page->getTranslation('keywords', $lang),
+            'og_title'              => $page->getTranslation('og_title', $lang),
+            'og_description'        => $page->getTranslation('og_description', $lang),
+            'twitter_title'         => $page->getTranslation('twitter_title', $lang),
+            'twitter_description'   => $page->getTranslation('twitter_description', $lang),
+        ];
+        
+        $this->loadSEO($seo);
+        return view('frontend.mortgage', compact('page','lang'));
     }
-
+   
     public function submitMortgageForm(Request $request)
     {
         $request->validate([
@@ -275,7 +288,12 @@ class FrontendController extends Controller
             'phone' => 'required|digits_between:10,15',
             'description' => 'required|string',
             'idimage' => 'required|image|mimes:jpeg,png,jpg,gif', // Max size 2MB
+            'idimageback' => 'required|image|mimes:jpeg,png,jpg,gif', // Max size 2MB
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',  // Optional image
+            'eidno' => 'required',
+            'metal' => 'required',
+            'metal_type' => 'required',
+            'weight' => 'required',
         ]);
     
         try {
@@ -284,6 +302,13 @@ class FrontendController extends Controller
             if ($request->hasFile('idimage')) {
                 $uniqueFileNameId = time() . '_' . uniqid();
                 $idImagePath = uploadImage('mortgage', $request->idimage, $uniqueFileNameId);
+            }
+
+            // Process uploaded files
+            $idImagePathBack = null;
+            if ($request->hasFile('idimageback')) {
+                $uniqueFileNameIdB = time() . '_' . uniqid();
+                $idImagePathBack = uploadImage('mortgage', $request->idimageback, $uniqueFileNameIdB);
             }
 
             $productImagePath = null;
@@ -299,11 +324,100 @@ class FrontendController extends Controller
                 'phone' => $request->input('phone'),
                 'description' => $request->input('description'),
                 'id_image' => $idImagePath,
+                'id_image_back' => $idImagePathBack,
                 'product_image' => $productImagePath,
+                'duration' => $request->input('duration'), 
+                'metal' => $request->input('metal'), 
+                'metal_type' => $request->input('metal_type'), 
+                'weight' => $request->input('weight'), 
+                'eid_no' => $request->input('eidno'), 
             ];
 
             // Assuming you have a FormSubmission model
             \App\Models\Mortgages::create($formData);
+            // Respond with success
+            return response()->json(['status' => true,'message' => trans('messages.contact_success_msg')]);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => false,'message' => trans('messages.something_went_wrong')]);
+        }
+
+        // Handle the form submission logic here
+        
+    }
+
+    public function sales(){
+        $page = Page::where('type','sales')->first();
+        $lang = getActiveLanguage();
+        $seo = [
+            'title'                 => $page->getTranslation('title', $lang),
+            'meta_title'            => $page->getTranslation('meta_title', $lang),
+            'meta_description'      => $page->getTranslation('meta_description', $lang),
+            'keywords'              => $page->getTranslation('keywords', $lang),
+            'og_title'              => $page->getTranslation('og_title', $lang),
+            'og_description'        => $page->getTranslation('og_description', $lang),
+            'twitter_title'         => $page->getTranslation('twitter_title', $lang),
+            'twitter_description'   => $page->getTranslation('twitter_description', $lang),
+        ];
+        
+        $this->loadSEO($seo);
+        return view('frontend.sales', compact('page','lang'));
+    }
+   
+    public function submitSalesForm(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'required|digits_between:10,15',
+            'description' => 'required|string',
+            'idimage' => 'required|image|mimes:jpeg,png,jpg,gif', // Max size 2MB
+            'idimageback' => 'required|image|mimes:jpeg,png,jpg,gif', // Max size 2MB
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',  // Optional image
+            'eidno' => 'required',
+            'metal' => 'required',
+            'metal_type' => 'required',
+            'weight' => 'required',
+        ]);
+    
+        try {
+            // Process uploaded files
+            $idImagePath = null;
+            if ($request->hasFile('idimage')) {
+                $uniqueFileNameId = time() . '_' . uniqid();
+                $idImagePath = uploadImage('sales', $request->idimage, $uniqueFileNameId);
+            }
+
+            // Process uploaded files
+            $idImagePathBack = null;
+            if ($request->hasFile('idimageback')) {
+                $uniqueFileNameIdB = time() . '_' . uniqid();
+                $idImagePathBack = uploadImage('sales', $request->idimageback, $uniqueFileNameIdB);
+            }
+
+            $productImagePath = null;
+            if ($request->hasFile('image')) {
+                $uniqueFileName = time() . '_' . uniqid();
+                $productImagePath = uploadImage('sales', $request->image, $uniqueFileName);
+            }
+
+            // Save data to the database (example model: FormSubmission)
+            $formData = [
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'phone' => $request->input('phone'),
+                'description' => $request->input('description'),
+                'id_image' => $idImagePath,
+                'id_image_back' => $idImagePathBack,
+                'product_image' => $productImagePath,
+                'metal' => $request->input('metal'), 
+                'metal_type' => $request->input('metal_type'), 
+                'weight' => $request->input('weight'), 
+                'eid_no' => $request->input('eidno'), 
+            ];
+
+            // Assuming you have a FormSubmission model
+            \App\Models\Sales::create($formData);
             // Respond with success
             return response()->json(['status' => true,'message' => trans('messages.contact_success_msg')]);
 
