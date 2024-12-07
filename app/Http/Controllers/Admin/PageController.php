@@ -117,6 +117,8 @@ class PageController extends Controller
             return view('backend.website_settings.pages.find_us', compact('page','lang','page_id'));
           }else if ($id == 'contact_us') {
             return view('backend.website_settings.pages.contact_us', compact('page','lang','page_id'));
+          }else if ($id == 'mortgage' || $id == 'sales') {
+            return view('backend.website_settings.pages.mortgage_sales', compact('page','lang','page_id'));
           }else if ($id == 'about_us') {
             return view('backend.website_settings.pages.about_us', compact('page','lang','page_id'));
           }else{
@@ -135,13 +137,23 @@ class PageController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+        $image1 = $image2 = NULL;
         $page = Page::findOrFail($id);
         if ($page) {
             if ($request->hasfile('image')) {
                 $photo = uploadImage('page', $request->image, 'image_1');
                 $page->image = $photo;
                 $page->save();
+            }
+
+            if ($request->hasfile('image1')) {
+                $fileName1 = time() . '_' . uniqid();
+                $image1 = uploadImage('page', $request->image1, $fileName1);
+            }
+
+            if ($request->hasfile('image2')) {
+                $fileName2 = time() . '_' . uniqid();
+                $image2 = uploadImage('page', $request->image2, $fileName2);
             }
             
             $page_translation                       = PageTranslation::firstOrNew(['lang' => $request->lang, 'page_id' => $page->id]);
@@ -164,7 +176,8 @@ class PageController extends Controller
             $page_translation->twitter_title        = $request->twitter_title;
             $page_translation->twitter_description  = $request->twitter_description;
             $page_translation->keywords             = $request->keywords;
-            $page_translation->image1               = $request->has('image1') ? $request->image1 : NULL;
+            $page_translation->image1               = $image1;
+            $page_translation->image2               = $image2;
             $page_translation->save();
 
             flash(trans('messages.page').' '.trans('messages.updated_msg'))->success();

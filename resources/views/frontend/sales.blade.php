@@ -13,7 +13,7 @@
             </div>
             <!-- End description -->
             <div class="mb-5 text-center">
-                <a href="#" class="eighth-button" data-toggle="modal" data-target="#mortgageModal">{{trans('messages.start')}} {{trans('messages.mortgage')}} </a>
+                <a href="#" class="eighth-button" data-toggle="modal" data-target="#salesModal">{{trans('messages.start')}} {{trans('messages.sales')}} </a>
             </div>
 
         </div>
@@ -45,7 +45,7 @@
                         <!-- End description -->
 
                         {{-- <div class="mt-5 text-left">
-                            <a href="#" class="eighth-button " data-toggle="modal" data-target="#mortgageModal">Start mortgage</a>
+                            <a href="#" class="eighth-button " data-toggle="modal" data-target="#salesModal">Start sales</a>
                         </div> --}}
                     </div>
                     <!-- End company -->
@@ -70,7 +70,7 @@
 
 
                         <div class="mt-5 text-left">
-                            <a href="#" class="eighth-button " data-toggle="modal" data-target="#mortgageModal">{{trans('messages.start')}} {{trans('messages.mortgage')}}</a>
+                            <a href="#" class="eighth-button " data-toggle="modal" data-target="#salesModal">{{trans('messages.start')}} {{trans('messages.sales')}}</a>
                         </div>
                     </div>
                     <!-- End leader -->
@@ -82,17 +82,17 @@
         <!-- End about company -->
     </div>
 
-    <div id="mortgageModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mortgageModalLabel"
+    <div id="salesModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="salesModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="mortgageModalLabel">{{ trans('messages.mortgage') }} {{ trans('messages.information') }}</h5>
+                    <h5 class="modal-title" id="salesModalLabel">{{ trans('messages.sales') }} {{ trans('messages.information') }}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="mortgageForm">
+                <form id="salesForm">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group  m-2">
@@ -110,18 +110,6 @@
                         <div class="form-group m-2">
                             <label for="description">{{ trans('messages.description') }}<span class="text-danger">*</span></label>
                             <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                        </div>
-
-                        <div class="form-group m-2">
-                            <label for="duration">{{ trans('messages.duration') }}<span class="text-danger">*</span></label>
-                            <select class="form-control" id="duration" name="duration" required="">
-                                <option value="1">1 {{ trans('messages.month') }}</option>
-                                <option value="2">2 {{ trans('messages.month') }}</option>
-                                <option value="3">3 {{ trans('messages.month') }}</option>
-                                <option value="4">4 {{ trans('messages.month') }}</option>
-                                <option value="5">5 {{ trans('messages.month') }}</option>
-                                <option value="6">6 {{ trans('messages.month') }}</option>
-                            </select>
                         </div>
 
                         <div class="form-group m-2">
@@ -180,11 +168,11 @@
     
     <script type="text/javascript">
         $(document).ready(function () {
-            $("#mortgageForm").on("submit", function (e) {
+            $("#salesForm").on("submit", function (e) {
                 e.preventDefault(); // Prevent the page from reloading
             });
 
-            $("#mortgageForm").validate({
+            $("#salesForm").validate({
                 rules: {
                     name: {
                         required: true,
@@ -284,7 +272,7 @@
                     event.preventDefault();
                     // Perform an AJAX request or submit the form
                     $.ajax({
-                        url: "{{ route('submit-mortgage') }}", // Replace with your route
+                        url: "{{ route('submit-sales') }}", // Replace with your route
                         type: "POST",
                         data: new FormData(form),
                         processData: false,
@@ -292,8 +280,8 @@
                         success: function (response) {
                             if (response.status == true) {
                                 toastr.success(response.message, "{{trans('messages.success')}}");
-                                $('#mortgageForm')[0].reset(); // Reset the form
-                                $('#mortgageModal').modal('hide'); // Hide the modal
+                                $('#salesForm')[0].reset(); // Reset the form
+                                $('#salesModal').modal('hide'); // Hide the modal
                             } else {
                                 toastr.error(response.message, "{{trans('messages.error')}}");
                             }
@@ -306,9 +294,9 @@
             });
 
             // Reset validation on modal close
-            $('#mortgageModal').on('hidden.bs.modal', function () {
-                $("#mortgageForm")[0].reset(); // Clear the form
-                $("#mortgageForm").validate().resetForm(); // Reset validation
+            $('#salesModal').on('hidden.bs.modal', function () {
+                $("#salesForm")[0].reset(); // Clear the form
+                $("#salesForm").validate().resetForm(); // Reset validation
             });
         });
 

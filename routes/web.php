@@ -33,6 +33,9 @@ Route::post('/contact-us', [FrontendController::class, 'submitContactForm'])->na
 Route::get('/mortgage', [FrontendController::class, 'mortgage'])->name('mortgage');
 Route::post('/submit-mortgage-form', [FrontendController::class, 'submitMortgageForm'])->name('submit-mortgage');
 
+Route::get('/sales', [FrontendController::class, 'sales'])->name('sales');
+Route::post('/submit-sales-form', [FrontendController::class, 'submitSalesForm'])->name('submit-sales');
+
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product-detail', [ProductController::class, 'productDetails'])->name('product-detail');
 Route::post('/recently-viewed', [CommonController::class, 'addRecentlyViewed']);
