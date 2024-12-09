@@ -336,6 +336,7 @@
                         if (response.status === true) {
                             // Remove the row from the table
                             row.remove();
+                            $('.cart_count').text(response.cart_count);
                             $('.canvasCartcount').text(response.cart_count);
                             $('.row_'+cartItemId).remove();
                             $('.cart_sub_total').html(response.updatedCartSummary.sub_total)
