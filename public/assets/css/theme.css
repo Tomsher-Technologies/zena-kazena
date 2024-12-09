@@ -35703,6 +35703,20 @@ body.home-minimal .header--type-7 {
 a {
     text-decoration: none!important;
 }
+/* 7/12/2024 */
+.delete-btn {
+  color: #8c000d;
+  width: auto;
+  font-size: 12px; /* Smaller font size */
+  padding: 2px 8px; /* Reduced padding */
+  float: right; /* Align to the right */
+}
+
+.form-group.row.justify-content-end {
+  text-align: right; /* Ensure alignment inside the row */
+  margin-top: 10px; /* Add some spacing if needed */
+}
+
 /* 06/12/2024 style for vendor product add */
 .add-product-section-title {
   font-size: 26px;

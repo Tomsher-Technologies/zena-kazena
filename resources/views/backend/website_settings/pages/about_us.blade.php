@@ -19,7 +19,7 @@
                 </li>
             @endforeach
         </ul>
-
+ 
         <form class="p-4" action="{{ route('custom-pages.update', $page->id) }}" method="POST"
             enctype="multipart/form-data">
             @csrf

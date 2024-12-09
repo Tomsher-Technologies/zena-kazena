@@ -7,17 +7,32 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
+use App\Models\ProductAttributes;
+use App\Models\ProductStock;
+use App\Models\ProductTranslation;
 use App\Models\Vendor;
+use App\Services\ImageResizeAndDownload;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Image;
+use Str;
 
 class VendorController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageResizeAndDownload $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     public function vendorRegister()
     {
         return view('frontend.vendor.auth.register');
@@ -315,13 +330,15 @@ class VendorController extends Controller
     }
     public function vendorAll_products(Request $request)
     {
+        $products = Product::where('vendor_id', auth()->guard('vendor')->id())->orderBy('created_at', 'desc')->get();
+        dd($products);
         $col_name = null;
         $query = null;
         $seller_id = null;
         $sort_search = null;
         $products = Product::orderBy('created_at', 'desc');
         $category = ($request->has('category')) ? $request->category : '';
-        
+
         if ($request->type != null) {
             $var = explode(",", $request->type);
             $col_name = $var[0];
@@ -338,16 +355,16 @@ class VendorController extends Controller
             $childIds = [];
             $categoryfilter = $request->category;
             $childIds[] = array($request->category);
-            
-            if($categoryfilter != ''){
+
+            if ($categoryfilter != '') {
                 $childIds[] = getChildCategoryIds($categoryfilter);
             }
 
-            if(!empty($childIds)){
+            if (!empty($childIds)) {
                 $childIds = array_merge(...$childIds);
                 $childIds = array_unique($childIds);
             }
-            
+
             $products = $products->whereHas('category', function ($q) use ($childIds) {
                 $q->whereIn('id', $childIds);
             });
@@ -362,12 +379,12 @@ class VendorController extends Controller
                 });
         }
 
-       
+
 
         $products = $products->paginate(15);
         $type = 'All';
 
-        return view('backend.products.index', compact('category','products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
+        return view('backend.products.index', compact('category', 'products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
     }
     public function vendorProductCreate()
     {
@@ -379,7 +396,7 @@ class VendorController extends Controller
     }
     public function vendorProductGet_attribute_values(Request $request)
     {
-        $all_attribute_values = AttributeValue::with('attribute')->where('is_active',1)->where('attribute_id', $request->attribute_id)->get();
+        $all_attribute_values = AttributeValue::with('attribute')->where('is_active', 1)->where('attribute_id', $request->attribute_id)->get();
 
         $html = '';
 
@@ -402,21 +419,23 @@ class VendorController extends Controller
         // echo env('DEFAULT_LANGUAGE', 'en');
         // // print_r($request->all());
         // die;
-        $skuMain = '';
-        if($request->has('products')){
+        $skuMain = $request->sku;
+        if ($request->has('products')) {
             $products = $request->products;
-            if(isset($products[0])){
+            if (isset($products[0])) {
                 $skuMain = $products[0]['sku'];
             }
         }
-       
         $product = new Product;
-        $product->type= $request->type;
+        $product->type = $request->type;
         $product->deposit = $request->has('deposit') ? $request->deposit : 0;
         $product->name = $request->name;
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
-        $product->user_id = Auth::user()->id;
+        $product->vendor_id = Auth::guard('vendor')->id();
+        $product->added_by = 'vendor';
+        $product->published = 0;
+        $product->approved = 0;
         $product->occasion_id = $request->occasion_id;
         $product->min_qty = $request->min_qty;
         $product->vat = $request->vat;
@@ -424,21 +443,16 @@ class VendorController extends Controller
         $product_type = ($request->product_type == 'variant') ? 1 : 0;
         $product->product_type = $product_type;
         $product->video_provider = $request->video_provider;
-        $product->video_link = $request->video_link;
+        $product->video_link = $request->video;
         $product->discount = $request->discount;
         $product->discount_type = $request->discount_type;
-        $product->unit_price = $request->has('price') ? $request->price : 0;
-
+        $product->unit_price =  0;
+        // $product->unit_price = $request->has('price') ? $request->price : 0;
         if ($request->date_range != null) {
             $date_var               = explode(" to ", $request->date_range);
             $product->discount_start_date = strtotime($date_var[0]);
             $product->discount_end_date   = strtotime($date_var[1]);
         }
-
-        // if ($request->hasFile('pdf')) {
-        //     $product->pdf = $request->pdf->store('uploads/products/pdf');
-        // }
-       
         $slug = $request->slug ? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
         $same_slug_count = Product::where('slug', 'LIKE', $slug . '%')->count();
         $slug_suffix = $same_slug_count ? '-' . $same_slug_count + 1 : '';
@@ -446,25 +460,7 @@ class VendorController extends Controller
 
         $product->slug = $slug;
 
-        // $choice_options = array();
 
-        // if ($request->has('main_attributes')) {
-        //     foreach ($request->main_attributes as $key => $no) {
-        //         $str = 'choice_options_' . $no;
-
-        //         $item['attribute_id'] = $no;
-
-        //         $data = array();
-        //         // foreach (json_decode($request[$str][0]) as $key => $eachValue) {
-        //         foreach ($request[$str] as $key => $eachValue) {
-        //             // array_push($data, $eachValue->value);
-        //             array_push($data, $eachValue);
-        //         }
-
-        //         $item['values'] = $data;
-        //         array_push($choice_options, $item);
-        //     }
-        // }
 
         if (!empty($request->main_attributes)) {
             $product->attributes = json_encode($request->main_attributes);
@@ -474,21 +470,7 @@ class VendorController extends Controller
 
         // $product->choice_options = json_encode($choice_options, JSON_UNESCAPED_UNICODE);
 
-        $product->published = 1;
-        if ($request->button == 'draft') {
-            $product->published = 0;
-        }
-
-        if ($request->has('featured')) {
-            $product->featured = 1;
-        }
-
-        if ($request->has('return_refund')) {
-            $product->return_refund = 1;
-        }
-
         $product->save();
-
         $tags = array();
         if ($request->tags[0] != null) {
             foreach (json_decode($request->tags[0]) as $key => $tag) {
@@ -496,13 +478,12 @@ class VendorController extends Controller
             }
         }
 
-        $product_translation                       = ProductTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE', 'en'), 'product_id' => $product->id]);
+        $product_translation = ProductTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE', 'en'), 'product_id' => $product->id]);
         $product_translation->name = $request->name;
         $product_translation->unit = $request->unit;
         $product_translation->tags = implode(',', $tags);
         $product_translation->description = $request->description;
         $product_translation->save();
-
         $gallery = [];
         if ($request->hasfile('gallery_images')) {
             if ($product->photos == null) {
@@ -512,9 +493,8 @@ class VendorController extends Controller
                 $old_gallery = explode(',', $product->photos);
                 $count = count($old_gallery) + 1;
             }
-
             foreach ($request->file('gallery_images') as $key => $file) {
-                $gallery[] = $this->downloadAndResizeImage('main_product',$file, $product->sku, false, $count + $key);
+                $gallery[] = $this->imageService->downloadAndResizeImage('main_product', $file, $product->sku, false, $count + $key);
             }
             $product->photos = implode(',', array_merge($old_gallery, $gallery));
         }
@@ -536,114 +516,154 @@ class VendorController extends Controller
                     Storage::delete($product->thumbnail_img);
                 }
             }
-            $gallery = $this->downloadAndResizeImage('main_product',$request->file('thumbnail_image'), $product->sku, true);
+            $gallery = $this->imageService->downloadAndResizeImage('main_product', $request->file('thumbnail_image'), $product->sku, true);
             $product->thumbnail_img = $gallery;
         }
 
         $product->save();
-
-        // SEO
-        $seo = ProductSeo::firstOrNew(['lang' => env('DEFAULT_LANGUAGE', 'en'), 'product_id' => $product->id]);
-
-        $seo->meta_title        = $request->meta_title;
-        $seo->meta_description  = $request->meta_description;
-
-        $keywords = array();
-        if ($request->meta_keywords[0] != null) {
-            foreach (json_decode($request->meta_keywords[0]) as $key => $keyword) {
-                array_push($keywords, $keyword->value);
-            }
-        }
-        $seo->meta_keywords = implode(',', $keywords);
-
-        $seo->og_title        = $request->og_title;
-        $seo->og_description  = $request->og_description;
-
-        $seo->twitter_title        = $request->twitter_title;
-        $seo->twitter_description  = $request->twitter_description;
-
-        if ($request->meta_title == null) {
-            $seo->meta_title = $product->name;
-        }
-        if ($request->og_title == null) {
-            $seo->og_title = $product->name;
-        }
-        if ($request->twitter_title == null) {
-            $seo->twitter_title = $product->name;
-        }
-
-        $seo->save();
-
         // Tabs
+
         if ($request->has('tabs')) {
             foreach ($request->tabs as $tab) {
-                $p_tab = $product->tabs()->create([
-                    'lang'    => env('DEFAULT_LANGUAGE', 'en'),
-                    'heading' => $tab['tab_heading'],
-                    'content' => $tab['tab_description'],
-                ]);
+                if (!empty($tab['tab_heading']) && !empty($tab['tab_description'])) {
+                    $p_tab = $product->tabs()->create([
+                        'lang'    => env('DEFAULT_LANGUAGE', 'en'),
+                        'heading' => $tab['tab_heading'],
+                        'content' => $tab['tab_description'],
+                    ]);
+                }
             }
         }
+        if ($request->product_type == 'single') {
+            $product_stock = new ProductStock();
+            $product_stock->product_id = $product->id;
+            $product_stock->sku = $product['sku'];
+            $product_stock->price = $request->price; // $prod['price'];
+            $product_stock->qty = $request->current_stock;
 
-        if($request->has('products')){
-            $products = $request->products;
+            $offertag       = '';
+            $productOrgPrice = $request->price;
+            $discountPrice = $productOrgPrice;
+            $discount_applicable = false;
+            if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                if ($product->discount_type == 'percent') {
+                    $discountPrice = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
+                    $offertag = $product->discount . '% OFF';
+                } elseif ($product->discount_type == 'amount') {
+                    $discountPrice = $productOrgPrice - $product->discount;
+                    $offertag = 'AED ' . $product->discount . ' OFF';
+                }
+            }
+            $product_stock->price       = $productOrgPrice;
+            $product_stock->offer_price = $discountPrice;
+            $product_stock->offer_tag   = $offertag;
+        } elseif ($request->product_type == 'variant') {
+            $product_stock = new ProductStock();
+            $product_stock->product_id = $product->id;
+            $product_stock->sku = $product['sku'];
+            $product_stock->price = $request->price;
+            $product_stock->qty = $request->current_stock;
+
+            $offertag       = '';
+            $productOrgPrice = $request->price;
+            $discountPrice = $productOrgPrice;
+            $discount_applicable = false;
             $product_attributes = array();
-            foreach($products as $prod){
-
-                $product_stock = new ProductStock;
-                $product_stock->product_id = $product->id;
-                $product_stock->sku = $prod['sku'];
-                $product_stock->price = $prod['price'];// $prod['price'];
-                $product_stock->qty = $prod['current_stock'];
-
-                $offertag       = '';
-                $productOrgPrice = $prod['price'];
-                $discountPrice = $productOrgPrice;
-               
-                $discount_applicable = false;
-                if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
-                    if ($product->discount_type == 'percent') {
-                        $discountPrice = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
-                        $offertag = $product->discount . '% OFF';
-                    } elseif ($product->discount_type == 'amount') {
-                        $discountPrice = $productOrgPrice - $product->discount;
-                        $offertag = 'AED '.$product->discount.' OFF';
-                    }
+            if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                if ($product->discount_type == 'percent') {
+                    $discountPrice = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
+                    $offertag = $product->discount . '% OFF';
+                } elseif ($product->discount_type == 'amount') {
+                    $discountPrice = $productOrgPrice - $product->discount;
+                    $offertag = 'AED ' . $product->discount . ' OFF';
                 }
-                
-                $product_stock->price       = $productOrgPrice;
-                $product_stock->offer_price = $discountPrice;
-                $product_stock->offer_tag   = $offertag;
-            
-                $variantImage = (isset($prod['variant_images'])) ? $this->downloadAndResizeImage('varient',$prod['variant_images'], $prod['sku'], false) : NULL;
-                $product_stock->image = $variantImage;
-
-                $product_stock->save();
-                
-                if ($request->has('main_attributes')) {
-                    foreach ($request->main_attributes as $key => $no) {
-                        $attrId = 'choice_options_' . $no;
-                        $product_attributes[] = [
-                            'product_id' => $product->id,
-                            'product_varient_id' => $product_stock->id,
-                            'attribute_id' => $no,
-                            'attribute_value_id' => $prod[$attrId]
-                        ];
-                    }
-                }
-               
             }
-            if(!empty($product_attributes)){
-                ProductAttributes::insert($product_attributes);
+            $product_stock->price       = $productOrgPrice;
+            $product_stock->offer_price = $discountPrice;
+            $product_stock->offer_tag   = $offertag;
+            $variantImage = (isset($request->product_variant_image)) ? $this->imageService->downloadAndResizeImage('varient', $request->product_variant_image, $request->sku, false) : NULL;
+            $product_stock->image = $variantImage;
+            $product_stock->save();
+            if ($request->has('main_attributes')) {
+                foreach ($request->main_attributes as $key => $no) {
+                    $attrId = $no;
+                    // Loop through each variant attribute
+                    foreach ($request->variant_attributes as $variant_key => $variant_values) {
+                        // If the variant has the current attribute
+                        if (isset($variant_values[$attrId])) {
+                            $product_attributes[] = [
+                                'product_id' => $product->id,
+                                'product_varient_id' => $product_stock->id,
+                                'attribute_id' => $attrId,
+                                'attribute_value_id' => $variant_values[$attrId][0], // Use the variant value for the current attribute
+                            ];
+                        }
+                        if (!empty($product_attributes)) {
+                            $p_attribute = ProductAttributes::insert($product_attributes);
+                        }
+                    }
+                }
+                foreach ($request->main_attributes as $key => $no) {
+                    if ($request->has('variants')) {
+                        $attrId = $no;
+                        // Loop through each variant attribute
+                        foreach ($request->variants as $variant_key => $variant) {
+                            $product_stock = new ProductStock();
+                            $product_stock->product_id = $product->id;
+                            $product_stock->sku = $variant['sku'];
+                            $product_stock->price = $variant['price'];
+                            $product_stock->qty =  $variant['quantity'];
+
+                            $offertag       = '';
+                            $productOrgPrice = $variant['price'];
+                            $discountPrice = $productOrgPrice;
+                            $discount_applicable = false;
+                            if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
+                                if ($product->discount_type == 'percent') {
+                                    $discountPrice = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
+                                    $offertag = $product->discount . '% OFF';
+                                } elseif ($product->discount_type == 'amount') {
+                                    $discountPrice = $productOrgPrice - $product->discount;
+                                    $offertag = 'AED ' . $product->discount . ' OFF';
+                                }
+                            }
+                            $product_stock->price       = $productOrgPrice;
+                            $product_stock->offer_price = $discountPrice;
+                            $product_stock->offer_tag   = $offertag;
+                            $variantImage = (isset($variant['image'])) ? $this->imageService->downloadAndResizeImage('varient', $variant['image'], $variant['sku'], false) : NULL;
+                            $product_stock->image = $variantImage;
+                            $product_stock->save();
+                            foreach ($variant['attributes'] as $variant_key => $attribute) {
+                                $attribute_value = $attribute[0];  // Or use reset($attribute);
+                                // If the variant has the current attribute
+                                if (isset($attribute[$attrId])) {
+                                    $product_attributes[] = [
+                                        'product_id' => $product->id,
+                                        'product_varient_id' => $product_stock->id,
+                                        'attribute_id' => $attrId,
+                                        'attribute_value_id' => $attribute_value[$attrId][0], // Use the variant value for the current attribute
+                                    ];
+                                }
+                                if (!empty($product_attributes)) {
+
+                                    $p_attribute = ProductAttributes::insert($product_attributes);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        flash(trans('messages.product').' '.trans('messages.created_msg'))->success();
+
+        dd($p_attribute);
+
+        flash(trans('messages.product') . ' ' . trans('messages.created_msg'))->success();
 
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
 
-        return redirect()->route('products.all');
+        return redirect()->route('vendor.products.all');
     }
 
     /**
@@ -661,17 +681,17 @@ class VendorController extends Controller
         $product = Product::findOrFail($id);
 
         $skuMain = '';
-        if($request->has('oldproduct')){
+        if ($request->has('oldproduct')) {
             $oldproduct = $request->oldproduct;
-            if(isset($oldproduct[0])){
+            if (isset($oldproduct[0])) {
                 $skuMain = $oldproduct[0]['sku'];
             }
         }
 
-        if ($request->lang == env("DEFAULT_LANGUAGE",'en')) {
+        if ($request->lang == env("DEFAULT_LANGUAGE", 'en')) {
             $product->name = $request->name;
         }
-        
+
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
         $product->user_id = Auth::user()->id;
@@ -706,7 +726,7 @@ class VendorController extends Controller
         }
 
         $slug               = $request->slug ? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
-        $same_slug_count    = Product::where('slug', 'LIKE', $slug . '%')->where('id','!=',$id)->count();
+        $same_slug_count    = Product::where('slug', 'LIKE', $slug . '%')->where('id', '!=', $id)->count();
         $slug_suffix        = $same_slug_count ? '-' . $same_slug_count + 1 : '';
         $slug .= $slug_suffix;
 
@@ -736,7 +756,7 @@ class VendorController extends Controller
             }
 
             foreach ($request->file('gallery_images') as $key => $file) {
-                $gallery[] = $this->downloadAndResizeImage('main_product',$file, $product->sku, false, $count + $key);
+                $gallery[] = $this->downloadAndResizeImage('main_product', $file, $product->sku, false, $count + $key);
             }
             $product->photos = implode(',', array_merge($old_gallery, $gallery));
         }
@@ -758,7 +778,7 @@ class VendorController extends Controller
                     Storage::delete($product->thumbnail_img);
                 }
             }
-            $gallery = $this->downloadAndResizeImage('main_product',$request->file('thumbnail_image'), $product->sku, true);
+            $gallery = $this->downloadAndResizeImage('main_product', $request->file('thumbnail_image'), $product->sku, true);
             $product->thumbnail_img = $gallery;
         }
         $product->save();
@@ -806,7 +826,7 @@ class VendorController extends Controller
 
         if ($request->has('tabs')) {
             ProductTabs::where('lang', $request->lang)->where('product_id', $product->id)->delete();
-           foreach ($request->tabs as $tab) {
+            foreach ($request->tabs as $tab) {
                 $p_tab = $product->tabs()->create([
                     'lang'    => $request->lang,
                     'heading' => $tab['tab_heading'],
@@ -814,16 +834,16 @@ class VendorController extends Controller
                 ]);
             }
         }
-       
-        if($request->has('oldproduct')){
+
+        if ($request->has('oldproduct')) {
             $oldproduct = $request->oldproduct;
             $oldproduct_attributes = array();
-            foreach($oldproduct as $prodOld){
+            foreach ($oldproduct as $prodOld) {
                 $product_stock                      = ProductStock::find($prodOld['stock_id']);
                 $product_stock->product_id          = $product->id;
                 $product_stock->product_id = $product->id;
                 $product_stock->sku = $prodOld['sku'];
-                $product_stock->price = $prodOld['price'];// $prod['price'];
+                $product_stock->price = $prodOld['price']; // $prod['price'];
                 $product_stock->qty = $prodOld['current_stock'];
                 $product_stock->status              = $prodOld['status'];
 
@@ -831,7 +851,7 @@ class VendorController extends Controller
                 $offertag       = '';
                 $productOrgPrice = $prodOld['price'];
                 $discountPrice = $productOrgPrice;
-                
+
                 $discount_applicable = false;
                 if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
                     if ($product->discount_type == 'percent') {
@@ -839,7 +859,7 @@ class VendorController extends Controller
                         $offertag       = $product->discount . '% OFF';
                     } elseif ($product->discount_type == 'amount') {
                         $discountPrice  = $productOrgPrice - $product->discount;
-                        $offertag       = 'AED '.$product->discount.' OFF';
+                        $offertag       = 'AED ' . $product->discount . ' OFF';
                     }
                 }
                 $product_stock->price       = $productOrgPrice;
@@ -853,7 +873,7 @@ class VendorController extends Controller
                             $info = pathinfo($product_stock->image);
                             $file_name = basename($product_stock->image, '.' . $info['extension']);
                             $ext = $info['extension'];
-        
+
                             $sizes = config('app.img_sizes');
                             foreach ($sizes as $size) {
                                 $path = $info['dirname'] . '/' . $file_name . '_' . $size . 'px.' . $ext;
@@ -864,14 +884,14 @@ class VendorController extends Controller
                             Storage::delete($product_stock->image);
                         }
                     }
-                    $gallery = $this->downloadAndResizeImage('varient',$prodOld['variant_images'], $prodOld['sku'], false);
+                    $gallery = $this->downloadAndResizeImage('varient', $prodOld['variant_images'], $prodOld['sku'], false);
                     $product_stock->image = $gallery;
                 }
-            
+
                 $product_stock->save();
 
                 if ($request->has('main_attributes')) {
-                    ProductAttributes::where('product_id',$product->id)->delete();
+                    ProductAttributes::where('product_id', $product->id)->delete();
                     foreach ($request->main_attributes as $key => $no) {
                         $attrId = 'choice_options_' . $no;
                         $oldproduct_attributes[] = [
@@ -882,22 +902,21 @@ class VendorController extends Controller
                         ];
                     }
                 }
-               
             }
-            if(!empty($oldproduct_attributes)){
+            if (!empty($oldproduct_attributes)) {
                 ProductAttributes::insert($oldproduct_attributes);
             }
         }
 
-        if($request->has('products')){
+        if ($request->has('products')) {
             $products = $request->products;
             $product_attributes = array();
-            foreach($products as $prod){
+            foreach ($products as $prod) {
 
                 $product_stock = new ProductStock;
                 $product_stock->product_id = $product->id;
                 $product_stock->sku = $prod['sku'];
-                $product_stock->price = $prod['price'];// $prod['price'];
+                $product_stock->price = $prod['price']; // $prod['price'];
                 $product_stock->qty = $prod['current_stock'];
 
                 $offertag       = '';
@@ -911,7 +930,7 @@ class VendorController extends Controller
                         $offertag = $product->discount . '% OFF';
                     } elseif ($product->discount_type == 'amount') {
                         $discountPrice = $productOrgPrice - $product->discount;
-                        $offertag = 'AED '.$product->discount.' OFF';
+                        $offertag = 'AED ' . $product->discount . ' OFF';
                     }
                 }
 
@@ -919,12 +938,12 @@ class VendorController extends Controller
                 $product_stock->offer_price = $discountPrice;
                 $product_stock->offer_tag   = $offertag;
 
-            
-                $variantImage = (isset($prod['variant_images'])) ? $this->downloadAndResizeImage('varient',$prod['variant_images'], $prod['sku'], false) : NULL;
+
+                $variantImage = (isset($prod['variant_images'])) ? $this->downloadAndResizeImage('varient', $prod['variant_images'], $prod['sku'], false) : NULL;
                 $product_stock->image = $variantImage;
 
                 $product_stock->save();
-                
+
                 if ($request->has('main_attributes')) {
                     foreach ($request->main_attributes as $key => $no) {
                         $attrId = 'choice_options_' . $no;
@@ -936,23 +955,19 @@ class VendorController extends Controller
                         ];
                     }
                 }
-               
             }
-            if(!empty($product_attributes)){
+            if (!empty($product_attributes)) {
                 ProductAttributes::insert($product_attributes);
             }
-            
         }
 
-        flash(trans('messages.product').' '.trans('messages.updated_msg'))->success();
-        
+        flash(trans('messages.product') . ' ' . trans('messages.updated_msg'))->success();
+
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
 
         return redirect()->route('products.all');
     }
-   
-
     /**
      * Remove the specified resource from storage.
      *
@@ -1074,5 +1089,4 @@ class VendorController extends Controller
             return 0;
         }
     }
-
 }

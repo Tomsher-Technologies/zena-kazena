@@ -45,6 +45,8 @@
             <li><a href="{{route('products.index')}}">{{ trans('messages.shop') }} </a></li>
             <li><a href="{{route('terms')}}">{{ trans('messages.terms_conditions') }} </a></li>
             <li><a href="{{route('privacy')}}">{{ trans('messages.privacy_policy') }}</a></li>
+            <li><a href="{{route('shipping')}}">{{ trans('messages.shipping_policy') }}</a></li>
+            <li><a href="{{route('return')}}">{{ trans('messages.return_policy') }}</a></li>
             <li><a href="{{route('contact')}}">{{ trans('messages.contact') }}</a></li>
         </ul>
         <!-- End menu -->

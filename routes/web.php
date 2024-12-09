@@ -28,6 +28,8 @@ Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/about', [FrontendController::class, 'about'])->name('about_us');
 Route::get('/terms', [FrontendController::class, 'terms'])->name('terms');
 Route::get('/privacy', [FrontendController::class, 'privacy'])->name('privacy');
+Route::get('/shipping', [FrontendController::class, 'shipping'])->name('shipping');
+Route::get('/return', [FrontendController::class, 'return'])->name('return');
 Route::get('/contact', [FrontendController::class, 'contact'])->name('contact');
 Route::post('/contact-us', [FrontendController::class, 'submitContactForm'])->name('contact.submit');
 
@@ -138,6 +140,24 @@ Route::group(['middleware' => ['vendor.auth']], function () {
     Route::post('/vendor/products/delete-variant-image', [VendorController::class, 'vendorProductDelete_variant_image'])->name('vendor.products.delete_varient_image');
     Route::post('/vendor/products/delete-thumbnail', [VendorController::class, 'vendorProductDelete_thumbnail'])->name('vendor.products.delete_thumbnail');
     Route::post('/vendor/products/delete_gallery', [VendorController::class, 'vendorProductDelete_gallery'])->name('vendor.products.delete_gallery');
+
+    Route::get('/vendor/get-attribute-values/{id}', function ($id) {
+        $attributeValues = \App\Models\AttributeValue::where('attribute_id', $id)
+            ->where('is_active', 1)
+            ->get()
+            ->map(function ($value) {
+                return [
+                    'id' => $value->id,
+                    'name' => $value->getTranslatedName(),
+                ];
+            });
+    
+        return response()->json([
+            'attribute_name' => \App\Models\Attribute::find($id)->name,
+            'attribute_values' => $attributeValues,
+        ]);
+    });
+    
 
 });
 

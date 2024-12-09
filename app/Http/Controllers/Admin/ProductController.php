@@ -136,7 +136,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-       
+        // dd($request->all());
         // echo '<pre>';
         // echo env('DEFAULT_LANGUAGE', 'en');
         // // print_r($request->all());
@@ -148,7 +148,6 @@ class ProductController extends Controller
                 $skuMain = $products[0]['sku'];
             }
         }
-       
         $product = new Product;
         $product->type= $request->type;
         $product->deposit = $request->has('deposit') ? $request->deposit : 0;

@@ -1,26 +1,23 @@
 @extends('frontend.layouts.app')
+@section('header')
+    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css">
+@endsection
 @section('content')
     <div class="shop-breadcrumb">
         <!-- Container -->
         <div class="container container--type-2">
+            <ol class="breadcrumb ">
+                <li class="breadcrumb__item"><a href="{{ route('home') }}">{{ __('messages.home') }} </a></li>
 
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-
-
-                    <li class="breadcrumb-item"><a href="productsab77.html?category=party-wear">Party Wear</a></li>
-
-
-                    <li class="breadcrumb-item active" aria-current="page">Generic Diamond Pendant Necklace</li>
-
-                </ol>
-            </nav>
-
-            <!-- End breadcrumb -->
-            <!-- Title -->
-            <!-- End Title -->
+                <li class="breadcrumb__item "><a href="{{ route('vendor.myaccount') }}">{{ __('messages.my_account') }}</a>
+                </li>
+                <li class="breadcrumb__item active" aria-current="page"> <a
+                        href="{{ route('vendor.products.create') }}">{{ __('messages.add_product') }}</a></li>
+            </ol>
         </div>
         <!-- End container -->
     </div>
@@ -31,317 +28,329 @@
 
             <div class="add-product-wrapper">
                 <h1 class="form-title">Add New Product</h1>
-                <div class="add-product-form d-flex gap-5">
-                    <div class="product-basics">
-                        <div class="product-image-wrapper">
-                            <div class="product-images">
-                                <h2 class="add-product-section-title">Upload product images</h2>
-                                <div class="drop_box">
-                                    <header>
-                                        <h4>Select File here</h4>
-                                    </header>
-                                    <p>Files Supported: JPG, JPEG, PNG, GIF, BMP, TIFF</p>
-                                    <input type="file" hidden accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff" id="fileID">
-                                    <button class="btn product-images-upload-btn z-btn-primary"
-                                        onclick="document.getElementById('fileID').click()">Choose File</button>
-                                </div>
-                                <div class="product-thumbnail mt-5">
-                                    <div class="form-group m-0">
-                                        <label for="thumbnail">Thumbnail Image (1000x1000)</label>
-                                        <input type="file" id="thumbnail" name="thumbnail" accept="image/*"
-                                            class="product-thumbnail-input">
+                <form class="form form-horizontal mar-top" id="addNewProduct" action="{{ route('vendor.products.store') }}"
+                    method="POST" enctype="multipart/form-data" id="choice_form">
+                    @csrf
+                    <div class="add-product-form d-flex gap-5">
+                        <div class="product-basics">
+                            <div class="product-image-wrapper">
+                                <div class="product-images">
+                                    <h2 class="add-product-section-title">
+                                        {{ trans('messages.product') . ' ' . trans('messages.images') }}</h2>
+                                    <div class="drop_box">
+                                        <header>
+                                            <h4>Select File here</h4>
+                                        </header>
+                                        <p>Files Supported: JPG, JPEG, PNG, GIF, BMP, TIFF</p>
+
+                                        <label class=" col-form-label"
+                                            for="signinSrEmail">{{ trans('messages.gallery_images') }}<small>({{ trans('messages.1000*1000') }})</small></label>
+                                        <input type="file" name="gallery_images[]" multiple class="form-control"
+                                            accept="image/*" id="fileID" required>
+                                    </div>
+                                    <div class="product-thumbnail mt-5">
+                                        <div class="form-group m-0">
+                                            <label for="signinSrEmail">{{ trans('messages.thumbnail_image') }}
+                                                <small>({{ trans('messages.1000*1000') }})</small></label>
+                                            <input type="file" id="thumbnail" name="thumbnail_image" accept="image/*"
+                                                class="product-thumbnail-input">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="product-status mt-3">
-                                <h2 class="add-product-section-title">Return & Refund Status</h2>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <span class="me-2" for="flexSwitchCheckDefault"
-                                        onclick="document.getElementById('flexSwitchCheckDefault').click()">Status</span>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input product-check-input" type="checkbox" role="switch"
-                                            id="flexSwitchCheckDefault">
-                                        <label class="form-check-label" for="flexSwitchCheckDefault"></label>
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
-                    </div>
-                    <div class="flex-grow-1">
-                        <form class=" mb-5 form-section">
-                            <h2 class="add-product-section-title">Product Information</h2>
-                            <div class="form-group">
-                                <label for="product-name">Product Name <span>*</span></label>
-                                <input type="text" id="product-name" name="product-name" placeholder="Enter product name"
-                                    required>
-                            </div>
-                            <div class="form-row d-grid">
+                        <div class="flex-grow-1">
+                            <div class=" mb-5 form-section">
+                                <h2 class="add-product-section-title">Product Information</h2>
                                 <div class="form-group">
-                                    <label for="type">Type <span>*</span></label>
-                                    <select id="type" name="type" required class="flat-select">
-                                        <option value="">Select Type</option>
-                                        <option value="for-sale">For Sale</option>
-                                        <option value="for-rent">For Rent</option>
-                                    </select>
+                                    <label for="product-name">Product Name <span>*</span></label>
+                                    <input type="text" id="product-name" name="name" placeholder="Enter product name"
+                                        required oninput="generateSlug()">
                                 </div>
-                                <div class="form-group hidden">
-                                    <label for="category">Refundable Deposit <span>*</span></label>
-                                    <select id="category" name="category" required>
-                                        <option value="">Select Category</option>
-                                        <option value="party-wear">Party Wear</option>
-                                        <option value="casual-wear">Casual Wear</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="category">Category <span>*</span></label>
-                                    <select id="category" name="category" required>
-                                        <option value="">Select Category</option>
-                                        <option value="party-wear">Party Wear</option>
-                                        <option value="casual-wear">Casual Wear</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="brand">Brand</label>
-                                    <select id="brand" name="brand">
-                                        <option value="">Select Brand</option>
-                                        <option value="brand-a">Brand A</option>
-                                        <option value="brand-b">Brand B</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="occasion">Occasion</label>
-                                    <select id="occasion" name="occasion">
-                                        <option value="">Select Occasion</option>
-                                        <option value="wedding">Wedding</option>
-                                        <option value="party">Party</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="unit">Unit</label>
-                                    <input type="text" id="unit" name="unit" placeholder="e.g., KG, Pc">
-                                </div>
-                                <div class="form-group">
-                                    <label for="min-qty">Minimum Purchase Qty <span>*</span></label>
-                                    <input type="number" id="min-qty" name="min-qty" value="1" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="tags">Tags</label>
-                                <input type="text" id="tags" name="tags"
-                                    placeholder="Add tags and press Enter">
-                            </div>
-                            <div class="form-group">
-                                <label for="slug">Slug <span>*</span></label>
-                                <input type="text" id="slug" name="slug" placeholder="Enter unique slug"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <label for="vat">VAT (%)</label>
-                                <input type="number" id="vat" name="vat" placeholder="e.g., 5"
-                                    min="0">
-                            </div>
-                        </form>
-
-                        <form class=" mb-5 form-section">
-                            <h2 class="add-product-section-title">Product Discounts</h2>
-
-                            <div class="form-group">
-                                <label for="date-range">Date Range <span>*</span></label>
-                                <input type="text" id="date-range" name="date-range" placeholder="Select Date Range"
-                                    required>
-                            </div>
-
-
-                            <div class="form-group product-form-group">
-                                <label for="discount">Discount <span>*</span></label>
-                                <div class="discount-field">
-                                    <input class="flex-grow-1" type="number" id="discount" name="discount"
-                                        placeholder="Enter discount value" required min="0" />
-                                    <select class="discount-type" id="discount-type" name="discount-type" required>
-                                        <option value="flat">Flat</option>
-                                        <option value="percent">Percent</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                        </form>
-
-
-
-                        <form class="mb-5 form-section">
-                            <h2 class="add-product-section-title">Product Details</h2>
-
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="product-type">Product Type *</label>
-                                    <select id="product-type" name="product-type" required>
-                                        <option value="single">Single</option>
-                                        <option value="variants">Variants</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="attributes">Attributes *</label>
-                                    <select id="attributes" name="attributes" required>
-                                        <option value="">Nothing Selected</option>
-                                        <option value="color">Color</option>
-                                        <option value="size">Size</option>
-                                        <option value="material">Material</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="product-variant">
-                                <h3 style="font-size: 24px;">Product Variant 1</h3>
-
-                                <div class="form-group">
-                                    <label for="sku">SKU *</label>
-                                    <input type="text" id="sku" name="sku" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="product-variant-image">Product Variant Image (1000x1000)</label>
-                                    <input class="product-variant-image-input" type="file" id="product-variant-image"
-                                        name="product-variant-image" accept="image/*">
+                                <div class="form-row d-grid">
+                                    <div class="form-group">
+                                        <label for="type">Type <span>*</span></label>
+                                        <select id="type" name="type" required class="flat-select">
+                                            <option value="">Select Type</option>
+                                            <option value="sale">For Sale</option>
+                                            <option value="rent">For Rent</option>
+                                            <option value="auction">For auction</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group " id="deposit-amount" style="display: none;">
+                                        <label for="deposit">{{ trans('messages.refundable_deposit') }} <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" name="deposit" id="deposit"
+                                            placeholder="{{ __('messages.enter_deposit_amount') }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="category">{{ trans('messages.category') }} <span
+                                                class="text-danger">*</span></label>
+                                        <select id="category" name="category_id" id="category_id" data-live-search="true"
+                                            required>
+                                            @foreach ($categories as $category)
+                                                <option value="{{ $category->id }}">{{ $category->name }}
+                                                </option>
+                                                @foreach ($category->childrenCategories as $childCategory)
+                                                    @include('backend.categories.child_category', [
+                                                        'child_category' => $childCategory,
+                                                    ])
+                                                @endforeach
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="form-row">
-
-                                    <div class="form-group">
-                                        <label for="quantity">Quantity *</label>
-                                        <input type="number" id="quantity" name="quantity" required>
+                                    <div class="form-group" id="brand">
+                                        <label for="brand">{{ trans('messages.brand') }}</label>
+                                        @php
+                                            $brands = \App\Models\Brand::where('is_active', 1)
+                                                ->orderBy('name', 'asc')
+                                                ->get();
+                                        @endphp
+                                        <select class="form-control" name="brand_id" id="brand_id" data-live-search="true">
+                                            <option value="">
+                                                {{ trans('messages.select') . ' ' . trans('messages.brand') }}</option>
+                                            @foreach ($brands as $brand)
+                                                <option value="{{ $brand->id }}">{{ $brand->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="price">Price *</label>
-                                        <input type="number" id="price" name="price" required>
+                                    <div class="form-group" id="occasion">
+                                        <label for="occasion">{{ trans('messages.occasion') }}</label>
+                                        @php
+                                            $occasions = \App\Models\Occasion::where('is_active', 1)
+                                                ->orderBy('name', 'asc')
+                                                ->get();
+                                        @endphp
+                                        <select class="form-control aiz-selectpicker" name="occasion_id" id="occasion_id"
+                                            data-live-search="true">
+                                            <option value="">
+                                                {{ trans('messages.select') . ' ' . trans('messages.occasion') }}</option>
+                                            @foreach ($occasions as $occasion)
+                                                <option value="{{ $occasion->id }}">{{ $occasion->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
-
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="unit">{{ trans('messages.unit') }}</label>
+                                        <input type="text" id="unit" name="unit"
+                                            placeholder="{{ trans('messages.unit_details') }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="min-qty">{{ trans('messages.minimum_purchase_qty') }} <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" id="min-qty" name="min_qty" value="1"
+                                            lang="en" min="1"required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tags">{{ trans('messages.tags') }}</label>
+                                    <input class="form-control" type="text" id="tags"name="tags[]"
+                                        placeholder="{{ trans('messages.type_hit_enter_add_tag') }}">
+                                    <small class="text-muted">{{ trans('messages.tag_details') }}</small>
                                 </div>
 
+                                <div class="form-group">
+                                    <label for="slug">{{ trans('messages.slug') }}<span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" id="slug" name="slug"
+                                        placeholder="{{ trans('messages.slug') }}" required>
+                                    @error('slug')
+                                        <div class="alert alert-danger mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="form-group">
+                                    <label for="vat">{{ trans('messages.vat') }} (%) </label>
+                                    <input type="number" ilang="en" min="0" value="0" step="0.01"
+                                        placeholder="VAT" name="vat" class="form-control">
+                                </div>
                             </div>
 
-                            <button class="btn product-images-upload-btn mt-4 z-btn-primary">Add Product
-                                Variant</button>
+                            <div class=" mb-5 form-section">
+                                <h2 class="add-product-section-title">
+                                    {{ trans('messages.product') . ' ' . trans('messages.discounts') }}</h2>
 
-                        </form>
+                                <div class="form-group">
+                                    <label
+                                        for="date_range">{{ trans('messages.discount') . ' ' . trans('messages.date') . ' ' . trans('messages.range') }}</label>
+                                    <input type="text" id="date_range" name="date_range"
+                                        placeholder="{{ trans('messages.select') . ' ' . trans('messages.date') }}"
+                                        data-time-picker="true" data-format="DD-MM-Y HH:mm:ss" data-separator=" to "
+                                        autocomplete="off">
+                                </div>
 
 
-                        <form class=" mb-5 form-section">
-                            <h2 class="add-product-section-title">Product Description</h2>
-
-                            <div class="form-group">
-                                <label for="rich-text-editor">Description <span>*</span></label>
-                                <textarea class="text-editor" id="rich-text-editor" name="rich-text-editor" required></textarea>
+                                <div class="form-group product-form-group">
+                                    <label for="discount">{{ trans('messages.discount') }}</label>
+                                    <div class="discount-field">
+                                        <input class="flex-grow-1" type="number" lang="en" min="0"
+                                            value="0" step="0.01" placeholder="{{ trans('messages.discount') }}"
+                                            name="discount" class="form-control" />
+                                        <select class="form-control discount-type" id="discount-type"
+                                            name="discount_type">
+                                            <option value="amount">{{ trans('messages.flat') }}</option>
+                                            <option value="percent">{{ trans('messages.percent') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
-                        </form>
-
-                        <form class=" mb-5 form-section">
-                            <h2 class="add-product-section-title">Product Tabs</h2>
-
-                            <div class="form-group">
-                                <label for="product-name">Heading <span>*</span></label>
-                                <input type="text" id="product-name" name="product-name"
-                                    placeholder="Enter product name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="rich-text-editor">Description <span>*</span></label>
-                                <textarea class="text-editor w-100 p-3" id="rich-text-editor" placeholder="Enter here.." name="rich-text-editor"
-                                    required></textarea>
-                            </div>
-                            <div class="action-buttons d-flex justify-content-between">
-                                <button class="btn btn-delete z-btn-secondary">Delete</button>
-                                <button class="btn btn-add z-btn-primary">Add</button>
-                            </div>
-
-                        </form>
-
-                        <form class=" mb-5 form-section">
-                            <h2 class="add-product-section-title">Product Video</h2>
-
-                            <div class="form-group product-form-group">
-                                <label for="video-link">Video Link<span>*</span></label>
-                                <div class="video-field">
-                                    <select class="video-type" id="video-type" name="video-type" required>
-                                        <option value="vimeo">Vimeo</option>
-                                        <option value="youtube">Youtube</option>
+                            <div class="mb-5 form-section">
+                                <h2 class="add-product-section-title">
+                                    {{ trans('messages.product') . ' ' . trans('messages.details') }}</h2>
+                                <div class="form-group">
+                                    <label
+                                        for="product-type">{{ trans('messages.product') . ' ' . trans('messages.type') }}
+                                        <span class="text-danger">*</span></label>
+                                    <select id="product-type" name="product_type" required>
+                                        <option value="single">{{ trans('messages.single') }}</option>
+                                        <option value="variant">{{ trans('messages.variants') }}</option>
                                     </select>
-                                    <input class="flex-grow-1" type="text" id="video" name="video"
-                                        placeholder="Video link here" required min="0" />
-
                                 </div>
-                            </div>
 
-                        </form>
+                                <div class="form-group" id="attributes-section" style="display: none;">
+                                    <input type="hidden" name="selected_attributes" id="selected_attributes">
+                                    <label for="attributes">{{ trans('messages.attributes') }} <span
+                                            class="text-danger">*</span></label>
+                                    @php
+                                        $attributes = \App\Models\Attribute::where('is_active', 1)
+                                            ->orderBy('name', 'asc')
+                                            ->get();
+                                    @endphp
+                                    <select id="attributes" class="form-select" name="main_attributes[]" multiple
+                                        data-live-search="true">
+                                        @foreach ($attributes as $attr)
+                                            <option value="{{ $attr->id }}">{{ $attr->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
+                                <div class="product-variant">
+                                    <h3 style="font-size: 24px; display: none;"id="pro_variant_name">
+                                        {{ trans('messages.product') . ' ' . trans('messages.variant') }} </h3>
 
-                        <form class="mb-5">
-                            <h2 class="add-product-section-title">SEO Section</h2>
-
-                            <div class="form-group">
-                                <label for="product-name">Meta Title<span>*</span></label>
-                                <input type="text" id="product-name" name="product-name"
-                                    placeholder="Enter product name" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="rich-text-editor">Meta Description <span>*</span></label>
-                                <textarea class="text-editor w-100 p-3" id="rich-text-editor" placeholder="Enter here.." name="rich-text-editor"
-                                    required></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="keywords">Keywords</label>
-                                <div class="keywords-tags-field">
-                                    <div class="keywords-tags">
-                                        <!-- Keywords tags will be added here dynamically -->
+                                    <div class="form-group">
+                                        <label for="sku">{{ trans('messages.sku') }} <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" placeholder="{{ trans('messages.sku') }}" name="sku"
+                                            class="form-control" required>
                                     </div>
-                                    <input type="text" id="keywords" name="keywords" class="keywords-input"
-                                        placeholder="Type a keyword and press Enter" />
+
+                                    <div class="form-group" id="image-variant-section" style="display: none;">
+                                        <label
+                                            for="product-variant-image">{{ trans('messages.product') . ' ' . trans('messages.variant') . ' ' . trans('messages.image') }}
+                                            <small>({{ trans('messages.1000*1000') }})</small></label>
+                                        <input class="product-variant-image-input" type="file"
+                                            id="product-variant-image" name="product_variant_image" accept="image/*">
+                                    </div>
+                                    <div class="form-row">
+
+                                        <div class="form-group">
+                                            <label for="quantity">{{ trans('messages.quantity') }} <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="number" id="quantity" lang="en" min="0"
+                                                value="0" step="0.01"
+                                                placeholder="{{ trans('messages.quantity') }}" name="current_stock"
+                                                class="form-control" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="price">{{ trans('messages.price') }} <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="number" id="price" lang="en" min="0"
+                                                value="0" step="0.01"
+                                                placeholder="{{ trans('messages.price') }}" name="price"
+                                                class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div id="product-attributes-container">
+                                        <!-- Dynamically generated product attributes will be added here -->
+                                    </div>
+
+                                </div>
+                                <div class="form-group add_variant">
+                                    <input type="button" id="add-variant-btn" style="display:none;"
+                                        class="btn product-images-upload-btn mt-4 z-btn-success action-btn"
+                                        value="{{ trans('messages.add') . ' ' . trans('messages.product') . ' ' . trans('messages.variant') }}">
+                                </div>
+
+                            </div>
+
+
+                            <div class=" mb-5 form-section">
+                                <h2 class="add-product-section-title">
+                                    {{ trans('messages.product') . ' ' . trans('messages.description') }}</h2>
+
+                                <div class="form-group">
+                                    <label for="rich-text-editor">{{ trans('messages.description') }}</label>
+                                    <textarea class="text-editor" id="rich-text-editor" name="description"></textarea>
+                                </div>
+
+                            </div>
+
+                            <div class="mb-5 form-section repeater">
+                                <h2 class="add-product-section-title">
+                                    {{ trans('messages.product') . ' ' . trans('messages.tabs') }}
+                                </h2>
+
+                                <div data-repeater-list="tabs">
+                                    <div data-repeater-item>
+                                        <div class="form-group">
+                                            <label for="product-name">{{ trans('messages.heading') }}</label>
+                                            <input type="text" class="form-control" name="tab_heading"
+                                                placeholder="Enter heading">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="rich-text-editor">{{ trans('messages.description') }}</label>
+                                            <textarea class="text-editor w-100 p-3" id="rich-text-editor" placeholder="Enter description"
+                                                name="tab_description"></textarea>
+                                        </div>
+                                        <div class="form-group row justify-content-end">
+                                            <input data-repeater-delete type="button"
+                                                style="width:auto;"class="btn btn-danger btn-sm delete-btn action-btn"
+                                                value="{{ trans('messages.delete') }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <input data-repeater-create type="button"
+                                    style="width:auto;"class="btn btn-success action-btn mt-0"
+                                    value="{{ trans('messages.add') }}">
+                            </div>
+
+
+                            <div class=" mb-5 form-section">
+                                <h2 class="add-product-section-title">
+                                    {{ trans('messages.product') . ' ' . trans('messages.video') }}</h2>
+
+                                <div class="form-group product-form-group">
+                                    <label
+                                        for="video-link">{{ trans('messages.video') . ' ' . trans('messages.provider') }}</label>
+                                    <div class="video-field">
+                                        <select class="video-type" name="video_provider" id="video_provider">
+                                            <option value="youtube">{{ trans('messages.youtube') }}</option>
+                                            <option value="vimeo">{{ trans('messages.vimeo') }}</option>
+                                        </select>
+                                        <input class="flex-grow-1" type="text" id="video" name="video"
+                                            placeholder="Video link here">
+
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="product-name">OG Title<span>*</span></label>
-                                <input type="text" id="product-name" name="product-name"
-                                    placeholder="Enter product name" required>
+                            <div class="form-actions  d-flex justify-content-between product-actions mb-2">
+                                <button type="submit"
+                                    class=" btn-publish z-btn-primary text-white">{{ __('messages.add') }}</button>
+                                <button type="submit"
+                                    class=" btn-publish z-btn-danger text-dark">{{ __('messages.cancel') }}</button>
                             </div>
-
-                            <div class="form-group">
-                                <label for="rich-text-editor">OG Description <span>*</span></label>
-                                <textarea class="text-editor w-100 p-3" id="rich-text-editor" placeholder="Enter here.." name="rich-text-editor"
-                                    required></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="product-name">Twitter<span>*</span></label>
-                                <input type="text" id="product-name" name="product-name"
-                                    placeholder="Enter product name" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="rich-text-editor">Twitter Description <span>*</span></label>
-                                <textarea class="text-editor w-100 p-3" id="rich-text-editor" placeholder="Enter here.." name="rich-text-editor"
-                                    required></textarea>
-                            </div>
-
-
-                        </form>
-
-
-                        <div class="form-actions  d-flex justify-content-between product-actions">
-                            <button type="submit" class="btn btn-draft z-btn-secondary">Save As Draft</button>
-                            <button type="submit" class="btn btn-publish z-btn-primary">Save & Publish</button>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
             <!-- End container -->
         </div>
@@ -354,688 +363,232 @@
         <!-- End sticky add to cart -->
         <meta name="csrf-token" content="lAjxm1kVepQnQsr3myNg38QYkBpdf0KrBJpGF5MJ">
 
-        <!-- Footer collection -->
-        <footer class="modern-footer collection-footer">
-
-            <!-- Newsletter -->
-            <div class="blog-with-sidebar__newsletter">
-                <!-- Container -->
-                <div class="container">
-                    <!-- Row -->
-                    <div class="row blog-newsletter">
-                        <div class="col-lg-12">
-                            <!-- Newsletter Title -->
-                            <h3 class="blog-newsletter__title font-family-jost text-center">NEWSLETTER</h3>
-                            <!-- End newsletter title -->
-                        </div>
-
-                        <div class="col-lg-6">
-                            <p class="newsletter-text-area">Sign up to be aware of our new products and all
-                                developments!</p>
-                        </div>
-                        <div class="col-lg-6">
-                            <!-- Newsletter form -->
-                            <form class="blog-newsletter__form" id="newsletterForm">
-                                <input type="email" placeholder="email" name="email"
-                                    class="blog-newsletter__input" />
-                                <button type="submit" class="blog-newsletter__submit">Subscribe</button>
-                            </form>
-                            <div id="newsletterMessage"></div>
-                            <!-- End newsletter form -->
-                        </div>
-                    </div>
-                    <!-- End row -->
-                </div>
-                <!-- End container -->
-            </div>
-            <!-- End newsletter -->
-
-            <!-- Container -->
-            <div class="container">
-
-                <!-- Menu -->
-                <ul class="modern-footer__menu">
-                    <li><a href="index.html">Home </a></li>
-                    <li><a href="about.html">About Us </a></li>
-                    <li><a href="products.html">Shop </a></li>
-                    <li><a href="terms.html">Terms &amp; Conditions </a></li>
-                    <li><a href="privacy.html">Privacy Policy</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-                <!-- End menu -->
-                <!-- Row -->
-                <div class="row">
-                    <div class="col-lg-4 mobile-order-2">
-                        <!-- Social -->
-                        <div class="modern-footer__social">
-                            <p>Follow Us</p>
-                            <ul>
-                                <li><a href="https://www.instagram.com/"><img src="assets/images/instagram.svg"
-                                            alt=""></a></li>
-                                <li><a href="https://www.facebook.com/"><img src="assets/images/facebook.svg"></a>
-                                </li>
-                                <li><a href="https://www.youtube.com/"><img src="assets/images/youtube.svg"></a>
-                                </li>
-                                <li><a href="https://www.linkedin.com/"><img src="assets/images/LinkedIn.svg"></a>
-                                </li>
-                            </ul>
-                        </div>
-                        <!-- End social -->
-                    </div>
-                    <div class="col-lg-4">
-                        <!-- Logo -->
-                        <div class="modern-footer__logo">
-                            <img width="250" src="assets/img/logow.png" alt="">
-                        </div>
-                        <!-- End logo -->
-                        <!-- Address -->
-                        <div class="modern-footer__address">
-
-                            <ul>
-                                <li><a href="#"><img width="40" src="assets/images/email.svg"
-                                            alt=""></a></li>
-                                <li><a href="#"><img width="40" src="assets/images/chat.svg"></a></li>
-                                <li><a href="#"><img width="40" src="assets/images/phone.svg"></a></li>
-                                <li><a href="#"><img width="40" src="assets/images/visit.svg"></a></li>
-                            </ul>
-                        </div>
-                        <!-- End address -->
-                        <!-- Payment -->
-                        <div class="modern-footer__payment d-none d-lg-block">
-                            <img src="storage/uploads/all/WRYRNuOPrWCltCwo0gpOmHDPrcFPCqnS2ncekqMQ.svg" alt="Payment" />
-                        </div>
-                        <!-- End payment -->
-                    </div>
-                    <div class="col-lg-4 mobile-order-3">
-                        <!-- Currency -->
-                        <div class="modern-footer__currency">
-                            <p>JOIN WITH US</p>
-
-                            <div class="become_promotor" bis_skin_checked="1"><a href="#"><i
-                                        class="lnr lnr-bullhorn"></i>Become Promotor
-                                </a></div>
-                            <div class="become_partner" bis_skin_checked="1"><a href="#" data-bs-toggle="modal"
-                                    data-bs-target="#becomePartnerModal"><i class="lnr lnr-thumbs-up"></i>Become
-                                    Partner
-                                </a></div>
-
-
-                        </div>
-                        <!-- End currency -->
-                    </div>
-                </div>
-                <!-- End row -->
-                <!-- Payment -->
-                <div class="modern-footer__payment d-block d-lg-none">
-                    <img src="assets/images/payment.svg" alt="Payment" />
-                </div>
-                <!-- End payment -->
-
-
-                <!-- Copyright -->
-                <div class="modern-footer__copyright"> © 2024 ZK. All rights reverved. Design By TOMSHER</div>
-                <!-- End copyright -->
-
-            </div>
-
-            <!-- End container -->
-        </footer>
-        <div class="modal fade" id="becomePartnerModal" tabindex="-1" aria-labelledby="authModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="authModalLabel">Become Partner</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <!-- Modal Body -->
-                    <div class="modal-body text-center">
-                        <p>Choose Option</p>
-                        <div class="d-grid gap-2">
-                            <ul class="canvas-menu__nav horizontal-menu">
-                                <li><a href="vendor-login.html" class="canvas-nav__item"><i class="lnil lnil-user"></i>
-                                        Login</a></li>
-                                <li><a href="vendor-registration.html" class="canvas-nav__item"><i
-                                            class="lnil lnil-user"></i> Register</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- End footer collection -->
-
-        <div class="search-popup js-search-popup">
-            <!-- Search close -->
-            <div class="search-popup__close">
-                <a href="#" class="js-close-search-popup"><i class="lnr lnr-cross"></i></a>
-            </div>
-            <!-- End search close -->
-            <!-- Container -->
-            <div class="container container--type-2">
-                <!-- Search title -->
-
-                <!-- End search categories -->
-                <!-- Search form -->
-                <form class="search-popup__form" action="https://zena.tomsher.net/products" method="get">
-                    <!-- Search input -->
-                    <input type="text" class="search-popup__input" name="search" placeholder="Search here..." />
-                    <!-- End search input -->
-                </form>
-                <!-- End search form -->
-                <!-- Search results -->
-
-                <!-- End search results -->
-            </div>
-            <!-- End container -->
-        </div>
     </div>
 @endsection
 @section('script')
+    {{-- rent deposit --}}
     <script>
-        if ($('#lang-change').length > 0) {
-            $('#lang-change').on('change', function(e) {
-                e.preventDefault();
-                var $this = $(this);
-                var locale = $this.val();
-                $.post('language_change.html', {
-                    _token: 'lAjxm1kVepQnQsr3myNg38QYkBpdf0KrBJpGF5MJ',
-                    locale: locale
-                }, function(data) {
-                    location.reload();
-                });
-            });
+        document.getElementById('type').addEventListener('change', function() {
+            const depositAmount = document.getElementById('deposit-amount');
+            if (this.value === 'rent') {
+                depositAmount.style.display = 'block'; // Show the deposit amount field
+            } else {
+                depositAmount.style.display = 'none'; // Hide the deposit amount field
+            }
+        });
+    </script>
+    {{-- slug creation --}}
+    <script>
+        function generateSlug() {
+            const productName = document.getElementById('product-name').value;
+            const slug = productName
+                .toLowerCase() // Convert to lowercase
+                .replace(/[^a-z0-9\s-]/g, '') // Remove invalid characters
+                .replace(/\s+/g, '-') // Replace spaces with hyphens
+                .replace(/-+/g, '-'); // Remove multiple hyphens
+
+            document.getElementById('slug').value = slug;
         }
-
-        var productDetailRoute =
-            "product-detaila022.html?slug=__slug__&amp;sku=__sku__"; // this will be a placeholder
-        $(".js-open-canvas-cart").on("click", function() {
-
-            $.get('cart.json', {
-                _token: 'lAjxm1kVepQnQsr3myNg38QYkBpdf0KrBJpGF5MJ'
-            }, function(data) {
-                console.log();
-                // location.reload();
-                var productRow = '';
-                $.each(data.products, function(index, product) {
-
-                    var productLink = productDetailRoute.replace('__slug__', product.product
-                        .slug).replace('__sku__', product.product.sku);
-
-                    var attributeHTML = '';
-
-                    $.each(product.product.attributes, function(attrIndex, attribute) {
-                        attributeHTML +=
-                            `<span class="cart-item__variant">${attribute.name}, ${attribute.value || "Not specified"}</span>`;
-                    });
-
-                    productRow += `
-                    <li class="cart-item d-flex">
-                            
-                            <p class="cart-item__image">
-                                <a href="${productLink}">
-                                    <img alt="Image" data-sizes="auto"
-                                        data-srcset="${product.product.image}"
-                                        src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                        class="lazyload" />
-                                </a>
-                            </p>
-                        
-                            <p class="cart-item__details">
-                                <a href="" class="cart-item__title">${product.product.name}</a>
-                                ${attributeHTML}
-                                <span class="cart-ietm__price">${product.quantity} <i>x</i> AED ${product.main_price}</span>
-                            </p>
-                            <div class="cart-item__quantity">
-                               
-                            </div>
-                           
-                        
-                            <p class="cart-item__delete">
-                                <a href="#" class="remove-cart-item" data-id="${product.id}" ><i class="lnr lnr-cross"></i></a>
-                            </p>
-                        
-                        </li>`;
-
-                });
-
-                $('.header-cart__items').html(productRow);
-
-                $('.cart_sub_total').html(data.summary.after_discount);
-            });
-
-
-
-            $(".js-canvas-cart").addClass("active");
-            $("body").css("overflow", "hidden");
-            return false;
+        // Initialize Tagify
+        var input = document.getElementById('tags');
+        var tagify = new Tagify(input, {
+            enforceWhitelist: false, // Allow custom tags
+            delimiters: ",| ", // Specify delimiters for new tags
+            originalInputValueFormat: valuesArr => JSON.stringify(valuesArr)
         });
 
-
-        $(document).ready(function() {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-
-            $(document).on('click', '.add-to-cart-btn', function() {
-                const productSlug = $(this).data('product-slug');
-                const productSku = $(this).data('product-sku');
-                var quantity = $('#product_quantity').val() ? ? 1;
-
-                $.ajax({
-                    url: '/cart/add', // Laravel route
-                    type: 'POST',
-                    data: {
-                        product_slug: productSlug,
-                        sku: productSku,
-                        quantity: quantity, // Default quantity
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                    },
-                    success: function(response) {
-                        $('.cart_count').text(response.cart_count);
-                        if (response.status == true) {
-                            toastr.success(response.message, "Success");
-                        } else {
-                            toastr.error(response.message, "Error");
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error("Failed to add item to the cart", 'Error');
-                    },
-                });
-            });
-
-            // Event listener for the "Remove" button
-            $(document).on('click', '.remove-cart-item', function() {
-                var cartItemId = $(this).data('id'); // Get the cart item ID
-                var row = $(this).closest('li'); // Get the closest row to remove
-
-                // Send an Ajax request to remove the item from the cart
-                $.ajax({
-                    url: '/cart/' + cartItemId,
-                    type: 'DELETE',
-                    success: function(response) {
-                        if (response.status === true) {
-                            // Remove the row from the table
-                            row.remove();
-                            $('.row_' + cartItemId).remove();
-                            $('.cart_sub_total').html(response.updatedCartSummary
-                                .sub_total)
-                            // Optionally, you can update the cart summary here
-                            toastr.success(response.message, "Success");
-                        } else {
-                            toastr.error(response.message, "Error");
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error(
-                            "An error occurred while removing the item from the cart.",
-                            "Error");
-                    }
-                });
-            });
-
-            $(document).on('click', '.change_quantity', function() {
-                var cartItemId = $(this).data('id'); // Get the cart item ID
-                var action = $(this).data('action'); // Get the cart item ID
-                var quantity = $('#quantity-field_' + cartItemId).val();
-                // Send an Ajax request to remove the item from the cart
-                if (action == 'plus') {
-                    quantity = parseInt(quantity, 10) + 1;
-                    $('#quantity-field_' + cartItemId).val(quantity);
-
+        document.addEventListener("DOMContentLoaded", function() {
+            const productTypeSelect = document.getElementById("product-type");
+            const attributesSection = document.getElementById("attributes-section");
+            const productVariantContainer = document.querySelector(".product-variant");
+            const attributesSelect = document.getElementById("attributes");
+            const attributesContainer = document.getElementById("product-attributes-container");
+            const proVariantName = document.getElementById("pro_variant_name");
+            const addVariantBtn = document.getElementById("add-variant-btn");
+            const imgVariant = document.getElementById("image-variant-section");
+          
+            let variantCount = 0;
+                      // Show or hide sections based on product type
+            productTypeSelect.addEventListener("change", function() {
+                if (this.value === "variant") {
+                    attributesSection.style.display = "block";
+                    productVariantContainer.style.display = "block";
+                    proVariantName.style.display = "block";
+                    addVariantBtn.style.display = "block";
+                    imgVariant.style.display = "block";
                 } else {
-                    quantity = parseInt(quantity, 10) - 1;;
-                    $('#quantity-field_' + cartItemId).val(quantity);
+                    attributesSection.style.display = "none";
+                    productVariantContainer.style.display = "";
+                    proVariantName.style.display = "none";
+                    addVariantBtn.style.display = "none";
+                    imgVariant.style.display = "none";
                 }
+            });
 
-                $.ajax({
-                    url: '/cart/change_quantity',
-                    type: 'POST',
-                    data: {
-                        cart_id: cartItemId,
-                        action: action,
-                        quantity: quantity
-                    },
-                    success: function(response) {
-                        if (response.status === true) {
-                            // Optionally, you can update the cart summary here
-                            toastr.success(response.message, "Success");
-                            window.location.reload();
-                        } else {
-                            toastr.error(response.message, "Error");
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error(
-                            "An error occurred while removing the item from the cart.",
-                            "Error");
-                    }
+            // Handle attribute selection changes
+            attributesSelect.addEventListener("change", function() {
+                attributesContainer.innerHTML = ""; // Clear previous attributes
+
+                const selectedAttributes = Array.from(this.selectedOptions).map(option => option.value);
+                document.getElementById("selected_attributes").value = JSON.stringify(selectedAttributes);
+
+                // Fetch and display attribute values
+                selectedAttributes.forEach(attributeId => {
+                    fetch(`/vendor/get-attribute-values/${attributeId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const attributeDiv = document.createElement("div");
+                            attributeDiv.classList.add("product_attributes");
+
+                            const label = document.createElement("label");
+                            label.innerHTML =
+                                `${data.attribute_name} <span class="text-danger">*</span>`;
+                            attributeDiv.appendChild(label);
+
+                            const select = document.createElement("select");
+                            select.name =
+                                `variant_attributes[${variantCount}][${attributeId}][]`;
+                            select.classList.add("form-select");
+
+                            data.attribute_values.forEach(value => {
+                                const option = document.createElement("option");
+                                option.value = value.id;
+                                option.textContent = value.name;
+                                select.appendChild(option);
+                            });
+
+                            attributeDiv.appendChild(select);
+                            attributesContainer.appendChild(attributeDiv);
+                        })
+                        .catch(error => console.error("Error fetching attribute values:", error));
                 });
             });
 
-            $(document).on('click', '.wishlist-btn', function() {
-                const heartIcon = $(this).find('.lnr-heart');
-                const productSlug = $(this).data('product-slug');
-                const productSku = $(this).data('product-sku');
-                const url = '/wishlist/store';
+            // Add functionality to add multiple variants
+            document.getElementById("add-variant-btn").addEventListener("click", function() {
+                const variantDiv = document.createElement("div");
+                variantDiv.classList.add("variant-item");
+                variantDiv.id = `variant_${variantCount}`; // Unique ID for each variant
 
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: {
-                        productSlug: productSlug,
-                        productSku: productSku,
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.status == true) {
-                            $('.wishlist_count').text(response.wishlist_count);
-                            toastr.success(response.message, "Success");
-                            heartIcon.toggleClass('active');
+                // Fetch selected attributes
+                const selectedAttributes = Array.from(document.getElementById("attributes").selectedOptions)
+                    .map(
+                        option => ({
+                            id: option.value,
+                            name: option.text
+                        })
+                    );
 
-                            if (response.wishlist_status == 1) {
-                                $('.wishlist_msg').html("Remove from wishlist");
-                            } else {
-                                $('.wishlist_msg').html("Add to wishlist");
-                            }
-                        } else {
-                            toastr.error(response.message, "Error");
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error(
-                            "An error occurred while removing the product from the wishlist.",
-                            "Error");
-                    }
+                // Create the base structure for the variant
+                variantDiv.innerHTML = `
+        <h4>Product Variant ${variantCount + 1}</h4>
+        <div class="form-group">
+            <label for="sku_${variantCount}">SKU <span class="text-danger">*</span></label>
+            <input type="text" name="variants[${variantCount}][sku]" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="quantity_${variantCount}">Quantity <span class="text-danger">*</span></label>
+            <input type="number" name="variants[${variantCount}][quantity]" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="price_${variantCount}">Price <span class="text-danger">*</span></label>
+            <input type="number" name="variants[${variantCount}][price]" class="form-control" required>
+        </div>
+        <div class="form-group">
+             <label for="variant_image_${variantCount}">Variant Image <span class="text-danger">*</span></label>
+             <input type="file" name="variants[${variantCount}][image]" class="form-control" accept="image/*" required>
+       </div>
+        <div class="variant-attributes">
+        </div>
+         <div class="form-group row">
+                <div class="text-right">
+                    <input type="button" class="btn btn-danger action-btn delete-variant-btn" 
+                           value="Delete" data-target="variant_${variantCount}" />
+                </div>
+            </div>
+    `;
+
+                // Add attribute dropdowns
+                const attributesContainer = variantDiv.querySelector(".variant-attributes");
+                selectedAttributes.forEach(attribute => {
+                    // Create a container for each attribute
+                    const attributeDiv = document.createElement("div");
+                    attributeDiv.classList.add("form-group");
+
+                    // Add label
+                    const label = document.createElement("label");
+                    label.innerHTML = `${attribute.name} <span class="text-danger">*</span>`;
+                    attributeDiv.appendChild(label);
+
+                    // Create a dropdown for the attribute values
+                    const select = document.createElement("select");
+                    select.name = `variants[${variantCount}][attributes][${attribute.id}][]`;
+                    select.classList.add("form-select");
+
+                    // Fetch the attribute values dynamically
+                    fetch(`/vendor/get-attribute-values/${attribute.id}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.attribute_values.forEach(value => {
+                                const option = document.createElement("option");
+                                option.value = value.id;
+                                option.textContent = value.name;
+                                select.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error("Error fetching attribute values:", error));
+
+                    attributeDiv.appendChild(select);
+                    attributesContainer.appendChild(attributeDiv);
                 });
+
+                // Append the complete variantDiv to the container
+                document.getElementById("product-attributes-container").appendChild(variantDiv);
+                variantCount++;
             });
-
-            $('#newsletterForm').on('submit', function(e) {
-                e.preventDefault();
-
-                $.ajax({
-                    url: "https://zena.tomsher.net/subscribe",
-                    method: "POST",
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        $('#newsletterMessage').html('<p style="color: green;">' +
-                            response
-                            .success + '</p>');
-                        $('#newsletterForm')[0].reset();
-                    },
-                    error: function(xhr) {
-                        let errors = xhr.responseJSON.errors;
-                        if (errors && errors.email) {
-                            $('#newsletterMessage').html('<p style="color: red;">' +
-                                errors
-                                .email[0] + '</p>');
-                        }
+            document.getElementById("product-attributes-container").addEventListener("click", function(event) {
+                if (event.target.classList.contains("delete-variant-btn")) {
+                    const targetVariantId = event.target.getAttribute("data-target");
+                    const variantElement = document.getElementById(targetVariantId);
+                    if (variantElement) {
+                        variantElement.remove(); // Remove the variant container
                     }
-                });
+                }
             });
 
         });
 
-        $('.proceedToCheckout').on('click', function() {
-            $.ajax({
-                url: '/check-login-status', // Endpoint to check login status
-                type: 'GET',
-                success: function(response) {
-                    if (response.is_logged_in) {
-                        // Redirect to checkout page
-                        window.location.href = 'login.html';
-                    } else {
-                        // Show alert if not logged in
-                        toastr.error("You need to log in to proceed.", "Error");
-                    }
+
+        //tab repeater
+        $(document).ready(function() {
+            $('.repeater').repeater({
+                initEmpty: false, // Ensures the first tab is already visible
+                defaultValues: {
+                    'tab_heading': '',
+                    'tab_description': ''
                 },
-                error: function() {
-                    toastr.error("An error occurred. Please try again.", "Error");
-                }
-            });
-        });
-
-        $(document).ajaxComplete(function() {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                show: function() {
+                    $(this).slideDown(); // Animation when adding a new tab
+                },
+                hide: function(deleteElement) {
+                    if (confirm('{{ trans('messages.are_you_sure') }}')) {
+                        $(this).slideUp(deleteElement); // Animation when deleting a tab
+                    }
                 }
             });
         });
     </script>
 
-    <script>
-        const currentAttribute = {
-            "6": 15
-        };
-        const productAttributes = [{
-            "id": "6",
-            "name": "Color",
-            "values": [{
-                "id": 15,
-                "name": "Gold"
-            }, {
-                "id": 17,
-                "name": "Rose Gold"
-            }]
-        }];
-        const variantProducts = [{
-            "SKU00010": ["15"]
-        }, {
-            "SKU00020": ["17"]
-        }];
-
-
-        var slug = 'generic-diamond-pendant-necklace';
-        $(document).ready(function() {
-
-            let selectedAttributes = {}; // Tracks selected attributes.
-            const firstAttributeId = productAttributes[0].id; // The ID of the first attribute.
-
-            // Event handler for selecting an attribute value
-            $('.attribute-item').click(function() {
-                const attributeId = $(this).closest('.attribute-list').data('attribute-id');
-                const valueId = $(this).data('value-id');
-
-                // If the first attribute is selected, no need to filter it
-                if (attributeId === firstAttributeId) {
-                    // Always update the first attribute selection
-                    selectedAttributes[attributeId] = valueId;
-                    $(this).siblings().removeClass('active');
-                    $(this).addClass('active');
-
-                    // Filter the remaining attributes based on this selection
-                    updateSubsequentAttributes(selectedAttributes);
-                    return;
-                }
-
-                // For other attributes, update selected value and filter
-                selectedAttributes[attributeId] = valueId;
-
-                // Mark the clicked value as selected
-                $(this).siblings().removeClass('active');
-                $(this).addClass('active');
-
-                // Clear selections for attributes that come after the current one
-                clearSubsequentAttributes(attributeId);
-
-                // Filter valid combinations based on the selected attributes
-                filterAttributes(selectedAttributes);
-
-                // Check if all attributes are selected to display SKU
-                if (Object.keys(selectedAttributes).length === productAttributes.length) {
-                    displaySKU(selectedAttributes);
-                } else {
-                    $('#product-stock').html(
-                        '<p>Select all attributes to see product details.</p>');
-                }
-            });
-
-            // Filter the valid values for each attribute based on the selected attributes
-            function filterAttributes(selectedAttributes) {
-                const validCombinations = getValidCombinations(selectedAttributes);
-                let validValues = {};
-
-                validCombinations.forEach(variant => {
-                    const values = Object.values(variant)[0].map(value => parseInt(
-                        value)); // Convert to integers
-                    values.forEach(value => {
-                        const attrId = getAttributeId(value);
-                        if (!validValues[attrId]) validValues[attrId] = [];
-                        if (!validValues[attrId].includes(value)) validValues[attrId].push(
-                            value);
-                    });
-                });
-
-                // Update UI for each attribute list
-                $('.attribute-list').each(function() {
-                    const attrId = $(this).data('attribute-id');
-
-                    // Skip the first attribute from filtering (it stays always visible)
-                    if (attrId === firstAttributeId) {
-                        $(this).find('.attribute-item').show().removeClass('disabled');
-                        return;
-                    }
-
-                    $(this).find('.attribute-item').each(function() {
-                        // Skip the item with class "firstItem_0" from getting disabled
-                        if ($(this).hasClass('firstItem_0')) {
-                            return; // Don't apply disabling logic to this item
-                        }
-
-                        const valueId = parseInt($(this).data(
-                            'value-id')); // Convert to integer
-                        if (validValues[attrId] ? .includes(valueId)) {
-                            $(this).removeClass('disabled').show();
-                        } else {
-                            $(this).addClass('disabled').hide();
-                        }
-                    });
-                });
-            }
-
-            // Automatically select valid combinations for subsequent attributes when the first attribute is changed
-            function updateSubsequentAttributes(selectedAttributes) {
-                const validCombinations = getValidCombinations(selectedAttributes);
-
-                let validValues = {};
-                validCombinations.forEach(variant => {
-                    const values = Object.values(variant)[0].map(value => parseInt(
-                        value)); // Convert to integers
-                    values.forEach(value => {
-                        const attrId = getAttributeId(value);
-                        if (!validValues[attrId]) validValues[attrId] = [];
-                        if (!validValues[attrId].includes(value)) validValues[attrId].push(
-                            value);
-                    });
-                });
-
-                // Update the UI for each attribute list
-                $('.attribute-list').each(function() {
-                    const attrId = $(this).data('attribute-id');
-
-                    // Skip the first attribute from filtering (it stays always visible)
-                    if (attrId === firstAttributeId) {
-                        $(this).find('.attribute-item').show().removeClass('disabled');
-                        return;
-                    }
-
-                    $(this).find('.attribute-item').each(function() {
-                        const valueId = parseInt($(this).data(
-                            'value-id')); // Convert to integer
-                        if (validValues[attrId] ? .includes(valueId)) {
-                            $(this).removeClass('disabled').show();
-                            // Auto-select the valid values
-                            if (!selectedAttributes[attrId]) {
-                                selectedAttributes[attrId] = valueId;
-                                $(this).addClass('active');
-                            }
-                        } else {
-                            $(this).addClass('disabled').hide();
-                        }
-                    });
-                });
-
-                // Check if all attributes are selected to display SKU
-                if (Object.keys(selectedAttributes).length === productAttributes.length) {
-                    displaySKU(selectedAttributes);
-                }
-            }
-
-            // Get valid combinations based on the selected attributes
-            function getValidCombinations(selectedAttributes) {
-                console.log("Selected Attributes:", selectedAttributes);
-                console.log("Variant Products:", variantProducts);
-
-                return variantProducts.filter(variant => {
-                    const values = Object.values(variant)[0].map(value => parseInt(
-                        value)); // Convert to integers
-                    return Object.entries(selectedAttributes).every(([attrId, valueId]) => {
-                        return values.includes(parseInt(
-                            valueId)); // Ensure both are integers
-                    });
-                });
-            }
-
-            // Function to clear selections for subsequent attributes
-            function clearSubsequentAttributes(attributeId) {
-                // Clear selections for attributes following the current attribute
-                const attributeIndex = productAttributes.findIndex(attr => attr.id == attributeId);
-                productAttributes.slice(attributeIndex + 1).forEach(attr => {
-                    delete selectedAttributes[attr.id];
-                    $(`[data-attribute-id="${attr.id}"] .attribute-item`).removeClass('active');
-                });
-            }
-
-            // Display the correct SKU once all attributes are selected
-            function displaySKU(selectedAttributes) {
-                const matchingVariant = variantProducts.find(variant => {
-                    const values = Object.values(variant)[0].map(value => parseInt(
-                        value)); // Convert to integers
-                    return Object.values(selectedAttributes).every(value => values.includes(value));
-                });
-
-                if (matchingVariant) {
-                    const sku = Object.keys(matchingVariant)[0];
-                    $('#product-stock').html(`<p>SKU: ${sku}</p>`);
-                    var url = '/product-detail?slug=' + encodeURIComponent(slug) + '&sku=' +
-                        encodeURIComponent(
-                            sku);
-
-                    // Redirect to the URL
-                    window.location.href = url;
-                } else {
-                    $('#product-stock').html('<p>No matching product found.</p>');
-                }
-            }
-
-            // Helper function to get the attribute ID based on value ID
-            function getAttributeId(valueId) {
-                for (const attribute of productAttributes) {
-                    if (attribute.values.some(value => value.id === valueId)) {
-                        return attribute.id;
-                    }
-                }
-                return null;
-            }
-        });
-    </script>
-    <link href="../cdn.jsdelivr.net/npm/bootstrap%405.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="../cdn.jsdelivr.net/npm/bootstrap%405.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.repeater/jquery.repeater.min.js"></script>
+     
     <script>
-        flatpickr("#date-range", {
+        flatpickr("#date_range", {
             mode: "range",
             dateFormat: "Y-m-d", // Customize date format
             onChange: function(selectedDates, dateStr, instance) {
@@ -1043,47 +596,52 @@
             }
         });
     </script>
-
     <script>
         // Function to initialize CKEditor for elements with a specific class
         function initializeCKEditorByClass(className) {
             const editors = document.getElementsByClassName(className);
-            Array.from(editors).forEach(editor => {
+            Array.from(editors).forEach((editor, index) => {
+                // Ensure the element has a unique ID
+                if (!editor.id) {
+                    editor.id = `editor-${index}`; // Generate a unique ID if not present
+                }
+    
+                // Initialize CKEditor
                 CKEDITOR.replace(editor.id, {
                     height: 300,
-                    toolbar: [{
-                            name: 'basicstyles',
-                            items: ['Bold', 'Italic', 'Underline', 'Strike']
-                        },
+                    toolbar: [
+                        { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike'] },
                         {
                             name: 'paragraph',
-                            items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent',
-                                '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight',
-                                'JustifyBlock'
+                            items: [
+                                'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent',
+                                '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'
                             ]
                         },
-                        {
-                            name: 'styles',
-                            items: ['Format', 'Font', 'FontSize']
-                        },
-                        {
-                            name: 'colors',
-                            items: ['TextColor', 'BGColor']
-                        },
-                        {
-                            name: 'insert',
-                            items: ['Link', 'Image', 'Table']
-                        },
-                        {
-                            name: 'tools',
-                            items: ['Maximize']
-                        }
+                        { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
+                        { name: 'colors', items: ['TextColor', 'BGColor'] },
+                        { name: 'insert', items: ['Link', 'Image', 'Table'] },
+                        { name: 'tools', items: ['Maximize'] }
                     ]
                 });
             });
         }
-
+    
         // Initialize CKEditor for all elements with the class 'text-editor'
         initializeCKEditorByClass('text-editor');
     </script>
+    <script>
+        // Intercept console warnings
+        const originalConsoleWarn = console.warn;
+        console.warn = function(message, ...args) {
+            if (typeof message === 'string' && message.includes('This CKEditor 4.21.0 version is not secure')) {
+                return; // Suppress the specific warning
+            }
+            originalConsoleWarn.apply(console, [message, ...args]);
+        };
+    </script>
+    <script>
+    console.warn = function() {}; // Suppress all warnings
+</script>
+    
 @endsection

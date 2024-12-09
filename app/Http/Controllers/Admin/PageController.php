@@ -25,11 +25,11 @@ class PageController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-	{
-		$pages = \App\Models\Page::where('status',1)->orderBy('slug', 'asc')->get();
-       
+    {
+        $pages = \App\Models\Page::where('status', 1)->orderBy('slug', 'asc')->get();
+
         return view('backend.website_settings.pages.index', compact('pages'));
-	}
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -49,7 +49,7 @@ class PageController extends Controller
      */
     public function store(Request $request)
     {
-        
+
         $page = new Page;
         $page->title = $request->title;
         if (Page::where('slug', preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->slug)))->first() == null) {
@@ -67,11 +67,17 @@ class PageController extends Controller
             $page_translation->content  = $request->content;
             $page_translation->save();
 
-            flash(translate('New page has been created successfully'))->success();
+            //     flash(translate('New page has been created successfully'))->success();
+            //     return redirect()->route('website.pages');
+            // }
+
+            // flash(translate('Slug has been used already'))->warning();
+            // return back();
+            flash(__('messages.page_created_success'))->success();
             return redirect()->route('website.pages');
         }
 
-        flash(translate('Slug has been used already'))->warning();
+        flash(__('messages.slug_used_message'))->warning();
         return back();
     }
 
@@ -92,36 +98,35 @@ class PageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-   public function edit(Request $request, $id)
-   {
+    public function edit(Request $request, $id)
+    {
         $lang = $request->lang;
         $page_name = $request->page;
         $page = Page::where('type', $id)->first();
-        if($page != null){
+        if ($page != null) {
             $page_id = $page->id;
-          if ($id == 'home') {
-            $banners = Banner::where('status', 1)->get();
-            $current_banners = BusinessSetting::whereIn('type', array('home_banner','home_mid_section_banner','home_center_banner', 'home_mid_banner', 'home_large_banner'))->get()->keyBy('type');
-            // echo '<pre>';
-            // print_r($current_banners);
-            // die;
-            $categories = Category::where('parent_id', 0)->where('is_active',1)->with('childrenCategories')->get();
+            if ($id == 'home') {
+                $banners = Banner::where('status', 1)->get();
+                $current_banners = BusinessSetting::whereIn('type', array('home_banner', 'home_mid_section_banner', 'home_center_banner', 'home_mid_banner', 'home_large_banner'))->get()->keyBy('type');
+                // echo '<pre>';
+                // print_r($current_banners);
+                // die;
+                $categories = Category::where('parent_id', 0)->where('is_active', 1)->with('childrenCategories')->get();
 
-            $products = Product::select('id', 'name')->where('published',1)->get();
-            $brands = Brand::where('is_active',1)->orderBy('name', 'asc')->get();
-            $occasions = Occasion::where('is_active',1)->orderBy('name', 'asc')->get();
+                $products = Product::select('id', 'name')->where('published', 1)->get();
+                $brands = Brand::where('is_active', 1)->orderBy('name', 'asc')->get();
+                $occasions = Occasion::where('is_active', 1)->orderBy('name', 'asc')->get();
 
-            return view('backend.website_settings.pages.home_page_edit', compact('page', 'banners', 'current_banners', 'categories', 'brands', 'products','occasions','lang','page_id'));
-            
-          }else if ($id == 'find_us' || $id == 'news' || $id == 'faq') {
-            return view('backend.website_settings.pages.find_us', compact('page','lang','page_id'));
-          }else if ($id == 'contact_us') {
-            return view('backend.website_settings.pages.contact_us', compact('page','lang','page_id'));
-          }else if ($id == 'about_us') {
-            return view('backend.website_settings.pages.about_us', compact('page','lang','page_id'));
-          }else{
-            return view('backend.website_settings.pages.edit', compact('page','lang','page_id'));
-          }
+                return view('backend.website_settings.pages.home_page_edit', compact('page', 'banners', 'current_banners', 'categories', 'brands', 'products', 'occasions', 'lang', 'page_id'));
+            } else if ($id == 'find_us' || $id == 'news' || $id == 'faq') {
+                return view('backend.website_settings.pages.find_us', compact('page', 'lang', 'page_id'));
+            } else if ($id == 'contact_us') {
+                return view('backend.website_settings.pages.contact_us', compact('page', 'lang', 'page_id'));
+            } else if ($id == 'about_us') {
+                return view('backend.website_settings.pages.about_us', compact('page', 'lang', 'page_id'));
+            } else {
+                return view('backend.website_settings.pages.edit', compact('page', 'lang', 'page_id'));
+            }
         }
         abort(404);
     }
@@ -135,7 +140,7 @@ class PageController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
         $page = Page::findOrFail($id);
         if ($page) {
             if ($request->hasfile('image')) {
@@ -143,7 +148,7 @@ class PageController extends Controller
                 $page->image = $photo;
                 $page->save();
             }
-            
+
             $page_translation                       = PageTranslation::firstOrNew(['lang' => $request->lang, 'page_id' => $page->id]);
             $page_translation->title                = $request->title;
             $page_translation->content              = $request->has('content') ? $request->content : NULL;
@@ -167,7 +172,7 @@ class PageController extends Controller
             $page_translation->image1               = $request->has('image1') ? $request->image1 : NULL;
             $page_translation->save();
 
-            flash(trans('messages.page').' '.trans('messages.updated_msg'))->success();
+            flash(trans('messages.page') . ' ' . trans('messages.updated_msg'))->success();
             return redirect()->route('website.pages');
         }
 
@@ -175,7 +180,8 @@ class PageController extends Controller
         return back();
     }
 
-    public function enquiries(){
+    public function enquiries()
+    {
         $query = Contacts::latest();
         $contact = $query->paginate(20);
         return view('backend.contact', compact('contact'));
@@ -193,23 +199,25 @@ class PageController extends Controller
         foreach ($page->page_translations as $key => $page_translation) {
             $page_translation->delete();
         }
-        if(Page::destroy($id)){
+        if (Page::destroy($id)) {
             flash(translate('Page has been deleted successfully'))->success();
             return redirect()->back();
         }
         return back();
     }
 
-    public function show_custom_page($slug){
+    public function show_custom_page($slug)
+    {
         $page = Page::where('slug', $slug)->first();
-        if($page != null){
+        if ($page != null) {
             return view('frontend.custom_page', compact('page'));
         }
         abort(404);
     }
-    public function mobile_custom_page($slug){
+    public function mobile_custom_page($slug)
+    {
         $page = Page::where('slug', $slug)->first();
-        if($page != null){
+        if ($page != null) {
             return view('frontend.m_custom_page', compact('page'));
         }
         abort(404);
