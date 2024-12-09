@@ -12,6 +12,7 @@ use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Frontend\ProfileController;
 use App\Http\Controllers\Frontend\ForgotPasswordController;
 use App\Http\Controllers\Frontend\VendorController;
+use App\Http\Controllers\Frontend\AddressController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,6 +92,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('account', [ProfileController::class, 'getUserAccountInfo'])->name('account');
     Route::post('/account/update', [ProfileController::class, 'update'])->name('account.update'); 
     Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('account.changePassword');
+
+    // Route::Resource('address', AddressController::class);
+    Route::get('address', [AddressController::class, 'index'])->name('address.index');
+    Route::post('save-address', [AddressController::class, 'store'])->name('save-address');
+    Route::post('/address/default', [AddressController::class, 'setDefaultAddress'])->name('address.default');
+    Route::delete('/address/delete', [AddressController::class, 'deleteAddress'])->name('address.delete');;
+    Route::post('/address/update', [AddressController::class, 'updateAddress'])->name('address.update');
     
     Route::post('/rent/product-order', [CheckoutController::class, 'rentProductOrder'])->name('rent.product-order');
     Route::post('/rent/product-order/process', [CheckoutController::class, 'placeRentOrder'])->name('rent.checkout.process');

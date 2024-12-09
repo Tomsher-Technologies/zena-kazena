@@ -49,6 +49,30 @@
                                 </div>
                                 <div id="couponMessage" class=" mb-1"></div>
                             </div>
+                            @if (!empty($addresses[0]))
+                                <div class="address">
+                                    <h3 class="discount__title" style="margin-left:10px;">{{ trans('messages.saved') }} {{ trans('messages.address') }}</h3>
+                                    <div class="row">
+                                        
+                                            @foreach ($addresses as $key => $address)
+                                                <div class="col-12 col-md-6 addressSelect" style="cursor:pointer;" id="address-{{ $address->id }}"  data-id="{{ $address->id }}" data-name="{{ $address->name }}" data-address="{{ $address->address }}" data-city="{{ $address->city }}" data-zipcode="{{ $address->postal_code }}" data-phone="{{ $address->phone }}" >
+                                                    <div class="customer-information__section addressDiv @if(old('address_id') == $address->id) default-address @endif">
+                                                        <h4 class="order-information__section-heading">{{ trans('messages.address') }} {{$key+1}}
+                                                        </h4>
+                                                        <div class="order-information__section-content">
+                                                            {{ $address->name }}<br>
+                                                            {!! nl2br($address->address) !!}<br>
+                                                            {{ $address->city }}<br>
+                                                            {{trans('messages.zipcode')}} : {{ $address->postal_code }}<br>
+                                                            {{trans('messages.phone')}} : {{ $address->phone }}<br>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        
+                                    </div>
+                                </div>
+                            @endif
                             <!-- End row -->
                             <form id="checkoutForm" action="{{ route('checkout.process') }}" method="POST">
                                 @csrf
@@ -57,7 +81,7 @@
                                     <!-- Title -->
                                     <h3 class="billing-form__heading">{{ trans('messages.billing_details') }}</h3>
                                     <!-- End title -->
-                                    
+                                    <input type="hidden" id="address_id" name="address_id">
                                     <div class="form-group">
                                         <input type="text" placeholder="{{trans('messages.full_name')}} *"  id="billing_name" name="billing_name" class="form-group__input" value="{{ old('billing_name') }}">
                                         @if ($errors->has('billing_name'))
@@ -66,7 +90,7 @@
                                     </div>
                                     
                                     <div class="form-group">
-                                        <input type="text" placeholder="{{trans('messages.address')}} *" id="billing_address" name="billing_address" class="form-group__input" value="{{ old('billing_address') }}">
+                                        <textarea placeholder="{{trans('messages.address')}} *" id="billing_address" name="billing_address" class="form-group__input" >{{ old('billing_address') }}</textarea>
                                         @if ($errors->has('billing_address'))
                                             <div class="alert alert-danger">{{ $errors->first('billing_address') }}</div>
                                         @endif
@@ -110,22 +134,37 @@
                                         <h3 class="billing-form__heading">{{ trans('messages.shipping_details') }}</h3>
                                         <div class="form-group">
                                             <input type="text" placeholder="{{trans('messages.full_name')}} *"  id="shipping_name" name="shipping_name" class="form-group__input" value="{{ old('shipping_name') }}" @if(old('same_as_billing') == 'on') readonly @endif>
+                                            @if ($errors->has('shipping_name'))
+                                                <div class="alert alert-danger">{{ $errors->first('shipping_name') }}</div>
+                                            @endif
                                         </div>
                                         
                                         <div class="form-group">
-                                            <input type="text" placeholder="{{trans('messages.address')}} *" id="shipping_address" name="shipping_address" class="form-group__input" value="{{ old('shipping_address') }}" @if(old('same_as_billing') == 'on') readonly @endif>
+                                            <textarea placeholder="{{trans('messages.address')}} *" id="shipping_address" name="shipping_address" class="form-group__input" @if(old('same_as_billing') == 'on') readonly @endif>{{ old('shipping_address') }}</textarea>
+                                            @if ($errors->has('shipping_address'))
+                                                <div class="alert alert-danger">{{ $errors->first('shipping_address') }}</div>
+                                            @endif
                                         </div>
                                       
                                         <div class="form-group">
                                             <input type="text"  id="shipping_city" name="shipping_city" placeholder="{{trans('messages.town_city')}} *" class="form-group__input" value="{{ old('shipping_city') }}" @if(old('same_as_billing') == 'on') readonly @endif>
+                                            @if ($errors->has('shipping_city'))
+                                                <div class="alert alert-danger">{{ $errors->first('shipping_city') }}</div>
+                                            @endif
                                         </div>
                                         
                                         <div class="form-group">
                                             <input type="text" placeholder="{{trans('messages.zip')}} *"  id="shipping_zipcode" name="shipping_zipcode" class="form-group__input"  value="{{ old('shipping_zipcode') }}" @if(old('same_as_billing') == 'on') readonly @endif>
+                                            @if ($errors->has('shipping_zipcode'))
+                                                <div class="alert alert-danger">{{ $errors->first('shipping_zipcode') }}</div>
+                                            @endif
                                         </div>
                                         
                                         <div class="form-group">
                                             <input type="text" placeholder="{{trans('messages.phone')}} *"  id="shipping_phone" name="shipping_phone" class="form-group__input" value="{{ old('shipping_phone') }}" @if(old('same_as_billing') == 'on') readonly @endif>
+                                            @if ($errors->has('shipping_zipcode'))
+                                                <div class="alert alert-danger">{{ $errors->first('shipping_zipcode') }}</div>
+                                            @endif
                                         </div>
                                        
                                     </div>
@@ -343,6 +382,7 @@
                 
                 $('.shipping-address input').prop('readonly', true);
             } else {
+                $('.shipping-address textarea').val('');
                 $('.shipping-address input').val('').prop('readonly', false);
             }
         });
@@ -354,6 +394,32 @@
         
         $('#submitCheckout').on('click', function () {
             $('#checkoutForm').submit();
+        });
+
+        
+        $(document).on('click', '.addressSelect', function () {
+            $('.addressDiv').removeClass('default-address');
+            $(this).find('.addressDiv').addClass('default-address');
+            let id = $(this).data('id');
+            let name = $(this).data('name');
+            let address = $(this).data('address');
+            let phone = $(this).data('phone');
+            let city = $(this).data('city');
+            let zipcode = $(this).data('zipcode');
+
+            $('#address_id').val(id);
+            $('#billing_address').val(address);
+            $('#billing_name').val(name);
+            $('#billing_phone').val(phone);
+            $('#billing_city').val(city);
+            $('#billing_zipcode').val(zipcode);
+            if ($('#checkbox2').is(':checked')) {
+                $('#shipping_name').val(name);
+                $('#shipping_address').val(address);
+                $('#shipping_city').val(city);
+                $('#shipping_zipcode').val(zipcode);
+                $('#shipping_phone').val(phone);
+            }
         });
 
     });
