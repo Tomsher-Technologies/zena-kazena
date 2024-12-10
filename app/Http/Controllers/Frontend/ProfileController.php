@@ -31,18 +31,40 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        
         $request->validate([
             'name' => 'required|string|max:255',
             // 'email' => 'required|email|unique:users,email,' . Auth::id(),
+            'idimage' => 'nullable|image|mimes:jpeg,png,jpg,gif', // Max size 2MB
+            'idimageback' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'phone' => 'nullable|min:9',
+            'eidno' => 'nullable',
         ]);
 
         $user = Auth::user();
         $user->name = $request->name;
         $user->phone = $request->phone;
-        $user->save();
-        // $user->update($request->only('name', 'phone'));
 
+        $idImagePath = null;
+        if ($request->hasFile('idimage')) {
+            $uniqueFileNameId = time() . '_' . uniqid();
+            $idImagePath = uploadImage('profile', $request->idimage, $uniqueFileNameId);
+            $user->eid_image_front = $idImagePath;
+            $user->eid_approval_status = 0;
+        }
+
+        // Process uploaded files
+        $idImagePathBack = null;
+        if ($request->hasFile('idimageback')) {
+            $uniqueFileNameIdB = time() . '_' . uniqid();
+            $idImagePathBack = uploadImage('profile', $request->idimageback, $uniqueFileNameIdB);
+            $user->eid_image_back = $idImagePathBack;
+            $user->eid_approval_status = 0;
+        }
+
+        $user->eid_no = $request->eid_no;
+        $user->save();
+       
         session()->flash('message', trans('messages.profile_update_success'));
         session()->flash('alert-type', 'success');
 

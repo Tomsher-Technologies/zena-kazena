@@ -33,13 +33,13 @@
                 <!-- Content -->
                 <div class="col-lg-8">
                     <!-- Form -->
-                    <form class="contact-page__form" action="{{ route('account.update') }}" method="POST">
+                    <form class="contact-page__form" action="{{ route('account.update') }}" method="POST"  enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
                                 <!-- Form group -->
                                 <div class="form-group">
-                                    <label for="First name">{{ trans('messages.full_name') }}</label>
+                                    <label for="First name">{{ trans('messages.full_name') }}<span class="text-danger">*</span></label>
                                     <input type="text" name="name" class="form-group__input" placeholder="{{ trans('messages.full_name') }}" value="{{old('name', $user['name'])}}">
                                     @error('name')
                                         <div class="alert alert-danger">{{ $message }}</div>
@@ -50,7 +50,7 @@
                             <div class="col-md-6">
                                 <!-- Form group -->
                                 <div class="form-group">
-                                    <label for="First name">{{ trans('messages.email') }}</label>
+                                    <label for="First name">{{ trans('messages.email') }}<span class="text-danger">*</span></label>
                                     <input type="text" name="email" disabled class="form-group__input" placeholder="{{ trans('messages.email') }}" value="{{old('email', $user['email'])}}">
                                     @error('email')
                                         <div class="alert alert-danger">{{ $message }}</div>
@@ -71,7 +71,70 @@
                                 </div>
                                 <!-- End form group -->
                             </div>
+
+                            <div class="col-md-6">
+                                <!-- Form group -->
+                                <div class="form-group">
+                                    <label for="First name">{{ trans('messages.eid') }} {{ trans('messages.number') }}</label>
+                                    <input type="text" name="eid_no" class="form-group__input" placeholder="{{ trans('messages.eid') }} {{ trans('messages.number') }}" value="{{old('eid_no', $user['eid_no'])}}">
+                                    @error('eid_no')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="idimage">{{ trans('messages.eid') }} {{ trans('messages.front') }} {{ trans('messages.image') }}</label>
+                                    <input type="file" class="form-control" id="idimage" name="idimage" accept="image/*">
+                                    @error('idimage')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
+                                    
+                                </div>
+                                @if ($user['eid_image_front'] != null)
+                                    <div class="file-preview box sm">
+                                        <a href="{{ asset($user['eid_image_front']) }}" target="_blank">
+                                            <div  class="d-flex justify-content-between align-items-center mt-2 file-preview-item">
+                                                <div class="align-items-center align-self-stretch d-flex thumb">
+                                                    <img src="{{ asset($user['eid_image_front']) }}" class="img-fit">
+                                                </div>
+                                                
+                                            </div>
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="idimageback">{{ trans('messages.eid') }} {{ trans('messages.back') }} {{ trans('messages.image') }}</label>
+                                    <input type="file" class="form-control" id="idimageback" name="idimageback" accept="image/*">
+                                    @error('idimageback')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
+                                   
+                                </div>
+                                @if ($user['eid_image_back'] != null)
+                                    <div class="file-preview box sm">
+                                        <a href="{{ asset($user['eid_image_back']) }}" target="_blank">
+                                            <div  class="d-flex justify-content-between align-items-center mt-2 file-preview-item">
+                                                <div
+                                                    class="align-items-center align-self-stretch d-flex thumb">
+                                                    <img src="{{ asset($user['eid_image_back']) }}" class="img-fit">
+                                                </div>
+                                                
+                                            </div>
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+
+                        
+                        
                         <!-- End row -->
                         <!-- Action -->
                         <div class="form__action">

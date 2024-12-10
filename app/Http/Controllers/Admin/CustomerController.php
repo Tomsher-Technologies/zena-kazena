@@ -224,4 +224,26 @@ class CustomerController extends Controller
 
         return back();
     }
+
+    public function changeEidStatus(Request $request){
+        $user = User::findOrFail(decrypt($request->id));
+        $user->eid_approval_status = $request->status;
+        $user->save();
+        if($request->status == 1){
+            return response()->json([
+                'status' => true,
+                'message' => trans('messages.approved_success')
+            ], 200);
+        }elseif($request->status == 2){
+            return response()->json([
+                'status' => true,
+                'message' => trans('messages.deny_success')
+            ], 200);
+        }
+        
+        return response()->json([
+            'status' => false,
+            'message' => trans('messages.something_went_wrong')
+        ], 200);
+    }
 }
