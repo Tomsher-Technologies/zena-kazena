@@ -8,7 +8,6 @@ use App;
 class Attribute extends Model
 {
 
-  protected $table = 'attributes';
   protected $with = ['attribute_translations'];
 
   protected $fillable = [

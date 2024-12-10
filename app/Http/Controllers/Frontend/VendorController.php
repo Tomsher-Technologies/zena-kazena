@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\AttributeValue;
-use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -15,7 +13,7 @@ use App\Models\ProductTranslation;
 use App\Models\Review;
 use App\Models\Vendor;
 use App\Services\ImageResizeAndDownload;
-// use Attribute;
+use App\Models\Attribute;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -299,6 +297,7 @@ class VendorController extends Controller
         flash(trans('messages.vendor') . ' ' . trans('messages.deleted_msg'))->success();
         return redirect()->route('vendors.index');
     }
+
     public function ban($id)
     {
         $vendor = Vendor::findOrFail(decrypt($id));
@@ -324,7 +323,6 @@ class VendorController extends Controller
     }
     public function vendorAll_products(Request $request)
     {
-
         $products = Product::where('vendor_id', auth()->guard('vendor')->id())
             ->whereHas('stocks', function ($query) {
                 $query->whereColumn('product_stocks.sku', 'sku');
@@ -348,7 +346,6 @@ class VendorController extends Controller
 
         return view('frontend.vendor.product.create', compact('categories'));
     }
-
     public function vendorProductStore(Request $request)
     {
         // echo '<pre>';
@@ -521,75 +518,6 @@ class VendorController extends Controller
             $variantImage = (isset($request->product_variant_image)) ? $this->imageService->downloadAndResizeImage('varient', $request->product_variant_image, $request->sku, false) : NULL;
             $product_stock->image = $variantImage;
             $product_stock->save();
-            // if ($request->has('main_attributes')) {
-            //     foreach ($request->main_attributes as $key => $no) {
-            //         $attrId = $no;
-            //         // Loop through each variant attribute
-            //         foreach ($request->variant_attributes as $variant_key => $variant_values) {
-            //             // If the variant has the current attribute
-            //             if (isset($variant_values[$attrId])) {
-            //                 $product_attributes[] = [
-            //                     'product_id' => $product->id,
-            //                     'product_varient_id' => $product_stock->id,
-            //                     'attribute_id' => $attrId,
-            //                     'attribute_value_id' => $variant_values[$attrId][0], // Use the variant value for the current attribute
-            //                 ];
-            //             }
-            //             if (!empty($product_attributes)) {
-            //                 $p_attribute = ProductAttributes::insert($product_attributes);
-            //             }
-            //         }
-            //     }
-            //     foreach ($request->main_attributes as $key => $no) {
-            //         if ($request->has('variants')) {
-            //             $attrId = $no;
-            //             // Loop through each variant attribute
-            //             foreach ($request->variants as $variant_key => $variant) {
-            //                 $product_stock = new ProductStock();
-            //                 $product_stock->product_id = $product->id;
-            //                 $product_stock->sku = $variant['sku'];
-            //                 $product_stock->price = $variant['price'];
-            //                 $product_stock->qty =  $variant['quantity'];
-
-            //                 $offertag       = '';
-            //                 $productOrgPrice = $variant['price'];
-            //                 $discountPrice = $productOrgPrice;
-            //                 $discount_applicable = false;
-            //                 if (strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date && strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date) {
-            //                     if ($product->discount_type == 'percent') {
-            //                         $discountPrice = $productOrgPrice - (($productOrgPrice * $product->discount) / 100);
-            //                         $offertag = $product->discount . '% OFF';
-            //                     } elseif ($product->discount_type == 'amount') {
-            //                         $discountPrice = $productOrgPrice - $product->discount;
-            //                         $offertag = 'AED ' . $product->discount . ' OFF';
-            //                     }
-            //                 }
-            //                 $product_stock->price       = $productOrgPrice;
-            //                 $product_stock->offer_price = $discountPrice;
-            //                 $product_stock->offer_tag   = $offertag;
-            //                 $variantImage = (isset($variant['image'])) ? $this->imageService->downloadAndResizeImage('varient', $variant['image'], $variant['sku'], false) : NULL;
-            //                 $product_stock->image = $variantImage;
-            //                 $product_stock->save();
-            //                 foreach ($variant['attributes'] as $variant_key => $attribute) {
-            //                     $attribute_value = $attribute[0];  // Or use reset($attribute);
-            //                     // If the variant has the current attribute
-            //                     if (isset($attribute[$attrId])) {
-            //                         $product_attributes[] = [
-            //                             'product_id' => $product->id,
-            //                             'product_varient_id' => $product_stock->id,
-            //                             'attribute_id' => $attrId,
-            //                             'attribute_value_id' => $attribute_value[$attrId][0], // Use the variant value for the current attribute
-            //                         ];
-            //                     }
-            //                     if (!empty($product_attributes)) {
-
-            //                         $p_attribute = ProductAttributes::insert($product_attributes);
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
             if ($request->has('main_attributes')) {
                 $product_attributes = []; // Initialize outside to collect all attributes once
 
@@ -673,7 +601,6 @@ class VendorController extends Controller
         }
 
 
-
         flash(trans('messages.product') . ' ' . trans('messages.created_msg'))->success();
 
         Artisan::call('view:clear');
@@ -711,7 +638,6 @@ class VendorController extends Controller
                 'slug' => "",
                 'logo' => "",
             ];
-
             if ($product_stock) {
 
                 trackRecentlyViewed($product_stock->product->id);
@@ -902,19 +828,6 @@ class VendorController extends Controller
     {
         $product = Product::find($id);
         $product->name = $request->name;
-        $product->slug = $request->slug;
-
-        $product->video_provider            = $request->video_provider;
-        $product->video_link                = $request->video_link;
-        $product->discount                  = $request->discount;
-        $product->discount_type             = $request->discount_type;
-
-        if ($request->date_range != null) {
-            $date_var               = explode(" to ", $request->date_range);
-            $product->discount_start_date   = strtotime($date_var[0]);
-            $product->discount_end_date     = strtotime($date_var[1]);
-        }
-
         $slug               = $request->slug ? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
         $same_slug_count    = Product::where('slug', 'LIKE', $slug . '%')->where('id', '!=', $id)->count();
         $slug_suffix        = $same_slug_count ? '-' . $same_slug_count + 1 : '';
