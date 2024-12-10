@@ -97,7 +97,7 @@
                                 class="lnr lnr-bullhorn"></i>{{ trans('messages.become_promotor') }}
                         </a></div>
                       @if (!auth()->guard('vendor')->check())
-                        <div class="become_partner" bis_skin_checked="1"><a href="#" data-bs-toggle="modal"
+                        <div class="become_partner" bis_skin_checked="1"><a href="{{ route('vendor.login') }}" data-bs-toggle="modal"
                                 data-bs-target="#becomePartnerModal"><i
                                     class="lnr lnr-thumbs-up"></i>{{ trans('messages.become_partner') }}
                             </a></div>

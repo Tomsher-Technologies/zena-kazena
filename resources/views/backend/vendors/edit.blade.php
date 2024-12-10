@@ -118,7 +118,14 @@
                                         <input type="file" class="form-control" name="trade_license">
                                     </div>
                                 </div>
-
+                                <!-- Profit Share -->
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label">Profit Share (%)</label>
+                                    <div class="col-md-9">
+                                        <input type="number" placeholder="Profit share for admin in %" value="{{$vendor->profit_share}}"class="form-control" name="profit_share" min="0" max="100" step="0.01"
+                                            required>
+                                    </div>
+                                </div>
                                 <!-- Address -->
                                 <div class="form-group row">
                                     <label class="col-md-3 col-form-label">Address</label>

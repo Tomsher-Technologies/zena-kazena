@@ -100,9 +100,10 @@ class VendorController extends Controller
                 ->withErrors($validator)
                 ->withInput();
         }
-
+        $credentials = $request->only('email', 'password');
         // Attempt to log the user in
-        if (Auth::guard('vendor')->attempt($request->only('email', 'password'))) {
+        if (Auth::guard('vendor')->attempt($credentials)) {
+
             $vendor = Auth::guard('vendor')->user();
             if ($vendor->is_active == 0) {
                 Auth::guard('vendor')->logout(); // Log out the vendor
@@ -197,6 +198,7 @@ class VendorController extends Controller
             'business_name'     => 'required|string|max:255',
             'business_type'     => 'required|string|max:255',
             'address'           => 'required|string|max:500',
+            'profit_share'      => 'required',
 
         ]);
         // if ($validator->fails()) {
@@ -212,6 +214,7 @@ class VendorController extends Controller
             'business_name'     => $request->business_name,
             'business_type'     => $request->business_type,
             'address'           => $request->address,
+            'profit_share'      => $request->profit_share,
         ];
         if ($request->hasFile('logo')) {
             $logoPath = $request->file('logo')->store('vendors/logos', 'public');

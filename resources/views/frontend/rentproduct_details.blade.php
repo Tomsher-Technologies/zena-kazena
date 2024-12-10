@@ -304,6 +304,25 @@
                                         placeholder="{{ trans('messages.start_date') }}"
                                         min="{{ now()->format('Y-m-d') }}">
                                 </div>
+                            @csrf
+                            <div class="product__quantity-and-add-to-cart d-flex align-items-center">
+                                <!-- Quantity -->
+                                <div class="product__quantity">
+                                    <div class="product-quantity__minus js-quantity-down"><a href="#"><i
+                                                class="lnil lnil-minus"></i></a></div>
+                                    <input type="text" value="1" name="product_quantity" id="product_quantity"
+                                        class="product-quantity__input js-quantity-field">
+                                    <div class="product-quantity__plus js-quantity-up"><a href="#"><i
+                                                class="lnil lnil-plus"></i></a></div>
+                                </div>
+                                <!-- End quantity -->
+                                <!-- Add to cart -->
+                                <div class="product__quantity">
+                                    <label for="start_date">{{ __('messages.start_date') }}</label>
+                                    <input type="date" id="start_date" name="start_date" class="form-control"
+                                        placeholder="{{ trans('messages.start_date') }}"
+                                        min="{{ now()->format('Y-m-d') }}">
+                                </div>
 
                                 <div class="product__quantity">
                                     <label for="end_date">{{ __('messages.end_date') }}</label>
@@ -744,7 +763,69 @@
     <!-- End product -->
 
 
+    {{-- @if (!empty($relatedProducts[0]))
+        <!-- Related Products -->
+        <div class="related-products">
+            <!-- Container -->
+            <div class="container container--type-2">
+                <!-- Title -->
+                <h3 class="related-products__title">{{ trans('messages.related') . ' ' . trans('messages.products') }}
+                </h3>
+                <!-- End title -->
+                <!-- Results -->
+                <div class="js-related-products">
 
+                    @foreach ($relatedProducts as $relProd)
+                        @php
+
+                            $imageRel = $relProd->thumbnail_img;
+                            if ($imageRel == null) {
+                                $imageRel = app('url')->asset('assets/img/placeholder.jpg');
+                            }
+
+                            $priceDataRel = getProductOfferPrice($relProd);
+                        @endphp
+                        <!-- Product -->
+                        <div class="result-product">
+                            <!-- Image -->
+                            <div class="result-product__image">
+                                <a
+                                    href="{{ route('product-detail', ['slug' => $relProd->slug, 'sku' => $relProd->sku]) }}">
+                                    <img alt="Image" data-sizes="auto" data-srcset="{{ $imageRel }}"
+                                        src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                        class="lazyload" />
+                                </a>
+                            </div>
+                            <!-- End image -->
+                            <!-- Product name -->
+                            <div class="result-product__name"><a
+                                    href="{{ route('product-detail', ['slug' => $relProd->slug, 'sku' => $relProd->sku]) }}">{{ $relProd->getTranslation('name', $lang) }}</a>
+                            </div>
+                            <!-- End product name -->
+                            <!-- Product price -->
+                            {{-- <div class="result-product__price">$56.99</div> --}}
+    {{-- <span
+                                class="product-grid-item__price-new">{{ env('DEFAULT_CURRENCY') . ' ' . $priceDataRel['discounted_price'] }}</span>
+                            <!-- End price new -->
+                            <!-- Price old -->
+                            @if ($priceDataRel['discounted_price'] != $priceDataRel['original_price'])
+                                <span
+                                    class="product-grid-item__price-old">{{ env('DEFAULT_CURRENCY') . ' ' . $priceDataRel['original_price'] }}</span>
+                            @endif
+                            <!-- End product price -->
+                        </div>
+                        <!-- End product -->
+                    @endforeach
+
+
+
+                </div>
+                <!-- End results -->
+            </div>
+            <!-- End container -->
+        </div>
+        <!-- End related products -->
+    @endif --}}
     @if (!empty($recentlyViewedProducts[0]))
         <!-- Recently viewed -->
         <div class="recently-viewed">

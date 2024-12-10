@@ -563,6 +563,15 @@ class CheckoutController
     {
         $lang = getActiveLanguage();
         $user = Auth::user();
+        if($user->eid_no == null || $user->eid_image_front == null || $user->eid_image_back == null || $user->eid_approval_status != 1)
+        {
+            $message = __('messages.profile_eid_verification_required');
+            $alertType = 'error'; // or 'warning', 'info', etc., based on your requirements
+        
+            session()->flash('message', $message);
+            session()->flash('alert-type', $alertType);
+            return redirect()->route('account');
+        }
         $product_stock = ProductStock::leftJoin('products', 'products.id', '=', 'product_stocks.product_id')
             ->where('products.published', 1)
             ->where('product_stocks.status', 1)

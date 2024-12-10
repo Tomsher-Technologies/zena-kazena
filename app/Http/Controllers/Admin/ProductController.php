@@ -447,7 +447,6 @@ class ProductController extends Controller
 
         // try {
             $ext = $imageUrl->getClientOriginalExtension();
-            
             if($product_type == 'main_product'){
                 $path = 'products/' . Carbon::now()->year . '/' . Carbon::now()->format('m') . '/' . $sku . '/main/';
             }else{

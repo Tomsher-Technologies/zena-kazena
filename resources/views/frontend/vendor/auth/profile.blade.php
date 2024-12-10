@@ -108,8 +108,16 @@
 
                         <!-- Row -->
                         <div class="row">
-
-                            <div class="col-md-8">
+                            <div class="col-md-4">
+                                <!-- Form group -->
+                                <div class="form-group">
+                                    <label for="First name">Name</label>
+                                    <input type="text" name="name" class="form-group__input"
+                                        value="{{ $vendor->name }}">
+                                </div>
+                                <!-- End form group -->
+                            </div>
+                            <div class="col-md-4">
                                 <!-- Form group -->
                                 <div class="form-group">
                                     <label for="First name">Address</label>
@@ -118,6 +126,17 @@
                                 </div>
                                 <!-- End form group -->
                             </div>
+                            <div class="col-md-4">
+                                <!-- Form group -->
+                                <div class="form-group">
+                                    <label for="profit_share">Profit Share (%)</label>
+                                    <input type="number" id="profit_share"name="profit_share" class="form-group__input"
+                                        value="{{ $vendor->profit_share }}" placeholder="{{__('messages.profit_share_with_admin')}}" readonly>
+                                </div>
+                                <!-- End form group -->
+                            </div>
+                        </div>
+                        <!-- End row -->
                         </div>
                         <!-- End content -->
                     </div>
