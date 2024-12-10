@@ -29,9 +29,18 @@ class AuthController extends Controller
 
         // Check credentials
         if (Auth::attempt($credentials)) {
-            return redirect()->route('admin.dashboard');
+            $user = Auth::user();
+        
+            if ($user->user_type === 'admin' || $user->user_type === 'staff') {
+                return redirect()->route('admin.dashboard');
+            } else {
+                // If usertype doesn't match
+                Auth::logout(); // Log the user out
+                return back()->withErrors(['password' => trans('messages.account_not_found')]);
+            }
+           
         } else {
-            return back()->withErrors(['email' => 'Invalid credentials']);
+            return back()->withErrors(['password' => 'Invalid credentials']);
         }
     }
 

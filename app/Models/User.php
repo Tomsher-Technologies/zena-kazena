@@ -24,6 +24,10 @@ class User extends Authenticatable
         'email',
         'phone',
         'password',
+        'eid_no',
+        'eid_image_front',
+        'eid_image_back',
+        'eid_approval_status'
     ];
 
     /**

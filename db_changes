@@ -95,26 +95,30 @@
 --   PRIMARY KEY (`id`)
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-ALTER TABLE `mortgages` ADD `duration` INT NULL AFTER `description`, ADD `metal` VARCHAR(50) NULL DEFAULT NULL AFTER `duration`, ADD `metal_type` VARCHAR(11) NULL DEFAULT NULL AFTER `metal`, ADD `weight` FLOAT NOT NULL DEFAULT '0' AFTER `metal_type`, ADD `eid_no` VARCHAR(191) NULL DEFAULT NULL AFTER `weight`, ADD `id_image_back` VARCHAR(255) NULL DEFAULT NULL AFTER `eid_no`;
+-- ALTER TABLE `mortgages` ADD `duration` INT NULL AFTER `description`, ADD `metal` VARCHAR(50) NULL DEFAULT NULL AFTER `duration`, ADD `metal_type` VARCHAR(11) NULL DEFAULT NULL AFTER `metal`, ADD `weight` FLOAT NOT NULL DEFAULT '0' AFTER `metal_type`, ADD `eid_no` VARCHAR(191) NULL DEFAULT NULL AFTER `weight`, ADD `id_image_back` VARCHAR(255) NULL DEFAULT NULL AFTER `eid_no`;
 
-INSERT INTO `pages` (`id`, `type`, `slug`, `image`, `status`, `created_at`, `updated_at`) VALUES (NULL, 'mortgage', 'Mortgage', NULL, '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (NULL, 'sales', 'Sales', NULL, '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `pages` (`id`, `type`, `slug`, `image`, `status`, `created_at`, `updated_at`) VALUES (NULL, 'mortgage', 'Mortgage', NULL, '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (NULL, 'sales', 'Sales', NULL, '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-ALTER TABLE `page_translations` ADD `image2` VARCHAR(191) NULL DEFAULT NULL AFTER `image1`;
+-- ALTER TABLE `page_translations` ADD `image2` VARCHAR(191) NULL DEFAULT NULL AFTER `image1`;
 
-CREATE TABLE IF NOT EXISTS `sales` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `phone` varchar(191) DEFAULT NULL,
-  `description` text,
-  `metal` varchar(50) DEFAULT NULL,
-  `metal_type` varchar(11) DEFAULT NULL,
-  `weight` float NOT NULL DEFAULT '0',
-  `eid_no` varchar(191) DEFAULT NULL,
-  `id_image_back` varchar(255) CHARACTER SET utf8mb4  DEFAULT NULL,
-  `id_image` varchar(255) DEFAULT NULL,
-  `product_image` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+-- CREATE TABLE IF NOT EXISTS `sales` (
+--   `id` int NOT NULL AUTO_INCREMENT,
+--   `name` varchar(255) DEFAULT NULL,
+--   `email` varchar(255) DEFAULT NULL,
+--   `phone` varchar(191) DEFAULT NULL,
+--   `description` text,
+--   `metal` varchar(50) DEFAULT NULL,
+--   `metal_type` varchar(11) DEFAULT NULL,
+--   `weight` float NOT NULL DEFAULT '0',
+--   `eid_no` varchar(191) DEFAULT NULL,
+--   `id_image_back` varchar(255) CHARACTER SET utf8mb4  DEFAULT NULL,
+--   `id_image` varchar(255) DEFAULT NULL,
+--   `product_image` varchar(255) DEFAULT NULL,
+--   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`id`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+ALTER TABLE `users` ADD `eid_no` VARCHAR(255) NULL DEFAULT NULL AFTER `email`, ADD `eid_image_front` VARCHAR(255) NULL DEFAULT NULL AFTER `eid_no`, ADD `eid_image_back` VARCHAR(255) NULL DEFAULT NULL AFTER `eid_image_front`;
+
+ALTER TABLE `users` ADD `eid_approval_status` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0-Pending, 1-Approved, 2-Denied' AFTER `eid_no`;

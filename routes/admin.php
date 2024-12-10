@@ -158,6 +158,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/customers/login/{id}', [CustomerController::class, 'login'])->name('customers.login');
     Route::get('/customers/destroy/{id}', [CustomerController::class, 'destroy'])->name('customers.destroy');
     Route::post('/bulk-customer-delete', [CustomerController::class, 'bulk_customer_delete'])->name('bulk-customer-delete');
+    Route::post('/change-eid-status', [CustomerController::class, 'changeEidStatus'])->name('change-eid-status');
+    
 
     // Route::resource('custom-pages', PageController::class);
     // Route::get('/custom-pages/edit/{id}', [PageController::class, 'edit'])->name('custom-pages.edit');
