@@ -300,7 +300,6 @@ class VendorController extends Controller
         flash(trans('messages.vendor') . ' ' . trans('messages.deleted_msg'))->success();
         return redirect()->route('vendors.index');
     }
-
     public function ban($id)
     {
         $vendor = Vendor::findOrFail(decrypt($id));

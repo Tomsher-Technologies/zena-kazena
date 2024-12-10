@@ -4,12 +4,9 @@
     <div class="shop-breadcrumb">
         <!-- Container -->
         <div class="container container--type-2">
-            @if ($product_stock && $product_stock->product)
+            @if (!empty($product_stock) && !empty($product_stock->product))
                 {{ Breadcrumbs::render('product', $product_stock->product) }}
-            @else
-                <p>{{ __('Product not found') }}</p>
             @endif
-
             <!-- End breadcrumb -->
             <!-- Title -->
             <!-- End Title -->
@@ -21,16 +18,18 @@
     @php
         $images = [];
 
-        // Check if $response exists and contains 'photos' key
+        // Check if 'photos' key exists
         if (isset($response['photos']) && is_array($response['photos'])) {
             $images = $response['photos'];
         }
 
-        if (!empty($response['thumbnail_image'])) {
+        // Check and prepend 'thumbnail_image' if it exists
+        if (isset($response['thumbnail_image']) && $response['thumbnail_image'] != null) {
             array_unshift($images, $response['thumbnail_image']);
         }
 
-        if (!empty($response['variant_image'])) {
+        // Check and append 'variant_image' if it exists
+        if (isset($response['variant_image']) && $response['variant_image'] != null) {
             array_push($images, $response['variant_image']);
         }
 
@@ -148,16 +147,17 @@
                     @php
                         $flattened_product_prices = [];
 
-                        if (
-                            !empty($response['varient_productsPrice']) &&
-                            is_array($response['varient_productsPrice'])
-                        ) {
-                            $flattened_product_prices = call_user_func_array(
-                                'array_merge',
-                                $response['varient_productsPrice'],
-                            );
+                        // Check if 'varient_productsPrice' exists and is an array
+                        if (isset($response['varient_productsPrice']) && is_array($response['varient_productsPrice'])) {
+                            // Ensure all elements within 'varient_productsPrice' are arrays
+                            $validPrices = array_filter($response['varient_productsPrice'], 'is_array');
+
+                            if (!empty($validPrices)) {
+                                $flattened_product_prices = call_user_func_array('array_merge', $validPrices);
+                            }
                         }
                     @endphp
+
 
                     @if (isset($response['sku']) && isset($flattened_product_prices[$response['sku']]['original_price']))
                         <div class="product__price" bis_skin_checked="1">
@@ -179,28 +179,15 @@
                     @else
                         <div class="product__price" bis_skin_checked="1">
                             <span class="text-black">{{ __('messages.daily_rent') }}: </span><span
-                                class="product-price__new">
-                                @if (isset($response['main_price']))
-                                    {{ env('DEFAULT_CURRENCY') . ' ' . $response['main_price'] }}
-                                @endif
-                            </span>
+                                class="product-price__new">{{ env('DEFAULT_CURRENCY') . ' ' . ($response['main_price'] ?? '') }}</span>
 
-                            @if (isset($response['stroked_price']) &&
-                                    isset($response['main_price']) &&
-                                    $response['stroked_price'] != $response['main_price']
-                            )
+                            @if (($response['stroked_price'] ?? null) != ($response['main_price'] ?? null))
                                 <span
-                                    class="product-price__old">{{ env('DEFAULT_CURRENCY') . ' ' . $response['stroked_price'] }}</span>
+                                    class="product-price__old">{{ env('DEFAULT_CURRENCY') . ' ' . ($response['stroked_price'] ?? '') }}</span>
                             @endif
                             <h6 class="text-black">{{ __('messages.refundable_deposit') }}: <span
                                     class="product-price__new">
-                                    @if (isset($response['deposit']))
-                                        {{ env('DEFAULT_CURRENCY') . ' ' . $response['deposit'] }}
-                                    @else
-                                        {{ env('DEFAULT_CURRENCY') . ' 0.00' }} <!-- Default value -->
-                                    @endif
-                                </span>
-                            </h6>
+                                    {{ env('DEFAULT_CURRENCY') . ' ' . ($response['deposit'] ?? '') }}</span></h6>
                         </div>
                     @endif
 
@@ -212,7 +199,7 @@
                         <i class="lni lni-package"></i>
                         <span>{{ trans('messages.status') }}:</span>
 
-                        @if (isset($response['quantity']) && $response['quantity'] > 0)
+                        @if (($response['quantity'] ?? 0) > 0)
                             <span class="status__value status__value--in-stock">{{ trans('messages.in_stock') }}</span>
                         @else
                             <span class="status__value ">{{ trans('messages.out_of_stock') }}</span>
@@ -229,17 +216,13 @@
                     <!-- Options -->
 
                     <div class="product-attributes product__options">
-                        @if (isset($response['product_type']) && $response['product_type'] == 1 && !empty($response['product_attributes'][0]))
+                        @if (($response['product_type'] ?? null) == 1 && !empty($response['product_attributes'][0] ?? null))
                             @php
-                                $flattened_products = [];
-                                if (!empty($response['varient_products'])) {
-                                    $flattened_products = call_user_func_array(
-                                        'array_merge',
-                                        $response['varient_products'],
-                                    );
-                                }
+                                $flattened_products = call_user_func_array(
+                                    'array_merge',
+                                    $response['varient_products'] ?? [],
+                                );
                             @endphp
-
                             @foreach ($response['product_attributes'] as $akey => $attribute)
                                 <div class="attribute product__sizes-2 d-flex align-items-center">
                                     <ul class="attribute-list product__available-sizes"
@@ -304,25 +287,6 @@
                                         placeholder="{{ trans('messages.start_date') }}"
                                         min="{{ now()->format('Y-m-d') }}">
                                 </div>
-                            @csrf
-                            <div class="product__quantity-and-add-to-cart d-flex align-items-center">
-                                <!-- Quantity -->
-                                <div class="product__quantity">
-                                    <div class="product-quantity__minus js-quantity-down"><a href="#"><i
-                                                class="lnil lnil-minus"></i></a></div>
-                                    <input type="text" value="1" name="product_quantity" id="product_quantity"
-                                        class="product-quantity__input js-quantity-field">
-                                    <div class="product-quantity__plus js-quantity-up"><a href="#"><i
-                                                class="lnil lnil-plus"></i></a></div>
-                                </div>
-                                <!-- End quantity -->
-                                <!-- Add to cart -->
-                                <div class="product__quantity">
-                                    <label for="start_date">{{ __('messages.start_date') }}</label>
-                                    <input type="date" id="start_date" name="start_date" class="form-control"
-                                        placeholder="{{ trans('messages.start_date') }}"
-                                        min="{{ now()->format('Y-m-d') }}">
-                                </div>
 
                                 <div class="product__quantity">
                                     <label for="end_date">{{ __('messages.end_date') }}</label>
@@ -358,6 +322,7 @@
                                 data-product-sku="{{ $response['sku'] ?? '' }}">
                                 <i
                                     class="lnr lnr-heart {{ isset($response['wishlisted']) && $response['wishlisted'] == 1 ? 'active' : '' }}"></i>
+
                                 <span class="wishlist_msg">
                                     @if (isset($response['wishlisted']) && $response['wishlisted'] == 1)
                                         {{ trans('messages.remove_wishlist') }}
@@ -377,9 +342,8 @@
                     <div class="product__description">
                         @if (isset($response['description']))
                             {!! $response['description'] !!}
-                        @else
-                            <p>{{ __('Description not available') }}</p>
                         @endif
+
                     </div>
                     <!-- End product information -->
                     <!-- Product social -->
@@ -945,18 +909,14 @@
             endDateInput.value = today;
         });
     </script>
-    @php
-        $currentAttribute = isset($response['current_attribute']) ? $response['current_attribute'] : null;
-        $productAttributes = isset($response['product_attributes']) ? $response['product_attributes'] : [];
-        $variantProducts = isset($response['varient_products']) ? $response['varient_products'] : [];
-    @endphp
     <script>
-        const currentAttribute = @json($currentAttribute);
-        const productAttributes = @json($productAttributes);
-        const variantProducts = @json($variantProducts);
+        const currentAttribute = @json($response['current_attribute'] ?? []);
+        const productAttributes = @json($response['product_attributes'] ?? []);
+        const variantProducts = @json($response['varient_products'] ?? []);
 
 
-        var slug = '{{ $response['slug'] ?? ''}}';
+
+        var slug = '{{ $response['slug'] ?? '' }}';
         $(document).ready(function() {
 
             let selectedAttributes = {}; // Tracks selected attributes.
