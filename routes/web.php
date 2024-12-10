@@ -127,19 +127,21 @@ Route::group(['middleware' => ['vendor.auth']], function () {
         Route::post('vendor/product/update/{id}', 'updateProduct')->name('vendor.product.update');
         Route::get('vendor/product/destroy/{id}', 'destroyProduct')->name('vendor.product.destroy');
         Route::get('vendor/products', 'products')->name('vendor.product.index');
-        Route::get('vendor/product/view/{id}', 'viewProduct')->name('vendor.product.view');
         Route::post('vendor/update', 'vendorUpdate')->name('vendor.update.info');
     });
     Route::post('vendor/change-password', [VendorController::class, 'changePassword'])->name('vendor.account.changePassword');
 
     Route::get('/vendor/products/all', [VendorController::class, 'vendorAll_products'])->name('vendor.products.all');
+    Route::get('vendor/product/view/{id}', [VendorController::class, 'vendorProductShow'])->name('vendor.product.view');
     Route::get('/vendor/products/create', [VendorController::class, 'vendorProductCreate'])->name('vendor.products.create');
     Route::post('/vendor/products/store/', [VendorController::class, 'vendorProductStore'])->name('vendor.products.store');
+    Route::get('/vendor/products/edit/{id}', [VendorController::class, 'vendorProductEdit'])->name('vendor.product.edit');
     Route::post('/vendor/products/update/{id}', [VendorController::class, 'vendorProductUpdate'])->name('vendor.products.update');
     Route::post('/vendor/products/add-attributes', [VendorController::class, 'vendorProductGet_attribute_values'])->name('vendor.products.add-attributes');
     Route::post('/vendor/products/delete-variant-image', [VendorController::class, 'vendorProductDelete_variant_image'])->name('vendor.products.delete_varient_image');
     Route::post('/vendor/products/delete-thumbnail', [VendorController::class, 'vendorProductDelete_thumbnail'])->name('vendor.products.delete_thumbnail');
-    Route::post('/vendor/products/delete_gallery', [VendorController::class, 'vendorProductDelete_gallery'])->name('vendor.products.delete_gallery');
+    Route::get('/vendor/products/edit/{id}', [VendorController::class, 'vendorProductEdit'])->name('vendor.product.edit');
+    Route::get('/vendor/products/deactivate/{id}', [VendorController::class, 'vendorProductDeactivate'])->name('vendor.product.deactivate');
 
     Route::get('/vendor/get-attribute-values/{id}', function ($id) {
         $attributeValues = \App\Models\AttributeValue::where('attribute_id', $id)
