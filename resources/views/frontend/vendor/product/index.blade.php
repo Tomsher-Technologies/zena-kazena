@@ -1,4 +1,7 @@
 @extends('frontend.layouts.app')
+@section('header')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+@endsection
 @section('content')
     <!-- Shop breadcrumb -->
     <div class="shop-breadcrumb">
@@ -64,7 +67,7 @@
                                                     <td>
                                                         <img src="{{ asset($product->thumbnail_img) }}"
                                                             class="img-fluid img-fit avatar"
-                                                            style="max-width: 50px; height: auto;" alt="Business Logo">
+                                                            style="max-width: 50px; height: auto;">
                                                         {{-- <p class="text-muted mb-1">{{$product->thumbnail_img}}</p> --}}
                                                     </td>
                                                     <td>
@@ -93,12 +96,13 @@
                                                     </td>
                                                     <td class="text-center">
                                                         <div class="cart-product__delete">
-                                                            <a class="sixth-button"
-                                                                href="{{ route('vendor.product.view', ['id' => $product->id]) }}">{{ trans('messages.view') . ' ' . trans('messages.product') }}</a>
+                                                            @if ($product->published == 1)
+                                                                <a class="sixth-button"
+                                                                    href="{{ route('vendor.product.view', ['id' => $product->id]) }}"
+                                                                    class="text-success"><i class="fas fa-eye"></i></a>
+                                                            @endif
                                                             <a href="{{ route('vendor.product.edit', ['id' => $product->id]) }}"
-                                                                class="sixth-button">
-                                                                <i class="fa fa-pencil-alt"></i>
-                                                                {{ trans('messages.edit') }}
+                                                                class="sixth-button text-info"><i class="fa fa-edit"></i>
                                                             </a>
 
                                                             <!-- Delete Product (Deactivate) -->
@@ -109,14 +113,14 @@
                                                                     @csrf
                                                                     @method('get')
                                                                     <!-- Assuming GET method for deactivation -->
-                                                                    <button type="submit" class="sixth-button"
+                                                                    <button type="submit" class="sixth-button text-danger"
                                                                         onclick="return confirm('{{ trans('messages.confirm_deactivate') }}');">
-                                                                        <i class="fa fa-trash-alt"></i>
-                                                                        {{ trans('messages.deactivate') }}
+                                                                        <i class="fa fa-trash"></i>
                                                                     </button>
                                                                 </form>
                                                             @else
-                                                                <span class="badge bg-danger">{{ trans('messages.inactive') }}</span>
+                                                                <span
+                                                                    class="badge bg-danger">{{ trans('messages.inactive') }}</span>
                                                             @endif
 
                                                         </div>

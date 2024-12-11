@@ -300,10 +300,14 @@
                                 <input type="hidden"name="price" value="{{ $response['main_price'] ?? '' }}">
                                 <input type="hidden"name="current_stock" value="{{ $response['current_stock'] ?? '' }}">
                                 <input type="hidden"name="slug" value="{{ $response['slug'] ?? '' }}">
-
-
                             </div>
                             <!-- End product quantity and add to cart -->
+                            <!-- Accept Terms and Conditions -->
+                            <div class="product__description product-stock d-flex align-items-center" id="accept_terms">
+                                <input type="checkbox" id="accept_terms_checkbox" name="accept_terms" style="margin-right: 5px; width: inherit;" required>
+                                <a href="{{ route('terms') }}" class="text-danger" target="_blank">{{ trans('messages.accept_terms') }}</a>
+                            </div>
+                            
                             <!-- Buy now -->
                             <div class="product__buy-now">
                                 @if (isset($response['quantity']) && $response['quantity'] > 0)
@@ -312,8 +316,8 @@
                                     <span class="status__value ">{{ trans('messages.out_of_stock') }}</span>
                                 @endif
                             </div>
-
-                            <!-- End buy now -->
+                        </form>
+                        <!-- End buy now -->
                     </div>
                     <!-- End product action -->
                     <!-- Product second action -->
@@ -815,12 +819,21 @@
                         <div class="result-product">
                             <!-- Image -->
                             <div class="result-product__image">
-                                <a
-                                    href="{{ route('rent.product-detail', ['slug' => $recentProd->slug, 'sku' => $recentProd->sku]) }}">
-                                    <img alt="Image" data-sizes="auto" data-srcset="{{ $imageRec }}"
-                                        src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                        class="lazyload" />
-                                </a>
+                                @if ($recentProd->type == 'rent')
+                                    <a
+                                        href="{{ route('rent.product-detail', ['slug' => $recentProd->slug, 'sku' => $recentProd->sku]) }}">
+                                        <img alt="Image" data-sizes="auto" data-srcset="{{ $imageRec }}"
+                                            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                            class="lazyload" />
+                                    </a>
+                                @else
+                                    <a
+                                        href="{{ route('product-detail', ['slug' => $recentProd->slug, 'sku' => $recentProd->sku]) }}">
+                                        <img alt="Image" data-sizes="auto" data-srcset="{{ $imageRec }}"
+                                            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                            class="lazyload" />
+                                    </a>
+                                @endif
                             </div>
                             <!-- End image -->
                             <!-- Product name -->

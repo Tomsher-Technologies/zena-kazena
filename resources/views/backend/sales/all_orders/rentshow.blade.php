@@ -148,8 +148,22 @@
                                     <td>1</td>
                                     <td>
                                         @if ($order->product != null)
-                                            <img height="50"
-                                                src="{{ get_product_image($order->product->thumbnail_img, '300') }}">
+                                            {{-- <img height="50"
+                                                src="{{ get_product_image($order->product->thumbnail_img, '300') }}"> --}}
+                                            @php
+                                                $imagePath = get_product_image($order->product->thumbnail_img, '300');
+                                                $imageExists = \Storage::disk('public')->exists(
+                                                    $order->product->thumbnail_img,
+                                                );
+                                            @endphp
+
+                                            @if ($imageExists && $imagePath)
+                                                <img height="50" src="{{ $imagePath }}" alt="Image">
+                                            @else
+                                            <img src="{{ asset(optional($order->product)->thumbnail_img) }}"
+                                                        class="img-fluid img-fit "
+                                                        style="max-width: 50px; height: auto;">
+                                            @endif
                                         @else
                                             <strong>N/A</strong>
                                         @endif
@@ -158,7 +172,7 @@
                                         @if ($order->product != null)
                                             <strong class="text-muted fs-13">{{ $order->product->name }}</strong>
                                             {{-- <small> --}}
-                                            @if ($order->productStock->variant != null)
+                                            @if (optional($order->productStock)->variant != null)
                                                 @php
                                                     $variations = json_decode($order->productStock->variant);
 
@@ -180,10 +194,10 @@
                                     <td class="text-center">{{ $order->no_of_days }}</td>
                                     <td class="text-center">{{ $order->quantity }}</td>
                                     <td class="text-center">
-                                        @if ($order->productStock->price != $order->productStock->offer_price)
+                                        @if (optional($order->productStock)->price != optional($order->productStock)->offer_price)
                                             <del>{{ single_price($orderDetail->price) }}</del> <br>
                                         @endif
-                                        {{ single_price($order->productStock->offer_price) }}
+                                        {{ single_price(optional($order->productStock)->offer_price) }}
                                     </td>
                                 </tr>
                             @endif

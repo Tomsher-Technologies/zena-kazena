@@ -96,8 +96,16 @@
                 <div class="product-list">
                     @if ($order)
                         <div class="product-item">
-                            <img src="{{ get_product_image($order->product->thumbnail_img, '300') }}" alt="Product"
-                                class="product-image">
+                            @php
+                                $imagePath = get_product_image($order->product->thumbnail_img, '300');
+                                $imageExists = \Storage::disk('public')->exists($order->product->thumbnail_img);
+                            @endphp
+
+                            @if ($imageExists && $imagePath)
+                                <img height="50" src="{{ $imagePath }}" alt="Image">
+                            @else
+                                <img src="{{ asset(optional($order->product)->thumbnail_img) }}" class="product-image img-fluid img-fit ">
+                            @endif
                             <div class="product-details">
                                 <h3 class="product-name">{{ $order->product->getTranslation('name', $lang) }} <span
                                         class="text-muted">x {{ $order->quantity }}</span></h3>

@@ -387,7 +387,7 @@ class ProductController extends Controller
 
         return $products;
     }
-      public function rentProducts(Request $request)
+    public function rentProducts(Request $request)
     {
         $price = $request->price;
         $min_price = $max_price = 0;

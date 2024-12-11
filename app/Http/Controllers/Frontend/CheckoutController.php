@@ -19,11 +19,13 @@ use Illuminate\Http\Request;
 use App\Utility\NotificationUtility;
 use App\Utility\SendSMSUtility;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Cart;
 use App\Mail\EmailManager;
 use App\Models\Category;
 use App\Models\RentOrder;
 use App\Models\RentOrderTracking;
+use App\Models\User;
 use Carbon\Carbon;
 use Mail;
 
@@ -561,12 +563,16 @@ class CheckoutController
     
     public function rentProductOrder(Request $request)
     {
+        $request->validate([
+            'accept_terms' => 'accepted',
+        ]);
         $lang = getActiveLanguage();
         $user = Auth::user();
-        if($user->eid_no == null || $user->eid_image_front == null || $user->eid_image_back == null || $user->eid_approval_status != 1)
+        // dd($user->eid_no, $user->eid_image_front, $user->eid_image_back, $user->eid_approval_status, $user->id);
+        if (is_null($user->eid_no) || is_null($user->eid_image_front) || is_null($user->eid_image_back) || $user->eid_approval_status != 1)
         {
             $message = __('messages.profile_eid_verification_required');
-            $alertType = 'error'; // or 'warning', 'info', etc., based on your requirements
+            $alertType = 'error'; // or 'warning', 'info', etc., 
         
             session()->flash('message', $message);
             session()->flash('alert-type', $alertType);
@@ -624,11 +630,12 @@ class CheckoutController
             'brand' => $products->brand ? $products->brand->getTranslation('name', $lang) : '',
             'slug' => $products->slug,
             'sku' => $product_stock->sku,
-            'image' => get_product_image($products->thumbnail_img, '300'),
+            'image' => \Storage::disk('public')->exists($products->thumbnail_img) 
+            ? get_product_image($products->thumbnail_img, '300') 
+            : $products->thumbnail_img,
             'attributes' => getProductAttributes($product_stock->attributes),
             'price' => $product_stock->offer_price,
         ];
-
         // return view('frontend.rentcheckout', compact('response', 'user'));
         return view('frontend.rentcheckout', compact('order', 'user', 'product'));
     }

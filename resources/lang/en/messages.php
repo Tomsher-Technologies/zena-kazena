@@ -511,7 +511,7 @@ return [
     'saved' => 'Saved',
     'profile_eid_verification_required' => 'Profile is not verified with Emirates ID details',
     'profit_share_with_admin' => 'admin\'s profit share ( updated by admin)',
-    '' => '',
+    'accept_terms' => 'Accept Terms And Conditions',
     '' => '',
     '' => '',
     '' => '',

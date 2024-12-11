@@ -192,9 +192,9 @@
                             <span class="fw-medium">
                                 {{ $order->product->name }}
                             </span>
-                            @if ($order->productStock->variant != null)
+                            @if (optional($order->productStock)->variant != null)
                                 @php
-                                    $variations = json_decode($order->productStock->variant);
+                                    $variations = json_decode(optional($order->productStock)->variant);
 
                                 @endphp
                                 <ul>
@@ -209,10 +209,10 @@
                         </td>
                         <td class="gry-color">{{ $order->quantity }}</td>
                         <td class="gry-color currency">
-                            @if ($order->productStock->price != $order->productStock->offer_price)
-                                <del>{{ single_price($order->productStock->price) }}</del> <br>
+                            @if (optional($order->productStock)->price != optional($order->productStock)->offer_price)
+                                <del>{{ single_price(optional($order->productStock)->price) }}</del> <br>
                             @endif
-                            {{ single_price($order->productStock->offer_price) }}
+                            {{ single_price(optional($order->productStock)->offer_price) }}
                         </td>
 
                     </tr>

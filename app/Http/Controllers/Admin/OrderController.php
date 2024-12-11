@@ -387,10 +387,10 @@ class OrderController extends Controller
     {
         $order = RentOrder::findOrFail(decrypt($id));
         $order_shipping_address = json_decode($order->shipping_address);
-        $delivery_boys = User::where('city', $order_shipping_address->city)
-            ->where('user_type', 'delivery_boy')
-            ->get();
-        return view('backend.sales.all_orders.rentshow', compact('order', 'delivery_boys'));
+        // $delivery_boys = User::where('city', $order_shipping_address->city)
+        //     ->where('user_type', 'delivery_boy')
+        //     ->get();
+        return view('backend.sales.all_orders.rentshow', compact('order'));
     }
     public function rentUpdate_delivery_status(Request $request)
     {

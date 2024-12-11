@@ -14,6 +14,7 @@ use App\Models\Review;
 use App\Models\Vendor;
 use App\Services\ImageResizeAndDownload;
 use App\Models\Attribute;
+use App\Models\AttributeValue;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
