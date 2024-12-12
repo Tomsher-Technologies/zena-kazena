@@ -444,6 +444,12 @@ function uploadImage($type, $imageUrl, $filename = null){
     
     if($type == 'page'){
         $path = 'pages/';
+    }else if($type == 'mortgage'){
+        $path = 'mortgages/';
+    }else if($type == 'sales'){
+        $path = 'sales/';
+    }else if($type == 'profile'){
+        $path = 'profile/';
     }else{
         $path = 'others/';
     }
@@ -577,10 +583,14 @@ function getUser()
 function cartCount()
 {
     $user = getUser();
+    $count = 0;
+    if($user['users_id'] != ''){
+        $count = Cart::where([
+            $user['users_id_type'] => $user['users_id']
+        ])->count();
+    }
 
-    return Cart::where([
-        $user['users_id_type'] => $user['users_id']
-    ])->count();
+    return $count;
 }
 
 function wishlistCount()

@@ -36,8 +36,9 @@ class CheckoutController
         $user = Auth::user();
         $cartController = new CartController();
         $response = $cartController->index();
+        $addresses = Address::where('user_id', auth()->user()->id)->get();
        
-        return view('frontend.checkout', compact('response', 'user'));
+        return view('frontend.checkout', compact('response', 'user','addresses'));
     }
 
     public function apply_coupon_code(Request $request)

@@ -121,10 +121,11 @@
             </div>
             <!-- End mobile menu -->
             <ul class="header_page_nav">
-                <li><a href="{{ route('home') }}" class="nav__item active">Sale</a></li>
-                 <li><a href="{{route('rent.products')}}" class="nav__item">Rent</a></li>
-                <li><a href="#" class="nav__item">Auction</a></li>
-                <li><a href="https://tomsher.co/MHS/ZK/HTML/mortgage.html" target="blank" class="nav__item">mortgage</a></li> 
+                <li><a href="{{ route('home') }}" class="nav__item {{ areActiveRoutes(['home']) }}">{{ trans('messages.shop') }}</a></li>
+                <li><a href="{{ route('sales') }}" class="nav__item {{ areActiveRoutes(['sales']) }}">{{ trans('messages.sale') }}</a></li>
+                 <li><a href="{{route('rent.products')}}" class="nav__item {{ areActiveRoutes(['rent.products']) }}">{{ trans('messages.rent') }}</a></li>
+                <li><a href="#" class="nav__item">{{ trans('messages.auction') }}</a></li>
+                <li><a href="{{route('mortgage')}}" class="nav__item {{ areActiveRoutes(['mortgage']) }}">{{ trans('messages.mortgage') }}</a></li> 
             </ul>
             <!-- Logo -->
             <h1 class="header__logo">

@@ -82,11 +82,19 @@ class AuthController extends Controller
 
         // Attempt to log the user in
         if (Auth::attempt($request->only('email', 'password'))) {
-            return redirect()->route('home'); // Redirect to home page if login is successful
+            $user = Auth::user();
+        
+            if ($user->user_type === 'customer') {
+                return redirect()->route('home'); // Redirect to home page if login is successful
+            } else {
+                // If usertype doesn't match
+                Auth::logout(); // Log the user out
+                return back()->withErrors(['password' => trans('messages.account_not_found')]);
+            }
         }
 
         // If authentication fails
-        return redirect('login')->withErrors(['email' => 'Invalid credentials'])->withInput();
+        return redirect('login')->withErrors(['password' => trans('messages.invalid_credentials')])->withInput();
     }
 
     // Logout the user

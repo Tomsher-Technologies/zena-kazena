@@ -216,7 +216,7 @@
             </div>
 
              {{-- Home categories --}}
-             <div class="card">
+             {{-- <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Occasions</h5>
                 </div>
@@ -293,7 +293,7 @@
                         </div>
                     </form>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="card  @if($lang != 'en') d-none @endif">
                 <div class="card-header">

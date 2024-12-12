@@ -9,6 +9,7 @@ use App\Models\ProductStock;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Auth;
 
 class CartController extends Controller
@@ -19,7 +20,7 @@ class CartController extends Controller
         $user_id = '';
         $guest_token = request()->cookie('guest_token') ?? uniqid('guest_', true);
 
-       
+    
         if (auth()->user()) {
             $user_id = auth()->user()->id;
             if ($guest_token) {
@@ -279,8 +280,13 @@ class CartController extends Controller
         $quantity       = $request->has('quantity') ? $request->quantity : 0;
 
         $userId = Auth::id();
-        $guestToken = $request->cookie('guest_token') ?? uniqid('guest_', true);
-
+        if($request->cookie('guest_token') != null){
+            $guestToken = $request->cookie('guest_token');
+        }else{
+            $guestToken = uniqid('guest_', true);
+            Cookie::queue('guest_token', $guestToken, 60 * 24 * 7);
+        }
+        
         if (auth()->user()) {
             $users_id_type = 'user_id';
             $user_id = auth()->user()->id;
@@ -388,10 +394,14 @@ class CartController extends Controller
     public function cartCount()
     {
         $user = getUser();
+        $count = 0;
+        if($user['users_id'] != ''){
+            $count = Cart::where([
+                $user['users_id_type'] => $user['users_id']
+            ])->count();
+        }
 
-        return Cart::where([
-            $user['users_id_type'] => $user['users_id']
-        ])->count();
+        return $count;
     }
 
     public function removeCartItem($id)
@@ -412,7 +422,8 @@ class CartController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => trans('messages.cart_item_removed_success'),
-                'updatedCartSummary' => $summary
+                'updatedCartSummary' => $summary,
+                'cart_count' => $this->cartCount(),
             ], 200);
         } else {
             return response()->json([

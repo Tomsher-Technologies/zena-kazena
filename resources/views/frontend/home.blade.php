@@ -1,34 +1,17 @@
 @extends('frontend.layouts.app')
 @section('content')
     <div class="container-fluid">
-        <!-- Dark slider -->
-        <div class="dark-slider">
-            <!-- Slider js -->
-            <div class="js-home-dark-slider">
-               
-
-                @if(!empty($data['slider']))
-                    @foreach($data['slider'] as $slider)
-                        <!-- Slider item -->
-                        <div class="dark-slider__item">
-                            <!-- Image -->
-                            <div class="dark-slider__image js-slider-heading">
-                                <img data-id="1" alt="Image" data-sizes="auto"
-                                    data-srcset="{{ uploaded_asset($slider->image) }}"
-                                    src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                    class="lazyload" />
-                            </div>
-                            <!-- End image -->
-                        </div>
-                        <!-- End slider item -->
-                    @endforeach
-                @endif
-                
-               
+        <!-- Responsive Video -->
+        <div class="video-container">
+            <video class="video" loop autoplay muted>
+                <source src="{{ asset('assets/video/zena.mp4') }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="caption">
+                <h1>Create your rings with award-winning jewellers</h1>
             </div>
-            <!-- End slider js -->
-        </div>
-        <!-- End dark slider -->
+        </div>       
+        <!-- End Responsive Video -->
     </div>
     <!-- New in -->
     <div class="shoppable-new-in">
@@ -250,7 +233,7 @@
     </div>
     <!-- End our products -->
     <!-- New in -->
-    <div class="shoppable-new-coll">
+    {{-- <div class="shoppable-new-coll">
         <!-- Container -->
         <div class="container-fluid">
             <!-- Title and action -->
@@ -284,7 +267,7 @@
             <!-- End row -->
         </div>
         <!-- End container -->
-    </div>
+    </div> --}}
     <!-- End new in -->
     <!-- Deal week -->
    
@@ -503,6 +486,7 @@
                             <a href="{{ route('products.index',['brand' => [$shop_by_brands->getTranslation('slug', $lang)]]) }}">
                                 <img alt="Image" src="{{ uploaded_asset($shop_by_brands->getTranslation('logo',$lang)) }}" class="lazyload" />
                             </a>
+                            
                         </div>
                         <!-- End item -->
                     @endforeach
@@ -592,4 +576,81 @@
         <!-- End container -->
     </div>
     <!-- End shop by the look -->
+@endsection
+
+@section('header')
+<style>
+    .video-container {
+        position: relative;
+        border-radius: 20px;
+        width: 100%;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    .video-container h1 {
+        color: white;
+        text-transform: uppercase;
+        font-size: 56px !important;
+        font-weight: 100 !important;
+    }
+
+    @media screen and (max-width: 1400px) {
+        .video-container h1 {
+            font-size: 40px !important;
+        }
+    }
+
+    @media screen and (max-width: 991px) {
+        .video-container h1 {
+            font-size: 36px !important;
+        }
+    }
+
+    @media screen and (max-width: 600px) {
+        .video-container h1 {
+            font-size: 30px !important;
+        }
+    }
+
+    .video-container .video {
+        width: 100%;
+        height: 660px;
+        height: auto;
+        display: block;
+        object-fit: cover;
+    }
+
+    .video-container .caption {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #fff !important;
+        font-family: 'Arial', sans-serif;
+    }
+
+    .video-container .caption h1 {
+        margin-bottom: 0.5rem;
+    }
+
+    .video-container .caption p {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    @media screen and (max-width:991px) {
+        .video-container {
+            min-height: 450px;
+
+        }
+
+        .video-container .video {
+            width: 100%;
+            height: 450px;
+            display: block;
+        }
+    }
+</style>
 @endsection

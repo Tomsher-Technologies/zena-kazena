@@ -16,9 +16,12 @@
     <link rel="stylesheet" href="{{ asset('assets/css/lineicons-regular.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/icon-font.min.css') }}">
     <link href="{{ asset('assets/css/custom-style.css') }}" rel="stylesheet" type="text/css" />
+    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet"> --}}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     @yield('header')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href="{{ asset('assets/css/toastr.min.css') }}" rel="stylesheet">
+<script src="{{ asset('assets/js/toastr.min.js') }}"></script>
 </head>
 
 <body>
@@ -185,13 +188,23 @@
         </div>
     </div>
 
+    
     <script>
-         @if (session('message'))
-            toastr.options = {
-                "closeButton": true,
-                "progressBar": true,
-                "positionClass": "toast-top-right", // Change the position if needed
-            };
+        toastr.options = {
+            closeButton: true,        // Show close button
+            debug: false,             // Debugging (off by default)
+            progressBar: true,        // Show progress bar
+            preventDuplicates: true, // Prevent duplicate toasts
+            positionClass: "toast-top-right", // Toast position
+            showDuration: "300", // Duration of show animation (ms)
+            hideDuration: "1000", // Duration of hide animation (ms)
+            showEasing: "swing",      // Show easing effect
+            hideEasing: "linear",     // Hide easing effect
+            showMethod: "fadeIn",     // Show animation
+            hideMethod: "fadeOut"     // Hide animation
+        };
+        @if (session('message'))
+            
             toastr["{{ session('alert-type', 'info') }}"]("{{ session('message') }}");
         @endif
 
@@ -297,6 +310,7 @@
                     },
                     success: function (response) {
                         $('.cart_count').text(response.cart_count);
+                        $('.canvasCartcount').text(response.cart_count);
                         if (response.status == true) {
                             toastr.success(response.message, "{{trans('messages.success')}}");
                         } else {
@@ -322,6 +336,8 @@
                         if (response.status === true) {
                             // Remove the row from the table
                             row.remove();
+                            $('.cart_count').text(response.cart_count);
+                            $('.canvasCartcount').text(response.cart_count);
                             $('.row_'+cartItemId).remove();
                             $('.cart_sub_total').html(response.updatedCartSummary.sub_total)
                             // Optionally, you can update the cart summary here
@@ -457,10 +473,10 @@
             });
         });
     </script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js" integrity="sha512-KFHXdr2oObHKI9w4Hv1XPKc898mE4kgYx58oqsc/JqqdLMDI4YjOLzom+EMlW8HFUd0QfjfAvxSL6sEq/a42fQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     @yield('script')
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    
 </body>
 
 </html>
