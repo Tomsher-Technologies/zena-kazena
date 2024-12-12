@@ -27,6 +27,7 @@ class Vendor extends Authenticatable
         'is_active',
         'status',
         'remember_token',
+        'profit_share',
     ];
 
     protected $casts = [

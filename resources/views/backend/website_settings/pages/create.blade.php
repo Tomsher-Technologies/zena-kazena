@@ -15,15 +15,15 @@
             </div>
             <div class="card-body">
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Title') }} <span
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.title') }} <span
                             class="text-danger">*</span></label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="{{ translate('Title') }}" name="title"
+                        <input type="text" class="form-control" placeholder="{{ __('messages.title') }}" name="title"
                             required>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Link') }} <span
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.link') }} <span
                             class="text-danger">*</span></label>
                     <div class="col-sm-10">
                         <div class="input-group d-block d-md-flex">
@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Add Content') }} <span
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.add_content') }} <span
                             class="text-danger">*</span></label>
                     <div class="col-sm-10">
                         <textarea class="aiz-text-editor form-control"
@@ -52,62 +52,62 @@
             <div class="card-body">
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Meta Title') }}</label>
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.meta_title') }}</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="{{ translate('Title') }}" name="meta_title">
+                        <input type="text" class="form-control" placeholder="{{ __('messages.title') }}" name="meta_title">
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Meta Description') }}</label>
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.meta_description') }}</label>
                     <div class="col-sm-10">
-                        <textarea class="resize-off form-control" placeholder="{{ translate('Description') }}" name="meta_description"></textarea>
+                        <textarea class="resize-off form-control" placeholder="{{ __('messages.description') }}" name="meta_description"></textarea>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Keywords') }}</label>
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.keywords') }}</label>
                     <div class="col-sm-10">
-                        <textarea class="resize-off form-control" placeholder="{{ translate('Keyword, Keyword') }}" name="keywords"></textarea>
+                        <textarea class="resize-off form-control" placeholder="{{ __('messages.keyword,keyword') }}" name="keywords"></textarea>
                         <small class="text-muted">Separate with coma</small>
                     </div>
                 </div>
 
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('OG Title') }}</label>
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.og_title') }}</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="{{ translate('OG Title') }}"
+                        <input type="text" class="form-control" placeholder="{{ __('messages.og_title') }}"
                             name="og_title">
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('OG Description') }}</label>
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.og_description') }}</label>
                     <div class="col-sm-10">
-                        <textarea class="resize-off form-control" placeholder="{{ translate('OG Description') }}" name="og_description"></textarea>
+                        <textarea class="resize-off form-control" placeholder="{{ __('messages.og_description') }}" name="og_description"></textarea>
                     </div>
                 </div>
 
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Twitter Title') }}</label>
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.twitter_title') }}</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="{{ translate('Twitter Title') }}"
+                        <input type="text" class="form-control" placeholder="{{ __('messages.twitter_title') }}"
                             name="twitter_title">
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Twitter Description') }}</label>
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.twitter_description') }}</label>
                     <div class="col-sm-10">
-                        <textarea class="resize-off form-control" placeholder="{{ translate('Twitter Description') }}"
+                        <textarea class="resize-off form-control" placeholder="{{ __('messages.twitter_description') }}"
                             name="twitter_description"></textarea>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">{{ translate('Meta Image') }}</label>
+                    <label class="col-sm-2 col-from-label" for="name">{{ __('messages.meta_image') }}</label>
                     <div class="col-sm-10">
                         <div class="input-group " data-toggle="aizuploader" data-type="image">
                             <div class="input-group-prepend">

@@ -35703,3 +35703,303 @@ body.home-minimal .header--type-7 {
 a {
     text-decoration: none!important;
 }
+/* 7/12/2024 */
+.delete-btn {
+  color: #8c000d;
+  width: auto;
+  font-size: 12px; /* Smaller font size */
+  padding: 2px 8px; /* Reduced padding */
+  float: right; /* Align to the right */
+}
+
+.form-group.row.justify-content-end {
+  text-align: right; /* Ensure alignment inside the row */
+  margin-top: 10px; /* Add some spacing if needed */
+}
+
+/* 06/12/2024 style for vendor product add */
+.add-product-section-title {
+  font-size: 26px;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: calc(50% - 0.5rem);
+}
+
+@media (max-width: 768px) {
+  .form-row .form-group {
+      min-width: 100%;
+  }
+
+  .action-buttons button,.product-actions button {
+      max-width: 100% !important;
+  }
+}
+
+button {
+  flex: 1;
+}
+
+.form-title {
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #161616;
+}
+
+::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+input[type="file"] {
+  border: none;
+  background: none;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-draft {
+  background: #555;
+}
+
+.btn-draft:hover {
+  background: #333;
+}
+
+@media (max-width: 768px) {
+  .form-actions {
+      flex-direction: column;
+  }
+
+  button {
+      width: 100%;
+  }
+
+ 
+}
+
+.product-images,
+.product-status {
+  background-color: #ffffff;
+  padding: 40px;
+  border: 1px solid black;
+}
+
+@media (max-width: 1330px) {
+  .product-images,
+  .product-status {
+      width: 430px;
+      padding: 30px;
+  }
+}
+
+@media (max-width: 991px) {
+  .product-images,
+  .product-status {
+      width: 100%;
+      padding: 30px;
+  }
+
+  .add-product-form {
+      flex-direction: column;
+  }
+}
+
+@media (max-width: 500px) {
+  .product-images,
+  .product-status {
+      padding: 20px;
+  }
+}
+
+.product-thumbnail {
+  border-top: 1px solid #c4c3bd;
+  padding-top: 40px;
+}
+
+.drop_box {
+  margin: 10px 0;
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 3px dotted #a3a3a3;
+  border-radius: 5px;
+}
+
+.drop_box h4 {
+  font-size: 16px;
+  font-weight: 400;
+  color: #2e2e2e;
+  margin-bottom: 0;
+}
+
+.drop_box p {
+  margin: 10px 0 20px;
+  font-size: 12px;
+  color: #a3a3a3;
+}
+
+.form input {
+  margin: 10px 0;
+  width: 100%;
+  background-color: #e2e2e2;
+  border: none;
+  outline: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+}
+
+.product-check-input {
+  width: 3rem !important;
+}
+
+.product-thumbnail-input,
+.product-variant-image-input {
+  background-color: #EEEEEE !important;
+}
+
+.product-images-upload-btn,
+.z-btn-primary {
+  background-color: #010101;
+  border: 1px solid #010101;
+  color: white;
+  border-radius: 0;
+}
+
+.product-images-upload-btn:hover,
+.z-btn-primary:hover {
+  background-color: #313131;
+  color: white;
+}
+
+.z-btn-secondary {
+  border: 1px solid #010101;
+  background-color: white;
+  color: #010101;
+  border-radius: 0;
+}
+
+.z-btn-secondary:hover {
+  background-color: #e0e0e0;
+}
+
+.form-section {
+  border-bottom: 1px solid #c4c3bd;
+  padding-bottom: 20px;
+}
+
+.product-image-wrapper.sticky {
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+
+.action-buttons button,.product-actions button {
+  /* width: fit-content; */
+  border-radius: 0;
+  /* width: 200px; */
+}
+
+.discount-field,
+.video-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #ccc;
+  overflow: hidden;
+}
+
+.discount-field input,
+.video-field input {
+  border: none;
+  padding: 0.5rem;
+  flex: 1;
+  outline: none;
+}
+
+.discount-field select,
+.video-field select {
+  border: none;
+  padding: 14px 0.5rem;
+  background: #f9f9f9;
+  outline: none;
+  cursor: pointer;
+  max-width: 150px;
+}
+
+.discount-field select {
+  border-left: 1px solid #ccc;
+}
+
+.video-field select {
+  border-right: 1px solid #ccc;
+}
+
+.form-group h3 {
+  font-size: 24px !important;
+}
+
+.product-variant {
+  padding: 1.4rem;
+  border: 1px solid black;
+}
+
+.add-product-wrapper h2,.add-product-wrapper h3,.drop_box h4 {
+  font-family: "NeueMontreal-Regular";
+}
+
+.add-product-wrapper .form-title {
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  font-weight: 100;
+  font-size: 36px;
+  border-bottom: 1px solid #c4c3bd;
+}

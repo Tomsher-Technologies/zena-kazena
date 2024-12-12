@@ -4,8 +4,9 @@
     <div class="shop-breadcrumb">
         <!-- Container -->
         <div class="container container--type-2">
-
-            {{ Breadcrumbs::render('product', $product_stock->product) }}
+            @if (!empty($product_stock) && !empty($product_stock->product))
+                {{ Breadcrumbs::render('product', $product_stock->product) }}
+            @endif
             <!-- End breadcrumb -->
             <!-- Title -->
             <!-- End Title -->
@@ -15,17 +16,26 @@
     <!-- End shop breadcrumb -->
 
     @php
-        $images = $response['photos'];
-        if ($response['thumbnail_image'] != null) {
+        $images = [];
+
+        // Check if 'photos' key exists
+        if (isset($response['photos']) && is_array($response['photos'])) {
+            $images = $response['photos'];
+        }
+
+        // Check and prepend 'thumbnail_image' if it exists
+        if (isset($response['thumbnail_image']) && $response['thumbnail_image'] != null) {
             array_unshift($images, $response['thumbnail_image']);
         }
 
-        if ($response['variant_image'] != null) {
+        // Check and append 'variant_image' if it exists
+        if (isset($response['variant_image']) && $response['variant_image'] != null) {
             array_push($images, $response['variant_image']);
         }
 
         $thumbanailSlider = $productImagesWeb = $productImagesMob = '';
     @endphp
+
 
     @if (!empty($images))
         @foreach ($images as $imgkey => $img)
@@ -100,7 +110,7 @@
                 <!-- Product image and thumbnails -->
                 <div class="product__main-image-and-thumbnails">
                     <!-- Product tag -->
-                    <div class="product-grid-item__tag">{{ $response['offer_tag'] }}</div>
+                    <div class="product-grid-item__tag">{{ $response['offer_tag'] ?? '' }}</div>
                     <!-- End product tag -->
                     <!-- Product main image -->
                     <ul class="product__main-image js-popup-gallery">
@@ -120,7 +130,7 @@
                 <!-- Product right -->
                 <div class="product__right">
                     <!-- Product title -->
-                    <h1 class="product__title">{{ $response['name'] }}</h1>
+                    <h1 class="product__title">{{ $response['name'] ?? '' }}</h1>
                     <!-- End product title -->
                     <!-- Product reviews -->
                     <div class="product__reviews">
@@ -129,19 +139,27 @@
                         <i class="lnil lnil-star-fill active"></i>
                         <i class="lnil lnil-star-fill active"></i>
                         <i class="lnil lnil-star-fill"></i>
-                        <span>{{ $response['rating_count'] }} {{ trans('messages.reviews') }}</span>
+                        <span>{{ $response['rating_count'] ?? '' }} {{ trans('messages.reviews') }}</span>
                     </div>
                     <!-- End product reviews -->
                     <!-- Product price -->
 
                     @php
-                        $flattened_product_prices = call_user_func_array(
-                            'array_merge',
-                            $response['varient_productsPrice'],
-                        );
+                        $flattened_product_prices = [];
+
+                        // Check if 'varient_productsPrice' exists and is an array
+                        if (isset($response['varient_productsPrice']) && is_array($response['varient_productsPrice'])) {
+                            // Ensure all elements within 'varient_productsPrice' are arrays
+                            $validPrices = array_filter($response['varient_productsPrice'], 'is_array');
+
+                            if (!empty($validPrices)) {
+                                $flattened_product_prices = call_user_func_array('array_merge', $validPrices);
+                            }
+                        }
                     @endphp
 
-                    @if (isset($flattened_product_prices[$response['sku']]['original_price']))
+
+                    @if (isset($response['sku']) && isset($flattened_product_prices[$response['sku']]['original_price']))
                         <div class="product__price" bis_skin_checked="1">
                             <span class="text-black">{{ __('messages.daily_rent') }}: </span> <span
                                 class="product-price__new">
@@ -161,15 +179,15 @@
                     @else
                         <div class="product__price" bis_skin_checked="1">
                             <span class="text-black">{{ __('messages.daily_rent') }}: </span><span
-                                class="product-price__new">{{ env('DEFAULT_CURRENCY') . ' ' . $response['main_price'] }}</span>
+                                class="product-price__new">{{ env('DEFAULT_CURRENCY') . ' ' . ($response['main_price'] ?? '') }}</span>
 
-                            @if ($response['stroked_price'] != $response['main_price'])
+                            @if (($response['stroked_price'] ?? null) != ($response['main_price'] ?? null))
                                 <span
-                                    class="product-price__old">{{ env('DEFAULT_CURRENCY') . ' ' . $response['stroked_price'] }}</span>
+                                    class="product-price__old">{{ env('DEFAULT_CURRENCY') . ' ' . ($response['stroked_price'] ?? '') }}</span>
                             @endif
                             <h6 class="text-black">{{ __('messages.refundable_deposit') }}: <span
                                     class="product-price__new">
-                                    {{ env('DEFAULT_CURRENCY') . ' ' . $response['deposit'] }}</span></h6>
+                                    {{ env('DEFAULT_CURRENCY') . ' ' . ($response['deposit'] ?? '') }}</span></h6>
                         </div>
                     @endif
 
@@ -181,7 +199,7 @@
                         <i class="lni lni-package"></i>
                         <span>{{ trans('messages.status') }}:</span>
 
-                        @if ($response['quantity'] > 0)
+                        @if (($response['quantity'] ?? 0) > 0)
                             <span class="status__value status__value--in-stock">{{ trans('messages.in_stock') }}</span>
                         @else
                             <span class="status__value ">{{ trans('messages.out_of_stock') }}</span>
@@ -198,11 +216,11 @@
                     <!-- Options -->
 
                     <div class="product-attributes product__options">
-                        @if ($response['product_type'] == 1 && !empty($response['product_attributes'][0]))
+                        @if (($response['product_type'] ?? null) == 1 && !empty($response['product_attributes'][0] ?? null))
                             @php
                                 $flattened_products = call_user_func_array(
                                     'array_merge',
-                                    $response['varient_products'],
+                                    $response['varient_products'] ?? [],
                                 );
                             @endphp
                             @foreach ($response['product_attributes'] as $akey => $attribute)
@@ -242,7 +260,7 @@
                         @endif
 
                         <div class="product__description product-stock" id="product-stock">
-                            <p>SKU : {{ $response['sku'] }}</p>
+                            <p>SKU : {{ $response['sku'] ?? '' }}</p>
                         </div>
                     </div>
 
@@ -250,60 +268,67 @@
                     <!-- Product action -->
                     <div class="product__action js-product-action">
                         <form action="{{ route('rent.product-order') }}" method="POST">
-                            @csrf 
-                        <div class="product__quantity-and-add-to-cart d-flex align-items-center">
-                            <!-- Quantity -->
-                            <div class="product__quantity">
-                                <div class="product-quantity__minus js-quantity-down"><a href="#"><i
-                                            class="lnil lnil-minus"></i></a></div>
-                                <input type="text" value="1" name="product_quantity" id="product_quantity"
-                                    class="product-quantity__input js-quantity-field">
-                                <div class="product-quantity__plus js-quantity-up"><a href="#"><i
-                                            class="lnil lnil-plus"></i></a></div>
-                            </div>
-                            <!-- End quantity -->
-                            <!-- Add to cart -->
-                            <div class="product__quantity">
-                                <label for="start_date">{{__('messages.start_date')}}</label>
-                                <input type="date" id="start_date" name="start_date" class="form-control"
-                                    placeholder="{{ trans('messages.start_date') }}" min="{{ now()->format('Y-m-d') }}">
-                            </div>
+                            @csrf
+                            <div class="product__quantity-and-add-to-cart d-flex align-items-center">
+                                <!-- Quantity -->
+                                <div class="product__quantity">
+                                    <div class="product-quantity__minus js-quantity-down"><a href="#"><i
+                                                class="lnil lnil-minus"></i></a></div>
+                                    <input type="text" value="1" name="product_quantity" id="product_quantity"
+                                        class="product-quantity__input js-quantity-field">
+                                    <div class="product-quantity__plus js-quantity-up"><a href="#"><i
+                                                class="lnil lnil-plus"></i></a></div>
+                                </div>
+                                <!-- End quantity -->
+                                <!-- Add to cart -->
+                                <div class="product__quantity">
+                                    <label for="start_date">{{ __('messages.start_date') }}</label>
+                                    <input type="date" id="start_date" name="start_date" class="form-control"
+                                        placeholder="{{ trans('messages.start_date') }}"
+                                        min="{{ now()->format('Y-m-d') }}">
+                                </div>
 
-                            <div class="product__quantity">
-                                <label for="end_date">{{__('messages.end_date')}}</label>
-                                <input type="date" id="end_date" name="end_date" class="form-control"
-                                    placeholder="{{ trans('messages.end_date') }}" min="{{ now()->format('Y-m-d') }}">
+                                <div class="product__quantity">
+                                    <label for="end_date">{{ __('messages.end_date') }}</label>
+                                    <input type="date" id="end_date" name="end_date" class="form-control"
+                                        placeholder="{{ trans('messages.end_date') }}" min="{{ now()->format('Y-m-d') }}">
+                                </div>
+                                <input type="hidden"name="sku" value="{{ $response['sku'] ?? '' }}">
+                                <input type="hidden"name="product_id" value="{{ $product_stock->product->id ?? '' }}">
+                                <input type="hidden"name="deposit" value="{{ $response['deposit'] ?? '' }}">
+                                <input type="hidden"name="category_id" value="{{ $response['category']['id'] ?? '' }}">
+                                <input type="hidden"name="price" value="{{ $response['main_price'] ?? '' }}">
+                                <input type="hidden"name="current_stock" value="{{ $response['current_stock'] ?? '' }}">
+                                <input type="hidden"name="slug" value="{{ $response['slug'] ?? '' }}">
                             </div>
-                            <input type="hidden"name="sku"value="{{$response['sku']}}">
-                            <input type="hidden"name="product_id"value="{{$product_stock->product->id}}">
-                            <input type="hidden"name="deposit"value="{{$response['deposit']}}">
-                            <input type="hidden"name="category_id"value="{{$response['category']['id']}}">
-                            <input type="hidden"name="price"value="{{$response['main_price']}}">
-                            <input type="hidden"name="current_stock"value="{{$response['current_stock']}}">
-                            <input type="hidden"name="slug"value="{{$response['slug']}}">
-
-                           
-                        </div>
-                        <!-- End product quantity and add to cart -->
-                        <!-- Buy now -->
-                        <div class="product__buy-now">
-                            @if ($response['quantity'] > 0)
-                                <input type="submit" class="second-button" value="{{ trans('messages.order_now') }}">
-                            @else
-                                <span class="status__value ">{{ trans('messages.out_of_stock') }}</span>
-                            @endif
-                        </div>
-
+                            <!-- End product quantity and add to cart -->
+                            <!-- Accept Terms and Conditions -->
+                            <div class="product__description product-stock d-flex align-items-center" id="accept_terms">
+                                <input type="checkbox" id="accept_terms_checkbox" name="accept_terms" style="margin-right: 5px; width: inherit;" required>
+                                <a href="{{ route('terms') }}" class="text-danger" target="_blank">{{ trans('messages.accept_terms') }}</a>
+                            </div>
+                            
+                            <!-- Buy now -->
+                            <div class="product__buy-now">
+                                @if (isset($response['quantity']) && $response['quantity'] > 0)
+                                    <input type="submit" class="second-button" value="{{ trans('messages.order_now') }}">
+                                @else
+                                    <span class="status__value ">{{ trans('messages.out_of_stock') }}</span>
+                                @endif
+                            </div>
+                        </form>
                         <!-- End buy now -->
                     </div>
                     <!-- End product action -->
                     <!-- Product second action -->
                     <ul class="product__second-action d-flex">
-                        <li><a href="#" class="wishlist-btn" data-product-slug="{{ $response['slug'] }}"
-                                data-product-sku="{{ $response['sku'] }}"><i
-                                    class="lnr lnr-heart {{ $response['wishlisted'] == 1 ? 'active' : '' }}"></i>
+                        <li><a href="#" class="wishlist-btn" data-product-slug="{{ $response['slug'] ?? '' }}"
+                                data-product-sku="{{ $response['sku'] ?? '' }}">
+                                <i
+                                    class="lnr lnr-heart {{ isset($response['wishlisted']) && $response['wishlisted'] == 1 ? 'active' : '' }}"></i>
+
                                 <span class="wishlist_msg">
-                                    @if ($response['wishlisted'] == 1)
+                                    @if (isset($response['wishlisted']) && $response['wishlisted'] == 1)
                                         {{ trans('messages.remove_wishlist') }}
                                     @else
                                         {{ trans('messages.add_wishlist') }}
@@ -319,7 +344,10 @@
                     <!-- End product section action -->
                     <!-- Product information -->
                     <div class="product__description">
-                        {!! $response['description'] !!}
+                        @if (isset($response['description']))
+                            {!! $response['description'] !!}
+                        @endif
+
                     </div>
                     <!-- End product information -->
                     <!-- Product social -->
@@ -466,7 +494,7 @@
                     <div class="accordion js-accordion">
                         <!-- Title -->
                         <div class="accordion__title js-accordion-title">
-                            {{ trans('messages.reviews') }} ({{ $response['rating_count'] }})
+                            {{ trans('messages.reviews') }} ({{ $response['rating_count'] ?? '' }})
                         </div>
                         <!-- End title -->
                         <!-- Content -->
@@ -685,7 +713,7 @@
                         <li>
                             <a href="#" class="js-tab-link"
                                 data-id="{{ $tabkeyOut }}">{{ trans('messages.reviews') }}
-                                ({{ $response['rating_count'] }})</a>
+                                ({{ $response['rating_count'] ?? '' }})</a>
                         </li>
 
                     </ul>
@@ -791,12 +819,21 @@
                         <div class="result-product">
                             <!-- Image -->
                             <div class="result-product__image">
-                                <a
-                                    href="{{ route('rent.product-detail', ['slug' => $recentProd->slug, 'sku' => $recentProd->sku]) }}">
-                                    <img alt="Image" data-sizes="auto" data-srcset="{{ $imageRec }}"
-                                        src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                        class="lazyload" />
-                                </a>
+                                @if ($recentProd->type == 'rent')
+                                    <a
+                                        href="{{ route('rent.product-detail', ['slug' => $recentProd->slug, 'sku' => $recentProd->sku]) }}">
+                                        <img alt="Image" data-sizes="auto" data-srcset="{{ $imageRec }}"
+                                            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                            class="lazyload" />
+                                    </a>
+                                @else
+                                    <a
+                                        href="{{ route('product-detail', ['slug' => $recentProd->slug, 'sku' => $recentProd->sku]) }}">
+                                        <img alt="Image" data-sizes="auto" data-srcset="{{ $imageRec }}"
+                                            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                            class="lazyload" />
+                                    </a>
+                                @endif
                             </div>
                             <!-- End image -->
                             <!-- Product name -->
@@ -876,7 +913,7 @@
                 endDateInput.setAttribute('min', startDateValue); // Ensure End Date starts from Start Date
                 if (endDateInput.value < startDateValue) {
                     endDateInput.value =
-                    startDateValue; // Adjust the End Date if it's before the Start Date
+                        startDateValue; // Adjust the End Date if it's before the Start Date
                 }
             });
 
@@ -886,12 +923,13 @@
         });
     </script>
     <script>
-        const currentAttribute = @json($response['current_attribute']);
-        const productAttributes = @json($response['product_attributes']);
-        const variantProducts = @json($response['varient_products']);
+        const currentAttribute = @json($response['current_attribute'] ?? []);
+        const productAttributes = @json($response['product_attributes'] ?? []);
+        const variantProducts = @json($response['varient_products'] ?? []);
 
 
-        var slug = '{{ $response['slug'] }}';
+
+        var slug = '{{ $response['slug'] ?? '' }}';
         $(document).ready(function() {
 
             let selectedAttributes = {}; // Tracks selected attributes.
@@ -1057,8 +1095,9 @@
                 if (matchingVariant) {
                     const sku = Object.keys(matchingVariant)[0];
                     $('#product-stock').html(`<p>SKU: ${sku}</p>`);
-                    var url = '/rent/product-details?slug=' + encodeURIComponent(slug) + '&sku=' + encodeURIComponent(
-                        sku);
+                    var url = '/rent/product-details?slug=' + encodeURIComponent(slug) + '&sku=' +
+                        encodeURIComponent(
+                            sku);
 
                     // Redirect to the URL
                     window.location.href = url;

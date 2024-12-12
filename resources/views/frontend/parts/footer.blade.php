@@ -45,6 +45,8 @@
             <li><a href="{{route('products.index')}}">{{ trans('messages.shop') }} </a></li>
             <li><a href="{{route('terms')}}">{{ trans('messages.terms_conditions') }} </a></li>
             <li><a href="{{route('privacy')}}">{{ trans('messages.privacy_policy') }}</a></li>
+            <li><a href="{{route('shipping')}}">{{ trans('messages.shipping_policy') }}</a></li>
+            <li><a href="{{route('return')}}">{{ trans('messages.return_policy') }}</a></li>
             <li><a href="{{route('contact')}}">{{ trans('messages.contact') }}</a></li>
         </ul>
         <!-- End menu -->
@@ -95,7 +97,7 @@
                                 class="lnr lnr-bullhorn"></i>{{ trans('messages.become_promotor') }}
                         </a></div>
                       @if (!auth()->guard('vendor')->check())
-                        <div class="become_partner" bis_skin_checked="1"><a href="#" data-bs-toggle="modal"
+                        <div class="become_partner" bis_skin_checked="1"><a href="{{ route('vendor.login') }}" data-bs-toggle="modal"
                                 data-bs-target="#becomePartnerModal"><i
                                     class="lnr lnr-thumbs-up"></i>{{ trans('messages.become_partner') }}
                             </a></div>

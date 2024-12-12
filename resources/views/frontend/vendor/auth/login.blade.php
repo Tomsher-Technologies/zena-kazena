@@ -5,8 +5,7 @@
         <div class="minimal-about__d-flex d-flex">
             <!-- Image -->
             <div class="minimal-about__image">
-                <img alt="Image" data-sizes="auto"
-                    data-srcset="{{ asset('assets/images/login.webp')}}"
+                <img alt="Image" data-sizes="auto" data-srcset="{{ asset('assets/images/login.webp') }}"
                     src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="lazyload" />
             </div>
             <!-- End image -->
@@ -39,22 +38,31 @@
                                                     @csrf
                                                     <!-- Form group -->
                                                     <div class="form-group required">
-                                                        <input type="email" id="email" class="form-group__input" placeholder="Email address" name="email" value="{{ old('email') }}" required>
-                                                            @error('email') <span>{{ $message }}</span> @enderror
+                                                        <input type="email" id="email" class="form-group__input"
+                                                            placeholder="Email address" name="email"
+                                                            value="{{ old('email') }}" required>
+                                                        @error('email')
+                                                            <span>{{ $message }}</span>
+                                                        @enderror
                                                     </div>
                                                     <!-- End form group -->
                                                     <!-- Form group -->
                                                     <div class="form-group required">
-                                                        <input type="password" placeholder="Password" class="form-group__input" id="password" name="password" required>
-                                                        @error('password') <span>{{ $message }}</span> @enderror
+                                                        <input type="password" placeholder="Password"
+                                                            class="form-group__input" id="password" name="password"
+                                                            required>
+                                                        @error('password')
+                                                            <span>{{ $message }}</span>
+                                                        @enderror
                                                     </div>
                                                     <!-- End form group -->
                                                     <!-- Forgot password -->
                                                     <div class="login__forgot-password">
-                                                        <a href="{{route('vendor.register')}}" class="">NEW VENDOR? REGISTER NOW!
+                                                        <a href="{{ route('vendor.register') }}" class="">NEW VENDOR?
+                                                            REGISTER NOW!
                                                         </a>
-                                                        <!--<a href="#" class="js-login-forgot-password">Forgot-->
-                                                        <!--    password?</a>-->
+                                                        <a href="#" class="js-login-forgot-password">Forgot
+                                                            password?</a>
                                                     </div>
                                                     <!-- End forgot password -->
                                                     <!-- Action -->
@@ -76,10 +84,11 @@
                                                     Click submit to have your password e-mailed to you.</p>
                                                 <!-- End login description -->
                                                 <!-- Form -->
-                                                <form>
+                                                <form id="forgotPasswordForm">
+                                                    @csrf
                                                     <!-- Form group -->
                                                     <div class="form-group required">
-                                                        <input type="email" required="required" name="customer[email]"
+                                                        <input type="email" required="required" name="email"
                                                             placeholder="Email address" class="form-group__input">
                                                     </div>
                                                     <!-- End form group -->
@@ -92,6 +101,7 @@
                                                             class="js-login-back">Back</a></div>
                                                     <!-- End forgot password -->
                                                 </form>
+                                                <div id="forgotPasswordMessage"></div>
                                                 <!-- End form -->
                                             </div>
                                             <!-- End login box -->
@@ -261,4 +271,31 @@
         </div>
     </div>
     <!-- End minimal about -->
+@endsection
+@section('script')
+    <script>
+        $('#forgotPasswordForm').on('submit', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "{{ route('vendor.password.sendResetLink') }}",
+                method: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                        $('#forgotPasswordMessage').html('<p style="color: green;">' + response.success + '</p>');
+                        $('#forgotPasswordForm')[0].reset();
+                },
+                error: function(xhr) {
+                    let errors = xhr.responseJSON.errors;
+                    if (errors && errors.email) {
+                        $('#forgotPasswordMessage').html('<p style="color: red;">' + errors.email +
+                            '</p>');
+                    } else if (xhr.responseJSON.error) {
+                        $('#forgotPasswordMessage').html('<p style="color: red;">' + xhr.responseJSON
+                            .error + '</p>');
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

@@ -31,7 +31,6 @@ use DB;
 class ProductController extends Controller
 {
 
-
     public function all_products(Request $request)
     {
         $col_name = null;
@@ -89,7 +88,6 @@ class ProductController extends Controller
         return view('backend.products.index', compact('category','products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
     }
 
-
     /**
      * Show the form for creating a new resource.
      *
@@ -138,6 +136,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         // echo '<pre>';
         // echo env('DEFAULT_LANGUAGE', 'en');
         // // print_r($request->all());
@@ -149,7 +148,6 @@ class ProductController extends Controller
                 $skuMain = $products[0]['sku'];
             }
         }
-       
         $product = new Product;
         $product->type= $request->type;
         $product->deposit = $request->has('deposit') ? $request->deposit : 0;
@@ -449,7 +447,6 @@ class ProductController extends Controller
 
         // try {
             $ext = $imageUrl->getClientOriginalExtension();
-            
             if($product_type == 'main_product'){
                 $path = 'products/' . Carbon::now()->year . '/' . Carbon::now()->format('m') . '/' . $sku . '/main/';
             }else{
