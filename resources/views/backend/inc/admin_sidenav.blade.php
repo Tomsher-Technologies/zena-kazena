@@ -126,6 +126,28 @@
                         </li>
                     </ul>
                 </li>
+                <li class="aiz-side-nav-item">
+                    <a href="#" class="aiz-side-nav-link">
+                        <i class="las la-money-bill aiz-side-nav-icon"></i>
+                        <span class="aiz-side-nav-text">Rent</span>
+                        <span class="aiz-side-nav-arrow"></span>
+                    </a>
+                    <!--Submenu-->
+                    <ul class="aiz-side-nav-list level-2">
+                        <li class="aiz-side-nav-item">
+                            <a href="{{ route('rent.all_orders.index') }}"
+                                class="aiz-side-nav-link {{ areActiveRoutes(['rent.all_orders.index', 'rentall_orders.show']) }}">
+                                <span class="aiz-side-nav-text">All Rent Orders</span>
+                            </a>
+                        </li>
+                        <li class="aiz-side-nav-item">
+                            <a href="{{ route('rent.cancel_requests.index') }}"
+                                class="aiz-side-nav-link {{ areActiveRoutes(['rent.cancel_requests.index', 'rent.cancel_orders.show']) }}">
+                                <span class="aiz-side-nav-text">Cancel Rent Requests</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 @endcanany
 
 

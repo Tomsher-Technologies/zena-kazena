@@ -1,33 +1,32 @@
 @extends('backend.layouts.app')
-
 @section('content')
-<style>
-    .bread .breadcrumb {
-        all: unset;
-    }
+    <style>
+        .bread .breadcrumb {
+            all: unset;
+        }
 
-    .bread .breadcrumb li {
-        display: inline-block;
-    }
+        .bread .breadcrumb li {
+            display: inline-block;
+        }
 
-    .bread nav {
-        display: inline-block;
-        max-width: 250px;
-    }
+        .bread nav {
+            display: inline-block;
+            max-width: 250px;
+        }
 
-    .bread .breadcrumb-item+.breadcrumb-item::before {
-        content: ">";
-    }
+        .bread .breadcrumb-item+.breadcrumb-item::before {
+            content: ">";
+        }
 
-    .breadcrumb-item+.breadcrumb-item {
-        padding-left: 0;
-    }
+        .breadcrumb-item+.breadcrumb-item {
+            padding-left: 0;
+        }
 
-    .bread a {
-        pointer-events: none;
-        cursor: sw-resize;
-    }
-</style>
+        .bread a {
+            pointer-events: none;
+            cursor: sw-resize;
+        }
+    </style>
     <div class="aiz-titlebar text-left mt-2 mb-3">
         <div class="row align-items-center">
             <div class="col-auto">
@@ -51,14 +50,14 @@
                     <h5 class="mb-md-0 h6">All Product</h5>
                 </div>
 
-               
+
                 <div class="col-md-2 ml-auto bootstrap-select">
-                    
-                    <select class="form-control form-control-sm aiz-selectpicker mb-md-0" data-live-search="true"
-                            name="category" id="" data-selected={{ $category }}>
+
+                    <select class="form-control form-control-sm aiz-selectpicker mb-2 mb-md-0" data-live-search="true"
+                        name="category" id="" data-selected={{ $category }}>
                         <option value="0">All</option>
                         @foreach (getAllCategories()->where('parent_id', 0) as $item)
-                            <option value="{{ $item->id }}" @if( $category == $item->id)  {{ 'selected' }} @endif >{{ $item->name }}</option>
+                            <option value="{{ $item->id }}" @if ($category == $item->id) {{ 'selected' }} @endif>{{ $item->name }}</option>
                             @if ($item->child)
                                 @foreach ($item->child as $cat)
                                     @include('backend.categories.menu_child_category', [
@@ -137,9 +136,9 @@
                             </th> --}}
                             <th>#</th>
                             <th>{{ trans('messages.name') }}</th>
-                            <th >{{ trans('messages.type') }}</th>
-                            <th >{{ trans('messages.category') }}</th>
-                            <th >{{ trans('messages.info') }}</th>
+                            <th>{{ trans('messages.type') }}</th>
+                            <th>{{ trans('messages.category') }}</th>
+                            <th>{{ trans('messages.info') }}</th>
                             <th class="text-center">{{ trans('messages.total_stock') }}</th>
                             {{-- <th data-breakpoints="lg">{{translate('Todays Deal')}}</th> --}}
                             <th class="text-center">{{ trans('messages.published') }}</th>
@@ -165,12 +164,25 @@
 
                                         @if ($product->thumbnail_img)
                                             <div class="col-auto">
-                                                <img src="{{ get_product_image($product->thumbnail_img, '300') }}"
-                                                    alt="Image" class="size-50px img-fit">
+                                                @php
+                                                    $imagePath = get_product_image($product->thumbnail_img, '300');
+                                                    $imageExists = \Storage::disk('public')->exists(
+                                                        $product->thumbnail_img,
+                                                    );
+                                                @endphp
+
+                                                @if ($imageExists && $imagePath)
+                                                    <img src="{{ $imagePath }}" alt="Image"
+                                                        class="size-50px img-fit">
+                                                @else
+                                                    <img src="{{ asset($product->thumbnail_img) }}"
+                                                        class="img-fluid img-fit avatar"
+                                                        style="max-width: 50px; height: auto;">
+                                                @endif
+
+
                                             </div>
                                         @endif
-
-
                                         <div class="col">
                                             <span class="text-muted text-truncate-2">{{ $product->name }}</span>
                                         </div>
@@ -184,12 +196,13 @@
                                     {{ Breadcrumbs::render('product_admin', $product) }}
                                 </td>
                                 <td>
-                                     @if($product->type != 'rent')
-                                    <strong>{{ trans('messages.no_of_sale') }}:</strong> {{ $product->num_of_sale }}
-                                    {{ trans('messages.times') }} <br>
+                                    @if ($product->type != 'rent')
+                                        <strong>{{ trans('messages.no_of_sale') }}:</strong> {{ $product->num_of_sale }}
+                                        {{ trans('messages.times') }} <br>
                                     @else
-                                    <strong>{{ trans('messages.refundable_deposit') }}:</strong> {{ $product->deposit }}
-                                     DHS <br>
+                                        <strong>{{ trans('messages.refundable_deposit') }}:</strong>
+                                        {{ $product->deposit }}
+                                        DHS <br>
                                     @endif
                                     <strong>{{ trans('messages.rating') }}:</strong> {{ $product->rating }} <br>
                                     <strong>{{ trans('messages.sku') }}:</strong> {{ $product->sku }} <br>
@@ -205,7 +218,7 @@
                                         } else {
                                             //$qty = $product->current_stock;
                                             $qty = optional($product->stocks->first())->qty;
-                                            echo '<b>'.$qty.'</b>';
+                                            echo '<b>' . $qty . '</b>';
                                         }
                                     @endphp
                                     @if ($qty <= $product->low_stock_quantity)

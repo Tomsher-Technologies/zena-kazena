@@ -170,6 +170,16 @@
                                 </a>
                             </li>
                             <li>
+                                <a class="dropdown-item" href="{{ route('vendor.products.all') }}">
+                                    {{ trans('messages.my_products') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('vendor.products.create') }}">
+                                    {{ trans('messages.add_product') }}
+                                </a>
+                            </li>
+                            <li>
                                 <form id="logout-form" action="{{ route('vendor.logout') }}" method="POST"
                                     style="display: none;">
                                     @csrf

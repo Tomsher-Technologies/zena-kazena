@@ -96,8 +96,16 @@
                 <div class="product-list">
                     @if ($order)
                         <div class="product-item">
-                            <img src="{{ get_product_image($order->product->thumbnail_img, '300') }}" alt="Product"
-                                class="product-image">
+                            @php
+                                $imagePath = get_product_image($order->product->thumbnail_img, '300');
+                                $imageExists = \Storage::disk('public')->exists($order->product->thumbnail_img);
+                            @endphp
+
+                            @if ($imageExists && $imagePath)
+                                <img height="50" src="{{ $imagePath }}" alt="Image">
+                            @else
+                                <img src="{{ asset(optional($order->product)->thumbnail_img) }}" class="product-image img-fluid img-fit ">
+                            @endif
                             <div class="product-details">
                                 <h3 class="product-name">{{ $order->product->getTranslation('name', $lang) }} <span
                                         class="text-muted">x {{ $order->quantity }}</span></h3>
@@ -122,7 +130,7 @@
                                         {{ single_price($order->productStock->og_price) }}</del> <br>
                                 @endif --}}
                                 {{ env('DEFAULT_CURRENCY') }}
-                                {{ single_price($order->productStock->price ) }}
+                                {{ single_price($order->productStock->price) }}
                             </div>
                         </div>
                     @endif
@@ -132,7 +140,7 @@
                 <div class="order-summary">
                     <div class="summary-row">
                         <span>{{ trans('messages.no_of_days') }}</span>
-                        <span> {{ ($order->no_of_days) }}</span>
+                        <span> {{ $order->no_of_days }}</span>
                     </div>
                     <div class="summary-row">
                         <span>{{ trans('messages.subtotal') }}</span>
@@ -166,7 +174,8 @@
 
                 <div class="row">
                     <div class="shipping-info col-sm-6">
-                        <h2 class="shipping-title">{{ trans('messages.shipping') . ' ' . trans('messages.information') }}</h2>
+                        <h2 class="shipping-title">{{ trans('messages.shipping') . ' ' . trans('messages.information') }}
+                        </h2>
                         <div class="address-details">
                             <p>{{ json_decode($order->shipping_address)->name }}</p>
                             <p>{{ json_decode($order->shipping_address)->address }}</p>
@@ -177,7 +186,8 @@
                     </div>
 
                     <div class="shipping-info col-sm-6">
-                        <h2 class="shipping-title">{{ trans('messages.billing') . ' ' . trans('messages.information') }}</h2>
+                        <h2 class="shipping-title">{{ trans('messages.billing') . ' ' . trans('messages.information') }}
+                        </h2>
                         <div class="address-details">
                             <p>{{ json_decode($order->billing_address)->name }}</p>
                             <p>{{ json_decode($order->billing_address)->address }}</p>
@@ -188,27 +198,27 @@
                     </div>
                 </div>
 
-                {{-- <div class="action-buttons">
+                <div class="action-buttons">
                     @if ($order->delivery_status == 'pending' || $order->delivery_status == 'confirmed')
                         @if ($order->cancel_request == 0)
-                            <button class="btn btn-cancel cancel-order-btn" data-order-id="{{$order->id}}">{{ trans('messages.cancel').' '.trans('messages.order') }}</button>
+                            <button class="btn btn-cancel cancel-order-btn"
+                                data-order-id="{{ $order->id }}">{{ trans('messages.cancel') . ' ' . trans('messages.order') }}</button>
                         @else
                             <span style="color: red;">{{ trans('messages.cancel_request_send') }}</span>
                         @endif
-                        
                     @endif
-                    
-                    @if ($order->delivery_status == 'delivered')
+
+                    {{-- @if ($order->delivery_status == 'delivered')
                         @if ($order->return_request == 0)
-                            <button class="btn btn-return return-order-btn" data-order-id="{{$order->id}}">{{trans('messages.return')}}</button>
+                            <button class="btn btn-return return-order-btn"
+                                data-order-id="{{ $order->id }}">{{ trans('messages.return') }}</button>
                         @else
                             <span style="color: red;">{{ trans('messages.return_request_send') }}</span>
                         @endif
-
-                    @endif
-                </div> --}}
+                    @endif --}}
+                </div>
             </div>
-            {{-- <div id="cancelModal" class="modal" style="display:none;">
+            <div id="cancelModal" class="modal" style="display:none;">
                 <div class="modal-content">
                     <span class="close-modal close-modal-cancel">&times;</span>
                     <h3>Cancel Order</h3>
@@ -225,7 +235,7 @@
                     <textarea id="returnReason" placeholder="Type your reason for returning the order here..."></textarea>
                     <button id="submitReturnReason" class="submit-btn">Submit</button>
                 </div>
-            </div> --}}
+            </div>
         </section>
 
 
@@ -235,7 +245,7 @@
 @endsection
 
 @section('header')
-    {{-- <style>
+    <style>
         .modal {
             position: fixed;
             top: 50%;
@@ -266,7 +276,7 @@
             margin-bottom: 10px;
             padding: 10px;
         }
-    </style> --}}
+    </style>
 @endsection
 
 @section('script')
@@ -306,7 +316,7 @@
                         if (response.status == true) {
                             console.log = response.message;
                             toastr.success(response.message,
-                            "{{ trans('messages.success') }}");
+                                "{{ trans('messages.success') }}");
                             $("#cancelModal").fadeOut();
                             window.location.reload();
                         } else {
@@ -321,51 +331,65 @@
                     }
                 });
             });
-
-            $(".return-order-btn").click(function() {
-                const orderId = $(this).data("order-id");
-                $("#returnModal").data("order-id", orderId).fadeIn(); // Attach order ID and show modal
-            });
-
-            $(".close-modal-return, .modal-overlay").click(function() {
-                $("#returnModal").fadeOut();
-            });
-
-            $("#submitReturnReason").click(function() {
-                const orderId = $("#returnModal").data("order-id");
-                const reason = $("#returnReason").val().trim();
-
-                if (!reason) {
-                    toastr.error("{{ trans('messages.reason_for_return') }}", 'Error');
-                    return;
-                }
-
-                // AJAX request
-                $.ajax({
-                    url: "/return-order",
-                    type: "POST",
-                    data: {
-                        order_id: orderId,
-                        reason: reason,
-                        _token: $('meta[name="csrf-token"]').attr("content")
-                    },
-                    success: function(response) {
-                        if (response.status == true) {
-                            toastr.success(response.message,
-                            "{{ trans('messages.success') }}");
-                            $("#returnModal").fadeOut();
-                            window.location.reload();
-                        } else {
-                            toastr.error(response.message, "{{ trans('messages.error') }}");
-                        }
-
-                    },
-                    error: function(xhr) {
-                        toastr.error("{{ trans('messages.something_went_wrong') }}",
-                            "{{ trans('messages.error') }}");
-                    }
-                });
-            });
         });
+        // $(document).ready(function() {
+        //     // Open the modal
+        //     $(".cancel-order-btn").click(function() {
+        //         const orderId = $(this).data("order-id"); // Get the order ID from the button
+        //         $("#cancelModal").data("order-id", orderId).fadeIn(); // Pass order ID to modal
+        //     });
+
+        //     // Close the modal
+        //     $(".close-modal-cancel").click(function() {
+        //         $("#cancelModal").fadeOut();
+        //     });
+
+        //     // Submit the cancellation reason
+        //     $("#submitCancelReason").click(function() {
+        //         const orderId = $("#cancelModal").data("order-id"); // Get the order ID
+        //         const reason = $("#cancelReason").val().trim(); // Get the reason
+
+        //         if (!reason) {
+        //             toastr.error("{{ trans('messages.reason_for_cancel') }}",
+        //                 "{{ trans('messages.error') }}");
+        //             return;
+        //         }
+
+        //         // Disable the submit button to prevent multiple clicks
+        //         $(this).prop("disabled", true);
+
+        //         // Send the AJAX request
+        //         $.ajax({
+        //             url: "/rent/cancel-order", // Backend route
+        //             type: "POST",
+        //             data: {
+        //                 order_id: orderId,
+        //                 reason: reason,
+        //                 _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
+        //             },
+        //             success: function(response) {
+        //                 if (response.status) {
+        //                     console.log(response.message);
+        //                     toastr.success(response.message,
+        //                     "{{ trans('messages.success') }}");
+        //                     $("#cancelModal").fadeOut();
+        //                     window.location.reload();
+        //                 } else {
+        //                     console.error(response.message);
+        //                     toastr.error(response.message, "{{ trans('messages.error') }}");
+        //                 }
+        //             },
+        //             error: function(xhr, status, error) {
+        //                 console.error("AJAX Error:", error);
+        //                 toastr.error("{{ trans('messages.something_went_wrong') }}",
+        //                     "{{ trans('messages.error') }}");
+        //             },
+        //             complete: function() {
+        //                 // Re-enable the submit button after the request completes
+        //                 $("#submitCancelReason").prop("disabled", false);
+        //             }
+        //         });
+        //     });
+        // });
     </script>
 @endsection

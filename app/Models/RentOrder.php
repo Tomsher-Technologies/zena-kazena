@@ -34,6 +34,7 @@ class RentOrder extends Model
         'order_code',
         'order_date',
         'order_notes',
+        'tracking_code',
         'cancel_request',
         'cancel_request_date',
         'cancel_reason',

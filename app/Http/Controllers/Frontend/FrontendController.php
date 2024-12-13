@@ -260,6 +260,42 @@ class FrontendController extends Controller
         
         $this->loadSEO($seo);
         return view('frontend.privacy_policy',compact('page','lang'));
+    } 
+    public function shipping()
+    {
+        $page = Page::where('type','shipping_policy')->first();
+        $lang = getActiveLanguage();
+        $seo = [
+            'title'                 => $page->getTranslation('title', $lang),
+            'meta_title'            => $page->getTranslation('meta_title', $lang),
+            'meta_description'      => $page->getTranslation('meta_description', $lang),
+            'keywords'              => $page->getTranslation('keywords', $lang),
+            'og_title'              => $page->getTranslation('og_title', $lang),
+            'og_description'        => $page->getTranslation('og_description', $lang),
+            'twitter_title'         => $page->getTranslation('twitter_title', $lang),
+            'twitter_description'   => $page->getTranslation('twitter_description', $lang),
+        ];
+        
+        $this->loadSEO($seo);
+        return view('frontend.shipping_policy',compact('page','lang'));
+    }
+    public function return()
+    {
+        $page = Page::where('type','return_policy')->first();
+        $lang = getActiveLanguage();
+        $seo = [
+            'title'                 => $page->getTranslation('title', $lang),
+            'meta_title'            => $page->getTranslation('meta_title', $lang),
+            'meta_description'      => $page->getTranslation('meta_description', $lang),
+            'keywords'              => $page->getTranslation('keywords', $lang),
+            'og_title'              => $page->getTranslation('og_title', $lang),
+            'og_description'        => $page->getTranslation('og_description', $lang),
+            'twitter_title'         => $page->getTranslation('twitter_title', $lang),
+            'twitter_description'   => $page->getTranslation('twitter_description', $lang),
+        ];
+        
+        $this->loadSEO($seo);
+        return view('frontend.return_policy',compact('page','lang'));
     }
 
     public function mortgage(){

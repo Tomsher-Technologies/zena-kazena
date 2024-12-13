@@ -3,12 +3,10 @@
     <div class="shop-breadcrumb">
         <div class="container container--type-2">
             <ol class="breadcrumb text-uppercase">
-                <li class="breadcrumb__item"><a href="{{ route('home') }}">Home </a></li>
+                <li class="breadcrumb__item"><a href="{{ route('home') }}">{{ __('messages.home')}} </a></li>
 
                 <li class="breadcrumb__item active" aria-current="page">
-                    Orders <small>View the delivery status for items and your order history
-
-                    </small></li>
+                    {{ __('messages.my_account')}} <small>{{__('messages.my_account_desc')}}</small></li>
             </ol>
         </div>
     </div>
