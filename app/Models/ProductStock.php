@@ -7,7 +7,7 @@ use URL;
 
 class ProductStock extends Model
 {
-    protected $fillable = ['product_id', 'qty', 'price'];
+    protected $fillable = ['product_id', 'variant', 'status', 'sku', 'price', 'high_bid_amount', 'qty', 'offer_price', 'offer_tag', 'image'];
     //
     public function product(){
     	return $this->belongsTo(Product::class);

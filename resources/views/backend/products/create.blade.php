@@ -37,6 +37,16 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <div class="form-group row" id="auction_date" style="display: none;">
+                                <label class="col-sm-3 col-from-label" for="auction_date_range">{{ trans('messages.auction').' '.trans('messages.date').' '.trans('messages.range') }} <span
+                                    class="text-danger">*</span> </label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control aiz-date-range" id="auction_date_range"
+                                        name="auction_date_range" placeholder="{{ trans('messages.select').' '.trans('messages.date') }}" data-time-picker="true"
+                                        data-format="DD-MM-Y HH:mm:ss" data-separator=" to " autocomplete="off">
+                                </div>
+                            </div>
                             
                             <div class="form-group row" id="deposit-amount" style="display: none;">
                                 <label class="col-md-3 col-from-label">{{ trans('messages.refundable_deposit') }} <span
@@ -105,7 +115,7 @@
                             </div>
 
 
-                            <div class="form-group row">
+                            <div class="form-group row" id="min_quantity_div">
                                 <label class="col-md-3 col-from-label">{{ trans('messages.minimum_purchase_qty') }} <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
                                     <input type="number" lang="en" class="form-control" name="min_qty" value="1"
@@ -163,7 +173,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" id="product_discount_div">
                         <div class="card-header">
                             <h5 class="mb-0 h6">{{ trans('messages.product').' '.trans('messages.discounts') }}</h5>
                         </div>
@@ -201,7 +211,7 @@
                         </div>
                         <div class="card-body">
 
-                            <div class="form-group row">
+                            <div class="form-group row" id="product_typeDiv">
                                 <label class="col-md-3 col-from-label">{{ trans('messages.product').' '.trans('messages.type') }} <span class="text-danger">*</span></label>
                                 <div class="col-md-6">
                                     <select class="form-control aiz-selectpicker" name="product_type" id="product_type" required>
@@ -255,10 +265,10 @@
                                         
                                     </div>
 
-                                    <div class="form-group row">
+                                    <div class="form-group row" id="current_stockDiv">
                                         <label class="col-md-3 col-from-label">{{ trans('messages.quantity') }} <span  class="text-danger">*</span></label>
                                         <div class="col-md-6">
-                                            <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="{{ trans('messages.quantity') }}" name="current_stock" class="form-control" required>
+                                            <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="{{ trans('messages.quantity') }}" name="current_stock" id="current_stock" class="form-control" required>
                                         </div>
                                     </div>
 
@@ -566,12 +576,35 @@
     <script>
         document.getElementById('type-select').addEventListener('change', function() {
             const depositField = document.getElementById('deposit-amount');
+            const auction_date = document.getElementById('auction_date');
+            const product_typeDiv = document.getElementById('product_typeDiv');
+            const current_stockDiv = document.getElementById('current_stockDiv');
+            const product_discount_div = document.getElementById('product_discount_div');
+            const min_quantity_div = document.getElementById('min_quantity_div');
+            
+            auction_date.style.display = 'none'; 
+            product_typeDiv.style.display = 'flex'; 
+            depositField.style.display = 'none';
+            current_stockDiv.style.display = 'flex'; 
+            product_discount_div.style.display = 'flex'; 
+            min_quantity_div.style.display = 'flex';
+
             if (this.value === 'rent') {
                 depositField.style.display = 'flex'; // Show the deposit field
+            }else if(this.value === 'auction'){
+                product_typeDiv.style.display = 'none'; 
+                auction_date.style.display = 'flex'; 
+                $('#current_stock').val(1);
+                current_stockDiv.style.display = 'none';
+                product_discount_div.style.display = 'none'; 
+                min_quantity_div.style.display = 'none'; 
             } else {
                 depositField.style.display = 'none'; // Hide the deposit field
                 document.getElementById('deposit').value = ''; // Clear the input field
+                $('#current_stock').val(0);
             }
+            
+            $('#product_type').selectpicker('refresh');
         });
     </script>
     <script>

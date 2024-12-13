@@ -54,11 +54,11 @@
                
                 <div class="col-md-2 ml-auto bootstrap-select">
                     
-                    <select class="form-control form-control-sm aiz-selectpicker mb-2 mb-md-0" data-live-search="true"
+                    <select class="form-control form-control-sm aiz-selectpicker mb-md-0" data-live-search="true"
                             name="category" id="" data-selected={{ $category }}>
                         <option value="0">All</option>
                         @foreach (getAllCategories()->where('parent_id', 0) as $item)
-                            <option value="{{ $item->id }}" @if( $category == $item->id)  {{ 'selected' }} @endif )>{{ $item->name }}</option>
+                            <option value="{{ $item->id }}" @if( $category == $item->id)  {{ 'selected' }} @endif >{{ $item->name }}</option>
                             @if ($item->child)
                                 @foreach ($item->child as $cat)
                                     @include('backend.categories.menu_child_category', [
@@ -71,7 +71,7 @@
                     </select>
                 </div>
                 <div class="col-md-2 ml-auto bootstrap-select">
-                    <select class="form-control form-control-sm aiz-selectpicker mb-2 mb-md-0" name="type" id="type"
+                    <select class="form-control form-control-sm aiz-selectpicker  mb-md-0" name="type" id="type"
                         onchange="sort_products()">
                         <option value="">Sort By</option>
                         <option value="rating,desc"
@@ -100,6 +100,14 @@
                             Unpublished</option>
                     </select>
                 </div>
+                <div class="col-md-2 ml-auto bootstrap-select">
+                    <select class="form-control form-control-sm aiz-selectpicker  mb-md-0" name="product_type" id="product_type">
+                        <option value="">Select Product Type</option>
+                        <option value="auction" @if ($product_type == 'auction') selected @endif >Auction</option>
+                        <option value="rent" @if ($product_type == 'rent') selected @endif >Rent</option>
+                        <option value="sale" @if ($product_type == 'sale') selected @endif >Sale</option>
+                    </select>
+                </div>
                 <div class="col-md-2">
                     <div class="form-group mb-0">
                         <input type="text" class="form-control form-control-sm" id="search"
@@ -107,7 +115,7 @@
                             placeholder="Type & Enter">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <button class="btn btn-info " type="submit">Filter</button>
                     <a href="{{ route('products.all') }}" class="btn btn-warning">Reset</a>
                 </div>
@@ -169,7 +177,7 @@
                                     </div>
                                 </td>
                                 <td class="bread">
-                                    <span class="text-muted text-truncate-2">{{ $product->type }}</span>
+                                    <span class="text-muted text-truncate-2">{{ ucfirst($product->type) }}</span>
                                 </td>
 
                                 <td class="bread">

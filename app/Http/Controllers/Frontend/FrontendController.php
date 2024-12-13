@@ -499,4 +499,5 @@ class FrontendController extends Controller
         return response()->json(['success' => trans('messages.newsletter_success')]);
     }
 
+   
 }
