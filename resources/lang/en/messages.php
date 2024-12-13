@@ -548,7 +548,7 @@ return [
     'auction_still_active' => 'Auction still active',
     'winner' => 'Winner',
     'lost' => 'Lost',
-    '' => '',
+    'no_data_found' => 'No Data Found',
     '' => '',
     '' => '',
     '' => '',
