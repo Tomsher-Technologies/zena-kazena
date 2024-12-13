@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Occasion;
 use App\Models\Page;
+use App\Models\Bid;
 use App\Models\Wishlist;
 use App\Models\Cart;
 use App\Models\RecentlyViewedProduct;
@@ -665,4 +666,13 @@ function getCategoryHeader(){
     });
 
     return $data;
+}
+
+function winningStatus($product_id, $user_id){
+    $bids = Bid::where('product_id', $product_id)
+                ->where('user_id', $user_id)
+                ->orderBy('id', 'desc') // Or use any other ordering
+                ->limit(1)
+                ->pluck('winner')->toArray();
+    return (!empty($bids) ? $bids[0] : 0);
 }

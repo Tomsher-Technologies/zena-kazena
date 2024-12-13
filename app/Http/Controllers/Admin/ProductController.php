@@ -27,6 +27,8 @@ use Str;
 use File;
 use Hash;
 use DB;
+use DateTime ;
+use DateTimeZone;
 
 class ProductController extends Controller
 {
@@ -39,6 +41,7 @@ class ProductController extends Controller
         $sort_search = null;
         $products = Product::orderBy('created_at', 'desc');
         $category = ($request->has('category')) ? $request->category : '';
+        $product_type = ($request->has('product_type')) ? $request->product_type : '';
         
         if ($request->type != null) {
             $var = explode(",", $request->type);
@@ -80,12 +83,15 @@ class ProductController extends Controller
                 });
         }
 
+        if($product_type != ''){
+            $products = $products->where('type', $product_type);
+        }
        
 
         $products = $products->paginate(15);
         $type = 'All';
 
-        return view('backend.products.index', compact('category','products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
+        return view('backend.products.index', compact('category','product_type','products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
     }
 
     /**
@@ -139,7 +145,7 @@ class ProductController extends Controller
         // dd($request->all());
         // echo '<pre>';
         // echo env('DEFAULT_LANGUAGE', 'en');
-        // // print_r($request->all());
+        // print_r($request->all());
         // die;
         $skuMain = '';
         if($request->has('products')){
@@ -150,7 +156,7 @@ class ProductController extends Controller
         }
         $product = new Product;
         $product->type= $request->type;
-        $product->deposit = $request->has('deposit') ? $request->deposit : 0;
+        $product->deposit =  $request->deposit ?? 0;
         $product->name = $request->name;
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
@@ -171,6 +177,12 @@ class ProductController extends Controller
             $date_var               = explode(" to ", $request->date_range);
             $product->discount_start_date = strtotime($date_var[0]);
             $product->discount_end_date   = strtotime($date_var[1]);
+        }
+
+        if ($request->auction_date_range != null) {
+            $auction_date_var               = explode(" to ", $request->auction_date_range);
+            $product->auction_start_date = (DateTime::createFromFormat('d-m-Y H:i:s', $auction_date_var[0]));
+            $product->auction_end_date   = (DateTime::createFromFormat('d-m-Y H:i:s', $auction_date_var[1]));
         }
 
         // if ($request->hasFile('pdf')) {
@@ -333,6 +345,9 @@ class ProductController extends Controller
                 $product_stock->sku = $prod['sku'];
                 $product_stock->price = $prod['price'];// $prod['price'];
                 $product_stock->qty = $prod['current_stock'];
+                if($request->type == 'auction'){
+                    $product_stock->high_bid_amount = $prod['price'];
+                }
 
                 $offertag       = '';
                 $productOrgPrice = $prod['price'];
@@ -556,6 +571,12 @@ class ProductController extends Controller
             $product->discount_end_date     = strtotime($date_var[1]);
         }
 
+        if ($request->auction_date_range != null) {
+            $auction_date_var               = explode(" to ", $request->auction_date_range);
+            $product->auction_start_date = (DateTime::createFromFormat('d-m-Y H:i:s', $auction_date_var[0]));
+            $product->auction_end_date   = (DateTime::createFromFormat('d-m-Y H:i:s', $auction_date_var[1]));
+        }
+
         $slug               = $request->slug ? Str::slug($request->slug, '-') : Str::slug($request->name, '-');
         $same_slug_count    = Product::where('slug', 'LIKE', $slug . '%')->where('id','!=',$id)->count();
         $slug_suffix        = $same_slug_count ? '-' . $same_slug_count + 1 : '';
@@ -750,7 +771,9 @@ class ProductController extends Controller
                 $product_stock->sku = $prod['sku'];
                 $product_stock->price = $prod['price'];// $prod['price'];
                 $product_stock->qty = $prod['current_stock'];
-
+                if($request->type == 'auction'){
+                    $product_stock->high_bid_amount = $prod['price'];
+                }
                 $offertag       = '';
                 $productOrgPrice = $prod['price'];
                 $discountPrice = $productOrgPrice;

@@ -124,7 +124,7 @@
                 <li><a href="{{ route('home') }}" class="nav__item {{ areActiveRoutes(['home']) }}">{{ trans('messages.shop') }}</a></li>
                 <li><a href="{{ route('sales') }}" class="nav__item {{ areActiveRoutes(['sales']) }}">{{ trans('messages.sale') }}</a></li>
                  <li><a href="{{route('rent.products')}}" class="nav__item {{ areActiveRoutes(['rent.products']) }}">{{ trans('messages.rent') }}</a></li>
-                <li><a href="#" class="nav__item">{{ trans('messages.auction') }}</a></li>
+                <li><a href="{{route('auction.products')}}" class="nav__item {{ areActiveRoutes(['auction.products']) }}">{{ trans('messages.auction') }}</a></li>
                 <li><a href="{{route('mortgage')}}" class="nav__item {{ areActiveRoutes(['mortgage']) }}">{{ trans('messages.mortgage') }}</a></li> 
             </ul>
             <!-- Logo -->

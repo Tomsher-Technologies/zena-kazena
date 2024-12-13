@@ -36,6 +36,34 @@
                                             value="{{ $product->getTranslation('name',$lang) }}" required>
                                     </div>
                                 </div>
+
+                                <div class="form-group row  @if ($lang != 'en') d-none @endif" id="type">
+                                    <label class="col-md-3 col-from-label">{{ trans('messages.type') }} <span
+                                            class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <select class="form-control aiz-selectpicker" name="type" id="type-select" data-live-search="true" required disabled>
+                                            <option value="sale" @if($product->type == 'sale') selected @endif>For Sale</option>
+                                            <option value="rent" @if($product->type == 'rent') selected @endif>For Rent</option>
+                                            <option value="auction" @if($product->type == 'auction') selected @endif>For Auction</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                @php
+                                    $auction_start_date = date('d-m-Y H:i:s', strtotime($product->auction_start_date));
+                                    $auction_end_date = date('d-m-Y H:i:s', strtotime($product->auction_end_date));
+                                @endphp
+                                
+                                <div class="form-group row  @if ($lang != 'en') d-none @endif" id="auction_date" @if($product->type != 'auction') style="display:none;"  @endif>
+                                    <label class="col-sm-3 col-from-label" for="auction_date_range">{{ trans('messages.auction').' '.trans('messages.date').' '.trans('messages.range') }} <span
+                                        class="text-danger">*</span> </label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control aiz-date-range" id="auction_date_range"
+                                            name="auction_date_range" placeholder="{{ trans('messages.select').' '.trans('messages.date') }}" data-time-picker="true"
+                                            data-format="DD-MM-Y HH:mm:ss" data-separator=" to " autocomplete="off" @if ($product->auction_start_date && $product->auction_end_date) value="{{ $auction_start_date . ' to ' . $auction_end_date }}" @endif>
+                                    </div>
+                                </div>
+                                
+
                                 <div class="form-group row @if ($lang != 'en') d-none @endif" id="category">
                                     <label class="col-lg-3 col-from-label">{{ trans('messages.category') }}<span class="text-danger">*</span></label>
                                     <div class="col-lg-8">
@@ -96,7 +124,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group row @if ($lang != 'en') d-none @endif">
+                                <div class="form-group row @if ($lang != 'en') d-none @endif" @if($product->type == 'auction') style="display:none;"  @endif>
                                     <label class="col-lg-3 col-from-label">{{ trans('messages.minimum_purchase_qty') }}</label>
                                     <div class="col-lg-8">
                                         <input type="number" lang="en" class="form-control" name="min_qty"
@@ -215,7 +243,7 @@
                     </div>
 
 
-                    <div class="card @if ($lang != 'en') d-none @endif">
+                    <div class="card @if ($lang != 'en') d-none @endif"  @if($product->type == 'auction') style="display:none;"  @endif>
                         <div class="card-header">
                             <h5 class="mb-0 h6">{{ trans('messages.product').' '.trans('messages.discounts') }}</h5>
                         </div>
@@ -264,7 +292,7 @@
                         </div>
                         <div class="card-body">
 
-                            <div class="form-group row">
+                            <div class="form-group row" @if($product->type == 'auction') style="display:none;"  @endif>
                                 <label class="col-md-3 col-from-label">{{ trans('messages.product').' '.trans('messages.type') }} <span class="text-danger">*</span></label>
                                 <div class="col-md-6">
                                     <select class="form-control aiz-selectpicker" name="product_type" id="product_type" required>
@@ -382,7 +410,7 @@
                                                 
                                             </div>
 
-                                            <div class="form-group row">
+                                            <div class="form-group row"  @if($product->type == 'auction') style="display:none;"  @endif>
                                                 <label class="col-md-3 col-from-label">{{ trans('messages.quantity') }} <span  class="text-danger">*</span></label>
                                                 <div class="col-md-6">
                                                     <input type="number" lang="en" min="0"  step="0.01" placeholder="{{ trans('messages.quantity') }}" name="oldproduct[{{$key}}][current_stock]" class="form-control" required

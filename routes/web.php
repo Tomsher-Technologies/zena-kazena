@@ -13,7 +13,7 @@ use App\Http\Controllers\Frontend\ProfileController;
 use App\Http\Controllers\Frontend\ForgotPasswordController;
 use App\Http\Controllers\Frontend\VendorController;
 use App\Http\Controllers\Frontend\AddressController;
-
+use App\Http\Controllers\Frontend\BidController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -48,6 +48,9 @@ Route::get('related-products', [ProductController::class, 'relatedProducts'])->n
 Route::get('/rent/products', [ProductController::class, 'rentProducts'])->name('rent.products');
 Route::get('/rent/product-details', [ProductController::class, 'rentProductDetails'])->name('rent.product-detail');
 
+Route::get('/auction/products', [ProductController::class, 'auctionProducts'])->name('auction.products');
+Route::get('/auction/product-details', [ProductController::class, 'auctionProductDetails'])->name('auction.product-detail');
+
 Route::post('/language_change', [FrontendController::class, 'changeLanguage'])->name('language.change');
 
 Route::get('/category/{category_slug}', [SearchController::class, 'listingByCategory'])->name('products.category');
@@ -64,6 +67,8 @@ Route::post('coupon-remove', [CheckoutController::class, 'remove_coupon_code'])-
 
 Route::get('/check-login-status', [UserController::class, 'checkLoginStatus'])->name('check.login.status');
 
+Route::post('/auction/{id}/place-bid', [BidController::class, 'placeBid']);
+Route::get('/auction/{id}/status', [BidController::class, 'getAuctionStatus']);
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->middleware('auth')->name('checkout');
@@ -104,6 +109,9 @@ Route::group(['middleware' => ['auth']], function () {
     
     Route::post('/rent/product-order', [CheckoutController::class, 'rentProductOrder'])->name('rent.product-order');
     Route::post('/rent/product-order/process', [CheckoutController::class, 'placeRentOrder'])->name('rent.checkout.process');
+
+    Route::get('/user/auction-products', [ProfileController::class, 'auctionProducts'])->name('user.auction-products');
+    Route::get('/product/{productId}/user/{userId}/bid-history', [ProfileController::class, 'userBidHistory'])->name('product.user-bid-history');
 });
 
 Route::post('/subscribe', [FrontendController::class, 'subscribe'])->name('newsletter.subscribe');

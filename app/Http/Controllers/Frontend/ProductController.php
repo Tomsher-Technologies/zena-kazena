@@ -294,6 +294,7 @@ class ProductController extends Controller
                 
                 $response = [
                     'id' => (integer)$product_stock->id,
+                    'product_id' => $product_stock->product_id,
                     'wishlisted' => isWishlisted($product_stock->product_id, $product_stock->id),
                     'name' => $product_stock->product->getTranslation('name', $lang),
                     'slug' => $product_stock->product->slug,
@@ -691,4 +692,286 @@ class ProductController extends Controller
         return view('frontend.rentproduct_details', compact('lang','response','product_stock','relatedProducts','recentlyViewedProducts'));
     }
 
+    public function auctionProducts(Request $request)
+    {
+        $price = $request->price;
+        $min_price = $max_price = 0;
+        if($price != null){
+            preg_match_all('/\d+/', $price, $matches);
+            if(isset($matches[0][0])){
+                $min_price = $matches[0][0];
+            }
+            if(isset($matches[0][1])){
+                $max_price = $matches[0][1];
+            }
+           
+        }
+       
+        $lang = getActiveLanguage();
+        $limit = $request->has('limit') ? $request->limit : 10;
+        $offset = $request->has('offset') ? $request->offset : 0;
+        $category = $request->has('category') ? $request->category  : false;
+        $brand = $request->has('brand') ? $request->brand  : false;
+        $occasion = $request->has('occasion') ? $request->occasion  : false;
+        $sort_by = $request->has('sort_by') ? $request->sort_by : null;
+
+        $product_query  = Product::with('stocks')->where('type','auction');
+        $product_query  = $product_query->wherePublished(1);
+        $categoryData = null;
+        if ($category) {
+            $categoryData = Category::whereHas('category_translations', function ($query) use ($category) {
+                                        $query->where('slug', $category);
+                                    })->where('is_active',1)->first();
+
+            $childIds = [];
+            $category_ids = Category::whereHas('category_translations', function ($query) use ($category) {
+                                        $query->where('slug', $category);
+                                    })->where('is_active',1)->pluck('id')->toArray();
+
+            $childIds[] = $category_ids;
+            if(!empty($category_ids)){
+                foreach($category_ids as $cId){
+                    $childIds[] = getChildCategoryIds($cId);
+                }
+            }
+
+            if(!empty($childIds)){
+                $childIds = array_merge(...$childIds);
+                $childIds = array_unique($childIds);
+            }
+            // print_r($childIds);
+            // die;
+            $product_query->whereIn('category_id', $childIds);
+          
+        }
+        
+        if ($brand) {
+            $brand_ids = Brand::whereHas('brand_translations', function ($query) use ($brand) {
+                                    $query->whereIn('slug', $brand);
+                                })->where('is_active', 1)->pluck('id')->toArray();
+
+            $product_query->whereIn('brand_id', $brand_ids);
+        }
+
+        if ($occasion) {
+            $occasion_ids = Occasion::whereHas('occasion_translations', function ($query) use ($occasion) {
+                                    $query->whereIn('slug', $occasion);
+                                })->where('is_active', 1)->pluck('id')->toArray();
+
+            $product_query->whereIn('occasion_id', $occasion_ids);
+        }
+
+        if ($sort_by) {
+            switch ($sort_by) {
+                case 'latest':
+                    $product_query->latest();
+                    break;
+                case 'oldest':
+                    $product_query->oldest();
+                    break;
+                case 'name_asc':
+                    $product_query->orderBy('name', 'asc');
+                    break;
+                case 'name_desc':
+                    $product_query->orderBy('name', 'desc');
+                    break;
+                case 'price_high':
+                    $product_query->select('*', DB::raw("(SELECT MAX(high_bid_amount) from product_stocks WHERE product_id = products.id) as sort_price"));
+                    $product_query->orderBy('sort_price', 'desc');
+                    break;
+                case 'price_low':
+                    $product_query->select('*', DB::raw("(SELECT MIN(high_bid_amount) from product_stocks WHERE product_id = products.id) as sort_price"));
+                    $product_query->orderBy('sort_price', 'asc');
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+        }
+
+        if ($request->search) {
+            $sort_search = $request->search;
+            $products = $product_query->where(function ($query) use($sort_search) {
+                $query->orWhereHas('stocks', function ($q) use ($sort_search) {
+                    $q->where('sku', 'like', '%' . $sort_search . '%');
+                })->orWhereHas('product_translations', function ($q) use ($sort_search) {
+                    $q->where('tags', 'like', '%' . $sort_search . '%')->orWhere('name', 'like', '%' . $sort_search . '%');
+                });
+
+            });
+            // SearchUtility::store($sort_search, $request);
+        }
+
+        if($max_price != 0 && $min_price != 0){
+            $product_query->whereHas('stocks', function ($query) use ($min_price, $max_price) {
+                $query->whereBetween('price', [$min_price, $max_price]);
+            });
+        }
+
+        if($request->has('offers')){
+            $today = Carbon::now()->timestamp;
+            $product_query->where('discount_start_date', '<=', $today) // Offer starts on or before today
+            ->where('discount_end_date', '>=', $today);
+        }
+        $products = $product_query->paginate(20)->appends($request->query());
+
+
+        $categories = Cache::rememberForever('categories', function () {
+            $details = Category::where('parent_id',0)->where('is_active', 1)->orderBy('name','asc')->get();
+            return $details;
+        });
+
+        $brands = Cache::rememberForever('brands', function () {
+            $details = Brand::where('is_active', 1)->orderBy('name','asc')->get();
+            return $details;
+        });
+
+        $occasions = Cache::rememberForever('occasions', function () {
+            $details = Occasion::where('is_active', 1)->orderBy('name','asc')->get();
+            return $details;
+        });
+        return view('frontend.auctionproducts',compact('limit','products','offset','min_price','max_price','category','brand','occasion','sort_by','lang','categories','brands','occasions','categoryData','price'));
+    }
+
+    public function auctionProductDetails(Request $request)
+    {
+        $slug = $request->has('slug') ? $request->slug :  ''; 
+        $sku  = $request->has('sku') ? $request->sku :  ''; 
+        $lang = getActiveLanguage();
+
+        $product_stock = '';
+        $response = $relatedProducts = [];
+        if($slug !=  '' && $sku !=''){
+            $product_stock = ProductStock::leftJoin('products','products.id','=','product_stocks.product_id')
+                                    ->where('products.published',1)
+                                    ->where('product_stocks.status',1)
+                                    ->select('product_stocks.*')
+                                    ->where('products.slug', $slug)
+                                    ->where('products.type', 'auction')
+                                    ->where('product_stocks.sku', $sku)
+                                    ->first();
+
+            
+            $category = [
+                'id'=> 0,
+                'name'=> "",
+                'slug' => "",
+                'logo'=> "",
+            ];
+            
+            if($product_stock){
+
+                trackRecentlyViewed($product_stock->product->id);
+
+                if($product_stock->product->category != null) {
+                    $category = [
+                        'id'=> $product_stock->product->category->id ?? '',
+                        'name'=> $product_stock->product->category->getTranslation('name', $lang) ?? '',
+                        'slug' => $product_stock->product->category->getTranslation('slug', $lang) ?? '',
+                        'logo'=> uploaded_asset($product_stock->product->category->getTranslation('icon', $lang) ?? ''),
+                    ];
+                }
+    
+                $photo_paths = explode(',',$product_stock->product->photos);
+         
+                $photos = [];
+                if (!empty($photo_paths)) {
+                    foreach($photo_paths as $php){
+                        $photos[] = get_product_image($php);
+                    }
+                }
+
+                if ($product_stock->price > $product_stock->high_bid_amount){
+                    $auctionprice = $product_stock->price;
+                }else {
+                    $auctionprice = $product_stock->high_bid_amount;
+                }
+
+                $stroked_price = $auctionprice;
+                if ($product_stock->price != $product_stock->high_bid_amount && $product_stock->high_bid_amount != 0){
+                    $stroked_price = $product_stock->price;
+                }
+                
+                $response = [
+                    'id' => (integer)$product_stock->id,
+                    'product_id' => $product_stock->product_id,
+                    'name' => $product_stock->product->getTranslation('name', $lang),
+                    'slug' => $product_stock->product->slug,
+                    'auction_start_date' => $product_stock->product->auction_start_date,
+                    'auction_end_date' => $product_stock->product->auction_end_date,
+                    'product_type' => $product_stock->product->product_type,
+                    'occasion' => optional($product_stock->product->occasion)->getTranslation('name', $lang) ?? '',
+                    'brand' => optional($product_stock->product->brand)->getTranslation('name',$lang) ?? '',
+                    'category' => $category,
+                    'video_provider' => $product_stock->product->video_provider ?? '',
+                    'video_link' => $product_stock->product->video_link != null ?  $product_stock->product->video_link : "",
+                    'return_refund' =>  $product_stock->product->return_refund ,
+                    'published' =>  $product_stock->product->published ,
+                    'photos' => $photos,
+                    'thumbnail_image' => get_product_image($product_stock->product->thumbnail_img),
+                    'variant_image' => ($product_stock->image != NULL) ?  get_product_image($product_stock->image) : '' ,
+                    'tags' => explode(',', $product_stock->product->getTranslation('tags', $lang)),
+                    'status' => $product_stock->status,
+                    'sku' =>  $product_stock->sku,
+                    'quantity' => $product_stock->qty ?? 0,
+                    'description' => $product_stock->product->getTranslation('description', $lang),
+                    'stroked_price' => $stroked_price ,
+                    'main_price' => $auctionprice ,
+                    'offer_tag' =>  '',
+                    'current_stock' => (integer)$product_stock->qty,
+                    'rating' => (double)$product_stock->product->rating,
+                    'rating_count' => (integer)Review::where(['product_id' => $product_stock->product_id])->count(),
+                    'tabs' => $product_stock->product->tabsLang,
+                    'meta_title' => $product_stock->product->getSeoTranslation('meta_title', $lang) ?? '',
+                    'meta_description' => $product_stock->product->getSeoTranslation('meta_description', $lang) ?? '',
+                    'meta_keywords' => $product_stock->product->getSeoTranslation('meta_keywords', $lang) ?? '',
+                    'og_title' => $product_stock->product->getSeoTranslation('og_title', $lang) ?? '',
+                    'og_description' => $product_stock->product->getSeoTranslation('og_description', $lang) ?? '',
+                    'twitter_title' => $product_stock->product->getSeoTranslation('twitter_title', $lang) ?? '',
+                    'twitter_description' => $product_stock->product->getSeoTranslation('twitter_description', $lang) ?? '',
+                ];
+                $relatedProducts = $this->relatedAuctionProducts(10, 0, $slug, $product_stock->product->category->getTranslation('slug', $lang) ?? '');
+                
+            }
+
+            
+        } 
+       
+        return view('frontend.auctionproduct_details', compact('lang','response','product_stock','relatedProducts'));
+    }
+
+    public function relatedAuctionProducts($limit, $offset, $product_slug, $category_slug){
+
+        $product_query = Product::leftJoin('product_stocks', 'products.id', '=', 'product_stocks.product_id')
+                                    ->where('products.published', 1)
+                                    ->where('products.type', 'auction')
+                                    ->where('product_stocks.status', 1)
+                                    ->select('products.*') // Ensure only product fields are selected
+                                    ->groupBy('products.id'); // Prevent duplication
+
+        if ($category_slug) {
+            $category_ids = Category::whereHas('category_translations', function ($query) use ($category_slug) {
+                                    $query->where('slug', $category_slug);
+                                })->pluck('id')->toArray();;
+            
+            $childIds[] = $category_ids;
+            if(!empty($category_ids)){
+                foreach($category_ids as $cId){
+                    $childIds[] = getChildCategoryIds($cId);
+                }
+            }
+
+            if(!empty($childIds)){
+                $childIds = array_merge(...$childIds);
+                $childIds = array_unique($childIds);
+            }
+
+            $product_query->whereIn('products.category_id', $category_ids);
+        }
+        $product_query->where('products.slug','!=', $product_slug)->groupBy('products.id')->latest();
+
+        $products = $product_query->skip($offset)->take($limit)->get();
+
+        return $products;
+    }
 }

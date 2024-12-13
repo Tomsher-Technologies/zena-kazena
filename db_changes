@@ -119,6 +119,21 @@
 --   PRIMARY KEY (`id`)
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
-ALTER TABLE `users` ADD `eid_no` VARCHAR(255) NULL DEFAULT NULL AFTER `email`, ADD `eid_image_front` VARCHAR(255) NULL DEFAULT NULL AFTER `eid_no`, ADD `eid_image_back` VARCHAR(255) NULL DEFAULT NULL AFTER `eid_image_front`;
+-- ALTER TABLE `users` ADD `eid_no` VARCHAR(255) NULL DEFAULT NULL AFTER `email`, ADD `eid_image_front` VARCHAR(255) NULL DEFAULT NULL AFTER `eid_no`, ADD `eid_image_back` VARCHAR(255) NULL DEFAULT NULL AFTER `eid_image_front`;
 
-ALTER TABLE `users` ADD `eid_approval_status` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0-Pending, 1-Approved, 2-Denied' AFTER `eid_no`;
+-- ALTER TABLE `users` ADD `eid_approval_status` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0-Pending, 1-Approved, 2-Denied' AFTER `eid_no`;
+
+ALTER TABLE `products` ADD `auction_start_date` INT NULL DEFAULT NULL AFTER `product_type`, ADD `auction_end_date` INT NULL DEFAULT NULL AFTER `auction_start_date`;
+
+ALTER TABLE `product_stocks` ADD `high_bid_amount` DOUBLE(20,2) NOT NULL DEFAULT '0' AFTER `price`;
+
+CREATE TABLE IF NOT EXISTS `bids` ( `id` int NOT NULL AUTO_INCREMENT, `product_id` int NOT NULL, `user_id` int NOT NULL, `amount` decimal(8,2) NOT NULL DEFAULT '0.00', `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `bids` CHANGE `user_id` `user_id` INT(10) UNSIGNED NOT NULL;
+
+ALTER TABLE `bids` ADD FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE `bids` ADD FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+ALTER TABLE `products` CHANGE `auction_start_date` `auction_start_date` DATETIME NULL DEFAULT NULL, CHANGE `auction_end_date` `auction_end_date` DATETIME NULL DEFAULT NULL;
+
+ALTER TABLE `bids` ADD `winner` TINYINT(1) NOT NULL DEFAULT '0' AFTER `amount`;
