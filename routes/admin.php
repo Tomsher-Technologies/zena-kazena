@@ -50,6 +50,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/banners/edit/{id}', [Bannercontroller::class, 'edit'])->name('banners.edit');
 
     Route::get('/enquiries-contact', [PageController::class, 'enquiries'])->name('enquiries.contact');
+
+    Route::get('/enquiries-mortgage', [PageController::class, 'enquiriesMortgage'])->name('enquiries.mortgage');
+    Route::get('/enquiries-sales', [PageController::class, 'enquiriesSales'])->name('enquiries.sales');
+
     // website setting
     Route::group(['prefix' => 'website'], function () {
         Route::get('/footer', [WebsiteController::class, 'footer'])->name('website.footer');
