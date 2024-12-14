@@ -44,6 +44,7 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
+        session(['active_section' => 'shop']);
         $price = $request->price;
         $min_price = $max_price = 0;
         if($price != null){
@@ -390,6 +391,7 @@ class ProductController extends Controller
     }
     public function rentProducts(Request $request)
     {
+        session(['active_section' => 'rent']);
         $price = $request->price;
         $min_price = $max_price = 0;
         if($price != null){

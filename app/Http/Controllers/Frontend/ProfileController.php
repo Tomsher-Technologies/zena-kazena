@@ -473,17 +473,12 @@ class ProfileController extends Controller
 
     public function userBidHistory($productId, $userId)
     {
-        // Fetch the product by ID
-        $product = Product::findOrFail($productId);
-
         // Fetch the bids for the specific user and product
         $bids = Bid::where('product_id', $productId)
                     ->where('user_id', $userId)
                     ->orderBy('created_at', 'desc') // Or use any other ordering
                     ->get();
 
-      
-        // Return the view with the product and its user's bids
-        return view('frontend.user_bid_history', compact('product', 'bids'));
+        return view('frontend.user_bid_history', compact('bids'));
     }
 }

@@ -1,418 +1,432 @@
 @extends('frontend.layouts.app')
 @section('content')
-    <!-- Shop breadcrumb -->
-    <div class="shop-breadcrumb">
-        <!-- Container -->
-        <div class="container container--type-2">
+    @if ($product_stock?->product)
+        <!-- Shop breadcrumb -->
+        <div class="shop-breadcrumb">
+            <!-- Container -->
+            <div class="container container--type-2">
 
-            {{ Breadcrumbs::render('product', $product_stock->product) }}
+                {{ Breadcrumbs::render('product', $product_stock->product) }}
+
+            </div>
+            <!-- End container -->
+        </div>
+        <!-- End shop breadcrumb -->
+
+        @php
+            $images = $response['photos'];
+            if ($response['thumbnail_image'] != null) {
+                array_unshift($images, $response['thumbnail_image']);
+            }
+
+            if ($response['variant_image'] != null) {
+                array_push($images, $response['variant_image']);
+            }
+
+            $thumbanailSlider = $productImagesWeb = $productImagesMob = '';
+        @endphp
+
+        @if (!empty($images))
+            @foreach ($images as $imgkey => $img)
+                @php
+                    $activeStatus = '';
+                    if ($imgkey == 0) {
+                        $activeStatus = 'active';
+                    }
+
+                    $productImagesWeb .=
+                        '<li class="' .
+                        $activeStatus .
+                        ' js-product-main-image" data-id="' .
+                        $imgkey .
+                        '">
+                            <a href="' .
+                        $img .
+                        '">
+                                <img alt="Image" src="' .
+                        $img .
+                        '"data-zoomed="' .
+                        $img .
+                        '" class="js-zoomit" />
+                            </a>
+                        </li>';
+
+                    $productImagesMob .=
+                        '<div class="mobile-product-image">
+                            <p>
+                                <a href="' .
+                        $img .
+                        '" target="_blank">
+                                    <img alt="Image" src="' .
+                        $img .
+                        '" />
+                                </a>
+                            </p>
+                        </div>';
+
+                    $thumbanailSlider .=
+                        '<li class="js-product-thumnail-slider" data-group="1">
+                                            <a href="#" class="' .
+                        $activeStatus .
+                        ' js-product-thumbnail" data-id="' .
+                        $imgkey .
+                        '">
+                                                <img alt="Image" src="' .
+                        $img .
+                        '" />
+                                            </a>
+                                        </li>';
+                @endphp
+            @endforeach
+        @endif
+
+
+        <!-- Product mobile gallery -->
+        <div class="product__mobile-gallery js-product-mobile-gallery">
+
+            {!! $productImagesMob !!}
 
         </div>
-        <!-- End container -->
-    </div>
-    <!-- End shop breadcrumb -->
+        <!-- End product mobile allery -->
 
-    @php
-        $images = $response['photos'];
-        if ($response['thumbnail_image'] != null) {
-            array_unshift($images, $response['thumbnail_image']);
-        }
-
-        if ($response['variant_image'] != null) {
-            array_push($images, $response['variant_image']);
-        }
-
-        $thumbanailSlider = $productImagesWeb = $productImagesMob = '';
-    @endphp
-
-    @if (!empty($images))
-        @foreach ($images as $imgkey => $img)
-            @php
-                $activeStatus = '';
-                if ($imgkey == 0) {
-                    $activeStatus = 'active';
-                }
-
-                $productImagesWeb .=
-                    '<li class="' .
-                    $activeStatus .
-                    ' js-product-main-image" data-id="' .
-                    $imgkey .
-                    '">
-                        <a href="' .
-                    $img .
-                    '">
-                            <img alt="Image" src="' .
-                    $img .
-                    '"data-zoomed="' .
-                    $img .
-                    '" class="js-zoomit" />
-                        </a>
-                    </li>';
-
-                $productImagesMob .=
-                    '<div class="mobile-product-image">
-                        <p>
-                            <a href="' .
-                    $img .
-                    '" target="_blank">
-                                <img alt="Image" src="' .
-                    $img .
-                    '" />
-                            </a>
-                        </p>
-                    </div>';
-
-                $thumbanailSlider .=
-                    '<li class="js-product-thumnail-slider" data-group="1">
-                                        <a href="#" class="' .
-                    $activeStatus .
-                    ' js-product-thumbnail" data-id="' .
-                    $imgkey .
-                    '">
-                                            <img alt="Image" src="' .
-                    $img .
-                    '" />
-                                        </a>
-                                    </li>';
-            @endphp
-        @endforeach
-    @endif
-
-
-    <!-- Product mobile gallery -->
-    <div class="product__mobile-gallery js-product-mobile-gallery">
-
-        {!! $productImagesMob !!}
-
-    </div>
-    <!-- End product mobile allery -->
-
-    <!-- Product -->
-    <div class="product product-layout-3">
-        <!-- Container -->
-        <div class="container container--type-2">
-            <!-- Product main -->
-            <div class="product__main d-flex">
-                <!-- Product image and thumbnails -->
-                <div class="product__main-image-and-thumbnails">
-                    <!-- Product tag -->
-                    @if ($response['offer_tag'] != '')
-                        <div class="product-grid-item__tag">{{ $response['offer_tag'] }}</div>
-                    @endif
-                    <!-- End product tag -->
-                    <!-- Product main image -->
-                    <ul class="product__main-image js-popup-gallery">
-
-                        {!! $productImagesWeb !!}
-
-                    </ul>
-                    <!-- End product main image -->
-                    <!-- Product thumbnails -->
-                    <ul class="product__thumbnails">
-                        {!! $thumbanailSlider !!}
-
-                    </ul>
-                    <!-- End product thumbnails -->
-                </div>
-                <!-- End product thumbnails and image -->
-                <!-- Product right -->
-                <div class="product__right">
-                    <!-- Product title -->
-                    <h1 class="product__title">{{ $response['name'] }}</h1>
-                    <!-- End product title -->
-                    <!-- Product reviews -->
-                    <div class="product__reviews">
-
-                    </div>
-                    <!-- End product reviews -->
-                    <!-- Product price -->
-
-                 
-                    <div class="product__price" bis_skin_checked="1">
-                        <span
-                            class="product-price__new">{{ env('DEFAULT_CURRENCY') . ' ' . $response['main_price'] }}</span>
-
-                        @if ($response['stroked_price'] != $response['main_price'])
-                            <span
-                                class="product-price__old">{{ env('DEFAULT_CURRENCY') . ' ' . $response['stroked_price'] }}</span>
+        <!-- Product -->
+        <div class="product product-layout-3">
+            <!-- Container -->
+            <div class="container container--type-2">
+                <!-- Product main -->
+                <div class="product__main d-flex">
+                    <!-- Product image and thumbnails -->
+                    <div class="product__main-image-and-thumbnails">
+                        <!-- Product tag -->
+                        @if ($response['offer_tag'] != '')
+                            <div class="product-grid-item__tag">{{ $response['offer_tag'] }}</div>
                         @endif
+                        <!-- End product tag -->
+                        <!-- Product main image -->
+                        <ul class="product__main-image js-popup-gallery">
 
+                            {!! $productImagesWeb !!}
+
+                        </ul>
+                        <!-- End product main image -->
+                        <!-- Product thumbnails -->
+                        <ul class="product__thumbnails">
+                            {!! $thumbanailSlider !!}
+
+                        </ul>
+                        <!-- End product thumbnails -->
                     </div>
+                    <!-- End product thumbnails and image -->
+                    <!-- Product right -->
+                    <div class="product__right">
+                        <!-- Product title -->
+                        <h1 class="product__title">{{ $response['name'] }}</h1>
+                        <!-- End product title -->
+                        <!-- Product reviews -->
+                        <div class="product__reviews">
 
-
-                    <div class="product-attributes product__options">
-                        <div class="product__description product-stock" id="product-stock">
-                            <p>SKU : {{ $response['sku'] }}</p>
                         </div>
-                    </div>
+                        <!-- End product reviews -->
+                        <!-- Product price -->
 
-                    <!-- End options -->
-                    <!-- Product action -->
-                    <div class="product__action js-product-action">
+                    
+                        <div class="product__price" bis_skin_checked="1">
+                            <span
+                                class="product-price__new">{{ env('DEFAULT_CURRENCY') . ' ' . $response['main_price'] }}</span>
 
-                    </div>
+                            @if ($response['stroked_price'] != $response['main_price'])
+                                <span
+                                    class="product-price__old">{{ env('DEFAULT_CURRENCY') . ' ' . $response['stroked_price'] }}</span>
+                            @endif
 
-                    <div class="product__description">
-                        {!! $response['description'] !!}
-                    </div>
-
-                    <div class="product__promo-bar">
-                        <!-- Item -->
-                        <div class="promo-bar__item">
-                            <!-- Title -->
-                            <div class="promo-bar-item__title" id="timerTitle">{{ trans('messages.auction') }}<br>{{ trans('messages.ends_in') }}:</div>
-                            <!-- End title -->
-                            <!-- Content -->
-                            <div class="promo-bar-item__content"  class="auction-timer">
-                                <!-- Countdown -->
-                                <div class="promo-bar-item__counter " id="timer">
-                                    <ul>
-                                        <li>
-                                            <span class="counter__value " id="days">0</span>
-                                            <span class="counter__title">{{ trans('messages.days') }}</span>
-                                        </li>
-                                        <li>
-                                            <span class="counter__value " id="hours">0</span>
-                                            <span class="counter__title">{{ trans('messages.hours') }}</span>
-                                        </li>
-                                        <li>
-                                            <span class="counter__value" id="minutes">0</span>
-                                            <span class="counter__title">{{ trans('messages.minutes') }}</span>
-                                        </li>
-                                        <li>
-                                            <span class="counter__value" id="seconds">0</span>
-                                            <span class="counter__title">{{ trans('messages.seconds') }}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="promo-bar-item__counter " id="timerStart" style="display: none;">
-                                </div>
-                                <!-- End countdown -->
-                            </div>
-                            <!-- End content -->
                         </div>
-                        <!-- End item -->
-                        <!-- Item -->
-                        <div class="promo-bar__item">
-                            <!-- Title -->
-                            <div class="promo-bar-item__title">{{trans('messages.highest')}} {{trans('messages.bid')}}</div>
-                            <!-- End title -->
-                            <!-- Content -->
-                            <div class="promo-bar-item__content" id="current-bid">
-                                {{ env('DEFAULT_CURRENCY') . ' ' . $response['main_price'] }}
+
+
+                        <div class="product-attributes product__options">
+                            <div class="product__description product-stock" id="product-stock">
+                                <p>SKU : {{ $response['sku'] }}</p>
                             </div>
-                            <!-- End content -->
                         </div>
-                        <!-- End item -->
-                    </div>
-                    <!-- End product information -->
-                    <div class="product__action js-product-action" id="placeBidDiv">
-                        <!-- Product quantity and add to cart -->
-                        <div class="product__quantity-and-add-to-cart d-flex">
-                            <!-- Quantity -->
-                            <div class="product__quantity" style="min-width: 50% !important;">
-                                <input type="number" value="" placeholder="{{trans('messages.enter').' '.trans('messages.bid').' '.trans('messages.amount')}}" class="product-quantity__input js-quantity-field" style="padding:12px 2px 12px 2px !important;" id="bid-amount" min="{{$response['main_price']}}">
-                            </div>
-                            <!-- End quantity -->
-                            <!-- Add to cart -->
-                            <div class="product__add-to-cart">
-                                <button id="place-bid" class="eighth-button">{{trans('messages.place').' '.trans('messages.bid')}}</button>
-                            </div>
-                            
-                            <!-- End add to cart -->
+
+                        <!-- End options -->
+                        <!-- Product action -->
+                        <div class="product__action js-product-action">
+
                         </div>
-                        <!-- End product quantity and add to cart -->
-                        <p id="bid-message"></p>
-                    </div>
-                </div>
-                <!-- End product right -->
-                <!-- Product sidebar -->
-                <div class="product__sidebar">
-                    <div class="product-sidebar__features">
-                        <!-- Feature -->
-                        <div class="home-about-us__feature d-flex">
-                            <!-- Icon -->
-                            <div class="feature__icon">
-                                <i class="lni lni-crown"></i>
-                            </div>
-                            <!-- End icon -->
-                            <!-- Content -->
-                            <div class="feature__content">
+
+                        <div class="product__description">
+                            {!! $response['description'] !!}
+                        </div>
+
+                        <div class="product__promo-bar">
+                            <!-- Item -->
+                            <div class="promo-bar__item">
                                 <!-- Title -->
-                                <h6 class="feature__h6">1 Year Zena & Kazena Brand Warranty</h6>
-                                <!-- End title -->
-                                <!-- Description -->
-                                <div class="feature__description">Zena & Kazena Promise for Exchange and Upgrades.
-
-                                </div>
-                                <!-- End Description -->
-                            </div>
-                            <!-- End content -->
-                        </div>
-                        <!-- End feature -->
-
-
-
-                        <!-- Feature -->
-                        <div class="home-about-us__feature d-flex">
-                            <!-- Icon -->
-                            <div class="feature__icon">
-                                <i class="lni lni-spinner-solid"></i>
-                            </div>
-                            <!-- End icon -->
-                            <!-- Content -->
-                            <div class="feature__content">
-                                <!-- Title -->
-                                <h6 class="feature__h6">30 Day Return Policy</h6>
-                                <!-- End title -->
-                                <!-- Description -->
-                                <div class="feature__description">Zena & Kazena Promise for Exchange and Upgrades.
-
-                                </div>
-                                <!-- End Description -->
-                            </div>
-                            <!-- End content -->
-                        </div>
-                        <!-- End feature -->
-                        <!-- Feature -->
-                        <div class="home-about-us__feature d-flex">
-                            <!-- Icon -->
-                            <div class="feature__icon">
-                                <i class="lnil lnil-ship"></i>
-                            </div>
-                            <!-- End icon -->
-                            <!-- Content -->
-                            <div class="feature__content">
-                                <!-- Title -->
-                                <h6 class="feature__h6">Free shipping</h6>
-                                <!-- End title -->
-                                <!-- Description -->
-                                <div class="feature__description">Durotan free shipping for all orders over AED 199
-                                </div>
-                                <!-- End Description -->
-                            </div>
-                            <!-- End content -->
-                        </div>
-                        <!-- End feature -->
-                        <!-- Feature -->
-                        <div class="home-about-us__feature d-flex">
-                            <!-- Icon -->
-                            <div class="feature__icon">
-                                <i class="lnil lnil-money-protection"></i>
-                            </div>
-                            <!-- End icon -->
-                            <!-- Content -->
-                            <div class="feature__content">
-                                <!-- Title -->
-                                <h6 class="feature__h6">Secure payment</h6>
-                                <!-- End title -->
-                                <!-- Description -->
-                                <div class="feature__description">We guarantee 100% secure with online payment on
-                                    our site.</div>
-                                <!-- End Description -->
-                            </div>
-                            <!-- End content -->
-                        </div>
-                        <!-- End feature -->
-                    </div>
-                    <!-- Safe checkout -->
-                    <div class="product__safe-checkout">
-                        <img src="assets/images/safe-checkout.jpg" alt="Safe checkout" />
-                    </div>
-                    <!-- End safe checkout -->
-                </div>
-                <!-- End product sidebar -->
-            </div>
-            <!-- End product main -->
-
-
-
-            <!-- Product tabs -->
-            <div class="product__tabs-2">
-                <!-- Mobile tabs -->
-                <div class="product__mobile-tabs">
-                    <!-- Accordion -->
-                    @if (!empty($response['tabs']))
-                        @foreach ($response['tabs'] as $tabkeyMob => $tabMob)
-                            <div class="accordion @if ($tabkeyMob == 0) active @endif js-accordion">
-                                <!-- Title -->
-                                <div class="accordion__title js-accordion-title">
-                                    {{ $tabMob->heading }}
-                                </div>
+                                <div class="promo-bar-item__title" id="timerTitle">{{ trans('messages.auction') }}<br>{{ trans('messages.ends_in') }}:</div>
                                 <!-- End title -->
                                 <!-- Content -->
-                                <div class="accordion__content js-accordion-content">
-                                    <div class="row">
-                                        <div class="col-12 col-lg-12">
-                                            {!! $tabMob->content !!}
-                                        </div>
+                                <div class="promo-bar-item__content"  class="auction-timer">
+                                    <!-- Countdown -->
+                                    <div class="promo-bar-item__counter " id="timer">
+                                        <ul>
+                                            <li>
+                                                <span class="counter__value " id="days">0</span>
+                                                <span class="counter__title">{{ trans('messages.days') }}</span>
+                                            </li>
+                                            <li>
+                                                <span class="counter__value " id="hours">0</span>
+                                                <span class="counter__title">{{ trans('messages.hours') }}</span>
+                                            </li>
+                                            <li>
+                                                <span class="counter__value" id="minutes">0</span>
+                                                <span class="counter__title">{{ trans('messages.minutes') }}</span>
+                                            </li>
+                                            <li>
+                                                <span class="counter__value" id="seconds">0</span>
+                                                <span class="counter__title">{{ trans('messages.seconds') }}</span>
+                                            </li>
+                                        </ul>
                                     </div>
+                                    <div class="promo-bar-item__counter " id="timerStart" style="display: none;">
+                                    </div>
+                                    <!-- End countdown -->
                                 </div>
                                 <!-- End content -->
                             </div>
-                        @endforeach
-                    @endif
+                            <!-- End item -->
+                            <!-- Item -->
+                            <div class="promo-bar__item">
+                                <!-- Title -->
+                                <div class="promo-bar-item__title">{{trans('messages.highest')}} {{trans('messages.bid')}}</div>
+                                <!-- End title -->
+                                <!-- Content -->
+                                <div class="promo-bar-item__content" id="current-bid">
+                                    {{ env('DEFAULT_CURRENCY') . ' ' . $response['main_price'] }}
+                                </div>
+                                <!-- End content -->
+                            </div>
+                            <!-- End item -->
+                        </div>
+                        <!-- End product information -->
+                        <div class="product__action js-product-action" id="placeBidDiv">
+                            <!-- Product quantity and add to cart -->
+                            <div class="product__quantity-and-add-to-cart d-flex">
+                                <!-- Quantity -->
+                                <div class="product__quantity" style="min-width: 50% !important;">
+                                    <input type="number" value="" placeholder="{{trans('messages.enter').' '.trans('messages.bid').' '.trans('messages.amount')}}" class="product-quantity__input js-quantity-field" style="padding:12px 2px 12px 2px !important;" id="bid-amount" min="{{$response['main_price']}}">
+                                </div>
+                                <!-- End quantity -->
+                                <!-- Add to cart -->
+                                <div class="product__add-to-cart">
+                                    <button id="place-bid" class="eighth-button">{{trans('messages.place').' '.trans('messages.bid')}}</button>
+                                </div>
+                                
+                                <!-- End add to cart -->
+                            </div>
+                            <!-- End product quantity and add to cart -->
+                            <p id="bid-message"></p>
+                        </div>
+                    </div>
+                    <!-- End product right -->
+                    <!-- Product sidebar -->
+                    <div class="product__sidebar">
+                        <div class="product-sidebar__features">
+                            <!-- Feature -->
+                            <div class="home-about-us__feature d-flex">
+                                <!-- Icon -->
+                                <div class="feature__icon">
+                                    <i class="lni lni-crown"></i>
+                                </div>
+                                <!-- End icon -->
+                                <!-- Content -->
+                                <div class="feature__content">
+                                    <!-- Title -->
+                                    <h6 class="feature__h6">1 Year Zena & Kazena Brand Warranty</h6>
+                                    <!-- End title -->
+                                    <!-- Description -->
+                                    <div class="feature__description">Zena & Kazena Promise for Exchange and Upgrades.
 
-                    <!-- End accordion -->
+                                    </div>
+                                    <!-- End Description -->
+                                </div>
+                                <!-- End content -->
+                            </div>
+                            <!-- End feature -->
+
+
+
+                            <!-- Feature -->
+                            <div class="home-about-us__feature d-flex">
+                                <!-- Icon -->
+                                <div class="feature__icon">
+                                    <i class="lni lni-spinner-solid"></i>
+                                </div>
+                                <!-- End icon -->
+                                <!-- Content -->
+                                <div class="feature__content">
+                                    <!-- Title -->
+                                    <h6 class="feature__h6">30 Day Return Policy</h6>
+                                    <!-- End title -->
+                                    <!-- Description -->
+                                    <div class="feature__description">Zena & Kazena Promise for Exchange and Upgrades.
+
+                                    </div>
+                                    <!-- End Description -->
+                                </div>
+                                <!-- End content -->
+                            </div>
+                            <!-- End feature -->
+                            <!-- Feature -->
+                            <div class="home-about-us__feature d-flex">
+                                <!-- Icon -->
+                                <div class="feature__icon">
+                                    <i class="lnil lnil-ship"></i>
+                                </div>
+                                <!-- End icon -->
+                                <!-- Content -->
+                                <div class="feature__content">
+                                    <!-- Title -->
+                                    <h6 class="feature__h6">Free shipping</h6>
+                                    <!-- End title -->
+                                    <!-- Description -->
+                                    <div class="feature__description">Durotan free shipping for all orders over AED 199
+                                    </div>
+                                    <!-- End Description -->
+                                </div>
+                                <!-- End content -->
+                            </div>
+                            <!-- End feature -->
+                            <!-- Feature -->
+                            <div class="home-about-us__feature d-flex">
+                                <!-- Icon -->
+                                <div class="feature__icon">
+                                    <i class="lnil lnil-money-protection"></i>
+                                </div>
+                                <!-- End icon -->
+                                <!-- Content -->
+                                <div class="feature__content">
+                                    <!-- Title -->
+                                    <h6 class="feature__h6">Secure payment</h6>
+                                    <!-- End title -->
+                                    <!-- Description -->
+                                    <div class="feature__description">We guarantee 100% secure with online payment on
+                                        our site.</div>
+                                    <!-- End Description -->
+                                </div>
+                                <!-- End content -->
+                            </div>
+                            <!-- End feature -->
+                        </div>
+                        <!-- Safe checkout -->
+                        <div class="product__safe-checkout">
+                            <img src="assets/images/safe-checkout.jpg" alt="Safe checkout" />
+                        </div>
+                        <!-- End safe checkout -->
+                    </div>
+                    <!-- End product sidebar -->
                 </div>
-                <!-- End mobile tabs -->
+                <!-- End product main -->
 
 
-                <!-- Desktop tabs -->
-                <div class="product__desktop-tabs">
-                    <ul class="tabs__nav">
-                        @php
-                            $tabkeyOut = 0;
-                            $tabContent = '';
-                        @endphp
+
+                <!-- Product tabs -->
+                <div class="product__tabs-2">
+                    <!-- Mobile tabs -->
+                    <div class="product__mobile-tabs">
+                        <!-- Accordion -->
                         @if (!empty($response['tabs']))
-                            @foreach ($response['tabs'] as $tabkey => $tab)
-                                <li>
-                                    <a href="#" class="@if ($tabkey == 0) active @endif js-tab-link"
-                                        data-id="{{ $tabkey }}">{{ $tab->heading }}</a>
-                                </li>
-
-                                @php
-                                    $tabkeyOut++;
-                                    $tabactive = '';
-                                    if ($tabkey == 0) {
-                                        $tabactive = 'tab-content__active tab-content__show';
-                                    }
-
-                                    $tabContent .=
-                                        '<div class="tab-content ' .
-                                        $tabactive .
-                                        ' js-tab-content" data-id="' .
-                                        $tabkey .
-                                        '">
-                                            <div class="row">
-                                                <div class="col-12 col-lg-12">
-                                                    
-                                                    ' .
-                                        $tab->content .
-                                        '
-                                                </div>
-                                            
+                            @foreach ($response['tabs'] as $tabkeyMob => $tabMob)
+                                <div class="accordion @if ($tabkeyMob == 0) active @endif js-accordion">
+                                    <!-- Title -->
+                                    <div class="accordion__title js-accordion-title">
+                                        {{ $tabMob->heading }}
+                                    </div>
+                                    <!-- End title -->
+                                    <!-- Content -->
+                                    <div class="accordion__content js-accordion-content">
+                                        <div class="row">
+                                            <div class="col-12 col-lg-12">
+                                                {!! $tabMob->content !!}
                                             </div>
-                                        </div>';
-
-                                @endphp
+                                        </div>
+                                    </div>
+                                    <!-- End content -->
+                                </div>
                             @endforeach
                         @endif
-                    </ul>
-                    <div class="tabs__content">
-                        <!-- Description tab -->
-                        {!! $tabContent !!}
+
+                        <!-- End accordion -->
                     </div>
+                    <!-- End mobile tabs -->
+
+
+                    <!-- Desktop tabs -->
+                    <div class="product__desktop-tabs">
+                        <ul class="tabs__nav">
+                            @php
+                                $tabkeyOut = 0;
+                                $tabContent = '';
+                            @endphp
+                            @if (!empty($response['tabs']))
+                                @foreach ($response['tabs'] as $tabkey => $tab)
+                                    <li>
+                                        <a href="#" class="@if ($tabkey == 0) active @endif js-tab-link"
+                                            data-id="{{ $tabkey }}">{{ $tab->heading }}</a>
+                                    </li>
+
+                                    @php
+                                        $tabkeyOut++;
+                                        $tabactive = '';
+                                        if ($tabkey == 0) {
+                                            $tabactive = 'tab-content__active tab-content__show';
+                                        }
+
+                                        $tabContent .=
+                                            '<div class="tab-content ' .
+                                            $tabactive .
+                                            ' js-tab-content" data-id="' .
+                                            $tabkey .
+                                            '">
+                                                <div class="row">
+                                                    <div class="col-12 col-lg-12">
+                                                        
+                                                        ' .
+                                            $tab->content .
+                                            '
+                                                    </div>
+                                                
+                                                </div>
+                                            </div>';
+
+                                    @endphp
+                                @endforeach
+                            @endif
+                        </ul>
+                        <div class="tabs__content">
+                            <!-- Description tab -->
+                            {!! $tabContent !!}
+                        </div>
+                    </div>
+                    <!-- End desktop tabs -->
                 </div>
-                <!-- End desktop tabs -->
+                <!-- End product tabs -->
             </div>
-            <!-- End product tabs -->
+            <!-- End container -->
         </div>
-        <!-- End container -->
-    </div>
-    <!-- End product -->
+        <!-- End product -->
+
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        @php
+            $start_time = $response['auction_start_date']; // example start time
+            $end_time = $response['auction_end_date']; // example end time
+        @endphp
+    @else
+        @php
+            $start_time = $end_time = NULL; 
+            $response['product_id'] = NULL;
+        @endphp
+    @endif
+    
 
 
     @if (!empty($relatedProducts[0]))
@@ -484,11 +498,7 @@
         <!-- End related products -->
     @endif
 
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    @php
-        $start_time = $response['auction_start_date']; // example start time
-        $end_time = $response['auction_end_date']; // example end time
-    @endphp
+   
 @endsection
 
 @section('header')

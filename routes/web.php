@@ -26,6 +26,9 @@ use App\Http\Controllers\Frontend\BidController;
 */
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
+Route::get('/auction', [FrontendController::class, 'auctionHome'])->name('auction.home');
+Route::get('/rent', [FrontendController::class, 'rentHome'])->name('rent.home');
+
 Route::get('/about', [FrontendController::class, 'about'])->name('about_us');
 Route::get('/terms', [FrontendController::class, 'terms'])->name('terms');
 Route::get('/privacy', [FrontendController::class, 'privacy'])->name('privacy');

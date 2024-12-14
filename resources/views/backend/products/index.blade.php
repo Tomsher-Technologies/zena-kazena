@@ -196,16 +196,28 @@
                                     {{ Breadcrumbs::render('product_admin', $product) }}
                                 </td>
                                 <td>
-                                    @if ($product->type != 'rent')
-                                        <strong>{{ trans('messages.no_of_sale') }}:</strong> {{ $product->num_of_sale }}
-                                        {{ trans('messages.times') }} <br>
+                                    @if ($product->type == 'auction')
+                                        @php
+                                            $product->auction_status == 1 ? $auction_status = '<span class="badge badge-inline badge-success text-capitalize">Completed</span>' : $auction_status = '<span class="badge badge-inline badge-warning text-capitalize">Ongoing</span>';
+                                        @endphp
+                                        <strong>{{ trans('messages.sku') }}:</strong> {{ $product->sku }} <br>
+                                        <strong>{{ trans('messages.auction') }} {{ trans('messages.status') }}: </strong>{!! $auction_status !!}  <br>
+                                        @if ($product->auction_status == 1)
+                                            <strong>{{ trans('messages.winner') }}:</strong> {{ $product->winner_auction?->name }} <br>
+                                        @endif
                                     @else
-                                        <strong>{{ trans('messages.refundable_deposit') }}:</strong>
-                                        {{ $product->deposit }}
-                                        DHS <br>
+                                        @if ($product->type != 'rent')
+                                            <strong>{{ trans('messages.no_of_sale') }}:</strong> {{ $product->num_of_sale }}
+                                            {{ trans('messages.times') }} <br>
+                                        @else
+                                            <strong>{{ trans('messages.refundable_deposit') }}:</strong>
+                                            {{ $product->deposit }}
+                                            DHS <br>
+                                        @endif
+                                        <strong>{{ trans('messages.rating') }}:</strong> {{ $product->rating }} <br>
+                                        <strong>{{ trans('messages.sku') }}:</strong> {{ $product->sku }} <br>
                                     @endif
-                                    <strong>{{ trans('messages.rating') }}:</strong> {{ $product->rating }} <br>
-                                    <strong>{{ trans('messages.sku') }}:</strong> {{ $product->sku }} <br>
+                                    
                                 </td>
                                 <td class="text-center">
                                     @php
@@ -225,14 +237,7 @@
                                         <span class="badge badge-inline badge-danger">Low</span>
                                     @endif
                                 </td>
-                                {{-- <td>
-                            <label class="aiz-switch aiz-switch-success mb-0">
-                                <input onchange="update_todays_deal(this)" value="{{ $product->id }}" type="checkbox" <?php if ($product->todays_deal == 1) {
-                                    echo 'checked';
-                                } ?> >
-                                <span class="slider round"></span>
-                            </label>
-                        </td> --}}
+                               
                                 <td class="text-center">
                                     <label class="aiz-switch aiz-switch-success mb-0">
                                         <input onchange="update_published(this)" value="{{ $product->id }}"
@@ -242,19 +247,15 @@
                                         <span class="slider round"></span>
                                     </label>
                                 </td>
-                                {{-- <td>
-                            <label class="aiz-switch aiz-switch-success mb-0">
-                                <input onchange="update_featured(this)" value="{{ $product->id }}" type="checkbox" <?php if ($product->featured == 1) {
-                                    echo 'checked';
-                                } ?> >
-                                <span class="slider round"></span>
-                            </label>
-                        </td> --}}
+                         
                                 <td class="text-center">
-                                    {{-- <a class="btn btn-soft-success btn-icon btn-circle btn-sm"
-                                        href="{{ route('product', $product->slug) }}" target="_blank" title="View">
-                                        <i class="las la-eye"></i>
-                                    </a> --}}
+                                    @if ($product->type == 'auction')
+                                        <a class="btn btn-soft-success btn-icon btn-circle btn-sm"
+                                            href="{{ route('product.bid-history', $product->id) }}" title="View Bid History">
+                                            <i class="las la-eye"></i>
+                                        </a>
+                                    @endif
+
                                     <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
                                         href="{{ route('products.edit', ['id' => $product->id, 'lang' => env('DEFAULT_LANGUAGE')]) }}"
                                         title="Edit">

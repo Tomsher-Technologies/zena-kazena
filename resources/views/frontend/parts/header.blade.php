@@ -121,11 +121,15 @@
             </div>
             <!-- End mobile menu -->
             <ul class="header_page_nav">
-                <li><a href="{{ route('home') }}" class="nav__item {{ areActiveRoutes(['home']) }}">{{ trans('messages.shop') }}</a></li>
-                <li><a href="{{ route('sales') }}" class="nav__item {{ areActiveRoutes(['sales']) }}">{{ trans('messages.sale') }}</a></li>
-                 <li><a href="{{route('rent.products')}}" class="nav__item {{ areActiveRoutes(['rent.products']) }}">{{ trans('messages.rent') }}</a></li>
-                <li><a href="{{route('auction.products')}}" class="nav__item {{ areActiveRoutes(['auction.products']) }}">{{ trans('messages.auction') }}</a></li>
-                <li><a href="{{route('mortgage')}}" class="nav__item {{ areActiveRoutes(['mortgage']) }}">{{ trans('messages.mortgage') }}</a></li> 
+                <li><a href="{{ route('home') }}" class="nav__item {{ session('active_section') == 'shop' ? 'active' : '' }}">{{ trans('messages.shop') }}</a></li>
+
+                <li><a href="{{ route('sales') }}" class="nav__item  {{ session('active_section') == 'sale' ? 'active' : '' }}">{{ trans('messages.sale') }}</a></li>
+
+                 <li><a href="{{route('rent.home')}}" class="nav__item {{ session('active_section') == 'rent' ? 'active' : '' }}">{{ trans('messages.rent') }}</a></li>
+
+                <li><a href="{{route('auction.home')}}" class="nav__item {{ session('active_section') == 'auction' ? 'active' : '' }}">{{ trans('messages.auction') }}</a></li>
+
+                <li><a href="{{route('mortgage')}}" class="nav__item {{ session('active_section') == 'mortgage' ? 'active' : '' }}">{{ trans('messages.mortgage') }}</a></li> 
             </ul>
             <!-- Logo -->
             <h1 class="header__logo">
@@ -208,10 +212,20 @@
                         <div class="standard-column__title">{{ get_setting('header_category_title_1') }}</div>
                         <!-- End column title -->
                         <!-- Column nav -->
+                        @php
+                            if (session('active_section') == 'rent') {
+                                $routeProduct = 'rent.products';
+                            }elseif (session('active_section') == 'auction') {
+                                $routeProduct = 'auction.products';
+                            }else {
+                                $routeProduct = 'products.index';
+                            }
+                        @endphp 
+
                         <ul class="standard-column__nav">
                             @if(!empty($details['header_categories']))
                                 @foreach($details['header_categories'] as $header_categories)
-                                    <li><a href="{{ route('products.index',['category' => $header_categories->getTranslation('slug', $lang)]) }}">{{ $header_categories->getTranslation('name', $lang) }}</a></li>
+                                    <li><a href="{{ route($routeProduct,['category' => $header_categories->getTranslation('slug', $lang)]) }}">{{ $header_categories->getTranslation('name', $lang) }}</a></li>
                                 @endforeach
                             @endif  
                         </ul>
@@ -227,7 +241,7 @@
                         <ul class="standard-column__nav">
                             @if (!empty($details['header_brands']))
                                 @foreach ($details['header_brands'] as $header_brands)
-                                    <li><a href="{{ route('products.index',['brand' => [$header_brands->getTranslation('slug', $lang)]]) }}"> {{$header_brands->getTranslation('name', $lang)}}</a></li>
+                                    <li><a href="{{ route($routeProduct,['brand' => [$header_brands->getTranslation('slug', $lang)]]) }}"> {{$header_brands->getTranslation('name', $lang)}}</a></li>
                                 @endforeach
                             @endif 
                             
@@ -245,7 +259,7 @@
                         <ul class="standard-column__nav">
                             @if (!empty($details['header_occasions']))
                                 @foreach ($details['header_occasions'] as $header_occasions)
-                                    <li><a href="{{ route('products.index',['occasion' => [$header_occasions->getTranslation('slug', $lang)]]) }}"> {{$header_occasions->getTranslation('name', $lang)}}</a></li>
+                                    <li><a href="{{ route($routeProduct,['occasion' => [$header_occasions->getTranslation('slug', $lang)]]) }}"> {{$header_occasions->getTranslation('name', $lang)}}</a></li>
                                 @endforeach
                             @endif 
                         </ul>
@@ -263,16 +277,20 @@
                 </div>
                 <!-- End MegaMenu -->
             </li>
-            <li><a href="{{ route('products.index') }}" class="nav__item">{{ trans('messages.collections') }}</a></li>
-            <li><a href="{{ route('products.index',['offers']) }}" class="nav__item">{{ trans('messages.offers') }}</a></li>
+            <li><a href="{{ route($routeProduct) }}" class="nav__item">{{ trans('messages.collections') }}</a></li>
+            @if (session('active_section') != 'auction')
+                <li><a href="{{ route($routeProduct,['offers']) }}" class="nav__item">{{ trans('messages.offers') }}</a></li>
+            @endif
+            
         </ul>
         <!-- End navigation -->
     </div>
     <!-- End container -->
     <ul class="header_page_nav page-im-mobile">
-        <li><a href="{{ route('home') }}" class="nav__item active">Sale</a></li>
-         <li><a href="#" class="nav__item">Rent</a></li>
-        <li><a href="#" class="nav__item">Auction</a></li>
-        <li><a href="https://tomsher.co/MHS/ZK/HTML/mortgage.html" target="blank" class="nav__item">mortgage</a></li>
+        <li><a href="{{ route('home') }}" class="nav__item {{ session('active_section') == 'shop' ? 'active' : '' }}">{{ trans('messages.shop') }}</a></li>
+        <li><a href="{{ route('sales') }}" class="nav__item  {{ session('active_section') == 'sale' ? 'active' : '' }}">{{ trans('messages.sale') }}</a></li>
+        <li><a href="{{route('rent.products')}}" class="nav__item {{ session('active_section') == 'rent' ? 'active' : '' }}">{{ trans('messages.rent') }}</a></li>
+        <li><a href="{{route('auction.home')}}" class="nav__item {{ session('active_section') == 'auction' ? 'active' : '' }}">{{ trans('messages.auction') }}</a></li>
+        <li><a href="{{route('mortgage')}}" target="blank" class="nav__item {{ session('active_section') == 'mortgage' ? 'active' : '' }}">{{ trans('messages.mortgage') }}</a></li>
     </ul>
 </header>

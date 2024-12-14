@@ -134,6 +134,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/products/delete-thumbnail', [ProductController::class, 'delete_thumbnail'])->name('products.delete_thumbnail');
     Route::post('/products/delete_gallery', [ProductController::class, 'delete_gallery'])->name('products.delete_gallery');
 
+    Route::get('/product/{productId}/bid-history', [ProductController::class, 'productBidHistory'])->name('product.bid-history');
+
     //Reviews
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
     Route::post('/reviews/published', [ReviewController::class, 'updatePublished'])->name('reviews.published');

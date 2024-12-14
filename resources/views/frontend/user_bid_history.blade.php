@@ -50,7 +50,7 @@
                                                 <tr>
                                                     <td class="text-center">{{ $key + 1 }}</td>
                                                     <td class="text-center">{{ env('DEFAULT_CURRENCY') }} {{ $bid->amount }}</td>
-                                                    <td class="text-center">{{ $bid->created_at->format('Y-m-d H:i:s') }}</td>
+                                                    <td class="text-center">{{ $bid->created_at->format('d M, Y H:i a') }}</td>
                                                 </tr>
                                             @endforeach
                                         @else

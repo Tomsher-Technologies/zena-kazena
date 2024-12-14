@@ -35,6 +35,7 @@ class UpdateBidWinners extends Command
         // Get all products where the bid end time has passed and a winner has not been assigned
         $products = Product::where('auction_end_date', '<', $currentTime)
             ->where('type','auction') // Ensure that the product doesn't already have a winner
+            ->where('auction_status',0)
             ->get();
 
         foreach ($products as $product) {
@@ -47,6 +48,10 @@ class UpdateBidWinners extends Command
                 // Update the winner_id on the product to the user who placed the highest bid
                 $highestBid->winner = 1;
                 $highestBid->save();
+
+                $product->auction_winner = $highestBid->user_id;
+                $product->auction_status = 1;
+                $product->save();
             }
         }
 

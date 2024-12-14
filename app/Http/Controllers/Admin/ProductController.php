@@ -13,6 +13,7 @@ use App\Models\Cart;
 use App\Models\ProductTabs;
 use App\Models\ProductSeo;
 use App\Models\User;
+use App\Models\Bid;
 use App\Models\ProductAttributes;
 use Image;
 use Auth;
@@ -35,11 +36,12 @@ class ProductController extends Controller
 
     public function all_products(Request $request)
     {
+        $request->session()->put('product_list_last_url', url()->full());
         $col_name = null;
         $query = null;
         $seller_id = null;
         $sort_search = null;
-        $products = Product::orderBy('created_at', 'desc');
+        $products = Product::with('winner_auction')->orderBy('created_at', 'desc');
         $category = ($request->has('category')) ? $request->category : '';
         $product_type = ($request->has('product_type')) ? $request->product_type : '';
         
@@ -91,6 +93,7 @@ class ProductController extends Controller
         $products = $products->paginate(15);
         $type = 'All';
 
+      
         return view('backend.products.index', compact('category','product_type','products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
     }
 
@@ -1207,5 +1210,13 @@ class ProductController extends Controller
 
         }
         
+    }
+
+    public function productBidHistory ($productId){
+        $bids = Bid::where('product_id', $productId)
+                    ->orderBy('created_at', 'desc') // Or use any other ordering
+                    ->paginate(10);
+
+        return view('backend.products.product_bid_history', compact('bids'));
     }
 }
