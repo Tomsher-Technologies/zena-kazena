@@ -199,6 +199,22 @@
                     </a>
                 </li>
 
+                <li class="aiz-side-nav-item">
+                    <a href="{{ route('enquiries.mortgage') }}"
+                        class="aiz-side-nav-link {{ areActiveRoutes(['enquiries.mortgage']) }}">
+                        <i class="las la-mail-bulk aiz-side-nav-icon"></i>
+                        <span class="aiz-side-nav-text">Mortgage Enquiries</span>
+                    </a>
+                </li>
+
+                <li class="aiz-side-nav-item">
+                    <a href="{{ route('enquiries.sales') }}"
+                        class="aiz-side-nav-link {{ areActiveRoutes(['enquiries.sales']) }}">
+                        <i class="las la-mail-bulk aiz-side-nav-icon"></i>
+                        <span class="aiz-side-nav-text">Sales Enquiries</span>
+                    </a>
+                </li>
+
                 @canany(['manage_marketing'])
                     <li class="aiz-side-nav-item">
                         <a href="#" class="aiz-side-nav-link">

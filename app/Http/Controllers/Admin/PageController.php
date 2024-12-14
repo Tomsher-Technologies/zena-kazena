@@ -14,6 +14,8 @@ use App\Models\BusinessSetting;
 use App\Models\Banner;
 use App\Models\Product;
 use App\Models\Contacts;
+use App\Models\Mortgages;
+use App\Models\Sales;
 use Storage;
 use File;
 
@@ -220,6 +222,20 @@ class PageController extends Controller
         $query = Contacts::latest();
         $contact = $query->paginate(20);
         return view('backend.contact', compact('contact'));
+    }
+
+    public function enquiriesMortgage()
+    {
+        $query = Mortgages::latest();
+        $enquiries = $query->paginate(20);
+        return view('backend.mortgage_enquiries', compact('enquiries'));
+    }
+
+    public function enquiriesSales()
+    {
+        $query = Sales::latest();
+        $enquiries = $query->paginate(20);
+        return view('backend.sales_enquiries', compact('enquiries'));
     }
 
     /**
