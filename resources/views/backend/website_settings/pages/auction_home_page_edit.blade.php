@@ -30,7 +30,7 @@
                             <label class="col-sm-2 col-from-label" for="video">Choose Video <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="file" name="video" id="video" accept="video/*" required>
+                                <input type="file" name="video" id="video" accept="video/*">
                                 <br><br>
                                 @if($page->video != NULL)
                                     <h6>Preview:</h6>
@@ -39,6 +39,13 @@
                                         Your browser does not support the video tag.
                                     </video>
                                 @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-from-label" for="content5">{{ trans('messages.content') }} </label>
+                            <div class="col-sm-10">
+                                <textarea class="resize-off form-control" placeholder="{{ trans('messages.content') }}" name="content5" @if($lang == 'ae') dir="rtl" @endif >{!! $page->getTranslation('content5',$lang) !!}</textarea>
                             </div>
                         </div>
 

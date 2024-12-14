@@ -8,7 +8,7 @@
                 Your browser does not support the video tag.
             </video>
             <div class="caption">
-                <h1>Create your rings with award-winning jewellers</h1>
+                <h1>{{ $page->getTranslation('content5', $lang) }}</h1>
             </div>
         </div>       
         <!-- End Responsive Video -->
