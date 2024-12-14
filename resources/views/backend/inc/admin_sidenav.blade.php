@@ -42,7 +42,7 @@
                                     </a>
                                 </li>
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{ route('products.all') }}" class="aiz-side-nav-link {{ areActiveRoutes(['products.all','products.admin.edit']) }}">
+                                    <a href="{{ route('products.all') }}" class="aiz-side-nav-link {{ areActiveRoutes(['products.all','products.admin.edit','product.bid-history']) }}">
                                         <span class="aiz-side-nav-text">{{  trans('messages.all_Products') }}</span>
                                     </a>
                                 </li>

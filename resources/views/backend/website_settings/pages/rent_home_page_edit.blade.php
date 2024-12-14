@@ -3,7 +3,8 @@
 
     <div class="row">
         <div class="col-xl-10 mx-auto">
-            <h4 class="fw-600">Home Page Settings</h4>
+            <h4 class="fw-600">Rent Home Page Settings</h4>
+
 
             <div class="card">
                 <ul class="nav nav-tabs nav-fill border-light">
@@ -50,7 +51,6 @@
             </div>
 
             <div class="card">
-                
                 <div class="card-header">
                     <h5 class="mb-0">Discover Section</h5>
                 </div>
@@ -68,17 +68,17 @@
                         <div class="form-group @if($lang != 'en') d-none @endif">
                             <label>Categories (Max 4)</label>
                             <div class="new_collection-categories-target">
-                                <input type="hidden" name="types[]" value="discover_categories">
+                                <input type="hidden" name="types[]" value="rent_discover_categories">
                                 <input type="hidden" name="page_type" value="new_collection">
                                 <input type="hidden" name="page_id" value="{{ $page_id }}">
                                 <input type="hidden" name="lang" value="{{ $lang }}">
                                 
-                                @if (get_setting('discover_categories') != null && get_setting('discover_categories') != 'null')
-                                    @foreach (json_decode(get_setting('discover_categories'), true) as $key => $value)
+                                @if (get_setting('rent_discover_categories') != null && get_setting('rent_discover_categories') != 'null')
+                                    @foreach (json_decode(get_setting('rent_discover_categories'), true) as $key => $value)
                                         <div class="row gutters-5">
                                             <div class="col">
                                                 <div class="form-group">
-                                                    <select class="form-control aiz-selectpicker" name="discover_categories[]" data-live-search="true" data-selected={{ $value }}
+                                                    <select class="form-control aiz-selectpicker" name="rent_discover_categories[]" data-live-search="true" data-selected={{ $value }}
                                                         required>
                                                         <option value="">Select Category</option>
                                                         @foreach ($categories as $category)
@@ -108,7 +108,7 @@
                                 data-content='<div class="row gutters-5">
 								<div class="col">
 									<div class="form-group">
-										<select class="form-control aiz-selectpicker" name="discover_categories[]" data-live-search="true" required>
+										<select class="form-control aiz-selectpicker" name="rent_discover_categories[]" data-live-search="true" required>
                                             <option value="">Select Category</option>
 											@foreach ($categories as $key => $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -148,11 +148,11 @@
                 <div class="card-body">
                     <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="types[]" value="home_mid_banner">
-                        <input type="hidden" name="name" value="home_mid_banner">
-                        <input type="hidden" name="page_type" value="home_mid_banner">
+                        <input type="hidden" name="types[]" value="rent_home_mid_banner">
+                        <input type="hidden" name="name" value="rent_home_mid_banner">
+                        <input type="hidden" name="page_type" value="rent_home_mid_banner">
                         <input type="hidden" name="lang" value="{{ $lang }}">
-                        @error('home_mid_banner')
+                        @error('rent_home_mid_banner')
                             <div class="alert alert-danger" role="alert">
                                 {{ $message }}
                             </div>
@@ -169,13 +169,13 @@
                             </div>
                         </div> --}}
                         @php
-                            $small_banners = json_decode($current_banners['home_mid_banner']->value);
+                            $small_banners = json_decode($current_banners['rent_home_mid_banner']->value);
                         @endphp
                         <div class="form-group">
                             <label>Banner 1</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_mid_banner[]" data-live-search="true">
+                                    <select class="form-control aiz-selectpicker" name="rent_home_mid_banner[]" data-live-search="true">
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -190,7 +190,7 @@
                             <label>Banner 2</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_mid_banner[]" data-live-search="true">
+                                    <select class="form-control aiz-selectpicker" name="rent_home_mid_banner[]" data-live-search="true">
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -231,10 +231,10 @@
                         <div class="form-group row @if($lang != 'en') d-none @endif">
                             <label class="col-md-2 col-from-label">{{ trans('messages.products') }} (Max 4)</label>
                             <div class="col-md-10">
-                                <input type="hidden" name="types[]" value="new_arrival_products">
-                                <input type="hidden" name="page_type" value="new_arrival_products">
-                                <select name="new_arrival_products[]" class="form-control aiz-selectpicker" multiple
-                                    data-live-search="true" title="Select Products" data-selected="{{ get_setting('new_arrival_products') }}">
+                                <input type="hidden" name="types[]" value="rent_new_arrival_products">
+                                <input type="hidden" name="page_type" value="rent_new_arrival_products">
+                                <select name="rent_new_arrival_products[]" class="form-control aiz-selectpicker" multiple
+                                    data-live-search="true" title="Select Products" data-selected="{{ get_setting('rent_new_arrival_products') }}">
                                     {{-- <option disabled value=""></option> --}}
                                     @foreach ($products as $key => $prod)
                                         <option value="{{ $prod->id }}">{{ $prod->name }}</option>
@@ -250,86 +250,6 @@
                 </div>
             </div>
 
-             {{-- Home categories --}}
-             {{-- <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Occasions</h5>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="page_id" value="{{ $page_id }}">
-                        <input type="hidden" name="lang" value="{{ $lang }}">
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-from-label" for="name">{{ trans('messages.heading') }} <span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-10">
-                                <input type="text"  @if($lang == 'ae') dir="rtl" @endif class="form-control" placeholder="{{ trans('messages.heading') }}" name="heading3" value="{{ old('heading3', $page->getTranslation('heading3', $lang)) }}" required>
-                            </div>
-                        </div>
-                      
-                        <div class="form-group @if($lang != 'en') d-none @endif">
-                            <label>Occasions (Max 6)</label>
-                            <div class="home-categories-target">
-                                <input type="hidden" name="types[]" value="home_occasions">
-                                <input type="hidden" name="page_type" value="home_occasions">
-                                
-                                @if (get_setting('home_occasions') != null && get_setting('home_occasions') != 'null') 
-                                    @foreach (json_decode(get_setting('home_occasions'), true) as $key => $value)
-                                        <div class="row gutters-5">
-                                            <div class="col">
-                                                <div class="form-group">
-                                                    <select class="form-control aiz-selectpicker" name="home_occasions[]"
-                                                        data-live-search="true"  title="Select Occasions" data-selected={{ $value }}
-                                                        required>
-                                                    
-                                                        @foreach ($occasions as $occasion)
-                                                            <option value="{{ $occasion->id }}">{{ $occasion->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <button type="button"
-                                                    class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger"
-                                                    data-toggle="remove-parent" data-parent=".row">
-                                                    <i class="las la-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @endif
-                            </div>
-                            <button type="button" class="btn btn-soft-secondary btn-sm" data-toggle="add-more"
-                                data-content='<div class="row gutters-5">
-								<div class="col">
-									<div class="form-group">
-										<select class="form-control aiz-selectpicker" name="home_occasions[]" data-live-search="true"  title="Select Occasions" required>
-                                            
-											@foreach ($occasions as $key => $occasion)
-                                            <option value="{{ $occasion->id }}">{{ $occasion->name }}</option>
-                                            @endforeach
-										</select>
-									</div>
-								</div>
-								<div class="col-auto">
-									<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-										<i class="las la-times"></i>
-									</button>
-								</div>
-							</div>'
-                                data-target=".home-categories-target">
-                                Add New
-                            </button>
-                        </div>
-                        <div class="text-right">
-                            <button type="submit" class="btn btn-info">Update</button>
-                        </div>
-                    </form>
-                </div>
-            </div> --}}
-
             <div class="card  @if($lang != 'en') d-none @endif">
                 <div class="card-header">
                     <h5 class="mb-0">Banner</h5>
@@ -337,24 +257,24 @@
                 <div class="card-body">
                     <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="types[]" value="home_center_banner">
-                        <input type="hidden" name="name" value="home_center_banner">
-                        <input type="hidden" name="page_type" value="home_center_banner">
+                        <input type="hidden" name="types[]" value="rent_home_center_banner">
+                        <input type="hidden" name="name" value="rent_home_center_banner">
+                        <input type="hidden" name="page_type" value="rent_home_center_banner">
                         <input type="hidden" name="lang" value="{{ $lang }}">
-                        @error('home_center_banner')
+                        @error('rent_home_center_banner')
                             <div class="alert alert-danger" role="alert">
                                 {{ $message }}
                             </div>
                         @enderror
 
                         @php
-                            $center_banners = json_decode($current_banners['home_center_banner']->value);
+                            $center_banners = json_decode($current_banners['rent_home_center_banner']->value);
                         @endphp
                         <div class="form-group">
                             <label>Banner</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_center_banner[]" data-live-search="true">
+                                    <select class="form-control aiz-selectpicker" name="rent_home_center_banner[]" data-live-search="true">
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -394,10 +314,10 @@
                         <div class="form-group row @if($lang != 'en') d-none @endif">
                             <label class="col-md-2 col-from-label">{{ trans('messages.products') }} (Max 4)</label>
                             <div class="col-md-10">
-                                <input type="hidden" name="types[]" value="special_products">
-                                <input type="hidden" name="page_type" value="special_products">
-                                <select name="special_products[]" class="form-control aiz-selectpicker" multiple
-                                    data-live-search="true" title="Select Products" data-selected="{{ get_setting('special_products') }}">
+                                <input type="hidden" name="types[]" value="rent_special_products">
+                                <input type="hidden" name="page_type" value="rent_special_products">
+                                <select name="rent_special_products[]" class="form-control aiz-selectpicker" multiple
+                                    data-live-search="true" title="Select Products" data-selected="{{ get_setting('rent_special_products') }}">
                                     {{-- <option disabled value=""></option> --}}
                                     @foreach ($products as $key => $prod)
                                         <option value="{{ $prod->id }}">{{ $prod->name }}</option>
@@ -420,24 +340,24 @@
                 <div class="card-body">
                     <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="types[]" value="home_mid_section_banner">
-                        <input type="hidden" name="name" value="home_mid_section_banner">
+                        <input type="hidden" name="types[]" value="rent_home_mid_section_banner">
+                        <input type="hidden" name="name" value="rent_home_mid_section_banner">
 
-                        @error('home_mid_section_banner')
+                        @error('rent_home_mid_section_banner')
                             <div class="alert alert-danger" role="alert">
                                 {{ $message }}
                             </div>
                         @enderror
 
                         @php
-                            $mid_section_banner = (isset($current_banners['home_mid_section_banner'])) ? json_decode($current_banners['home_mid_section_banner']->value) : [];
+                            $mid_section_banner = (isset($current_banners['rent_home_mid_section_banner'])) ? json_decode($current_banners['rent_home_mid_section_banner']->value) : [];
                         @endphp
 
                         <div class="form-group">
                             <label>Banner 1</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_mid_section_banner[]" data-live-search="true" required>
+                                    <select class="form-control aiz-selectpicker" name="rent_home_mid_section_banner[]" data-live-search="true" required>
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -452,7 +372,7 @@
                             <label>Banner 2</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_mid_section_banner[]" data-live-search="true" required>
+                                    <select class="form-control aiz-selectpicker" name="rent_home_mid_section_banner[]" data-live-search="true" required>
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -467,7 +387,7 @@
                             <label>Banner 3</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_mid_section_banner[]" data-live-search="true" required>
+                                    <select class="form-control aiz-selectpicker" name="rent_home_mid_section_banner[]" data-live-search="true" required>
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -597,7 +517,7 @@
                 <div class="card-body">
                     <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="page_type" value="home_newsletter">
+                        <input type="hidden" name="page_type" value="rent_home_newsletter">
                         <input type="hidden" name="page_id" value="{{ $page_id }}">
                         <input type="hidden" name="lang" value="{{ $lang }}">
                         <div class="form-group row">

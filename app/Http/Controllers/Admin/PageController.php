@@ -106,31 +106,51 @@ class PageController extends Controller
         if ($page != null) {
             $page_id = $page->id;
 
-          if ($id == 'home') {
-            $banners = Banner::where('status', 1)->get();
-            $current_banners = BusinessSetting::whereIn('type', array('home_banner','home_mid_section_banner','home_center_banner', 'home_mid_banner', 'home_large_banner'))->get()->keyBy('type');
-            // echo '<pre>';
-            // print_r($current_banners);
-            // die;
-            $categories = Category::where('parent_id', 0)->where('is_active',1)->with('childrenCategories')->get();
+            if ($id == 'home') {
+                $banners = Banner::where('status', 1)->get();
+                $current_banners = BusinessSetting::whereIn('type', array('home_banner','home_mid_section_banner','home_center_banner', 'home_mid_banner', 'home_large_banner'))->get()->keyBy('type');
+                
+                $categories = Category::where('parent_id', 0)->where('is_active',1)->with('childrenCategories')->get();
+    
+                $products = Product::select('id', 'name')->where('published',1)->where('type','sale')->get();
+                $brands = Brand::where('is_active',1)->orderBy('name', 'asc')->get();
+                // $occasions = Occasion::where('is_active',1)->orderBy('name', 'asc')->get();
+    
+                return view('backend.website_settings.pages.home_page_edit', compact('page', 'banners', 'current_banners', 'categories', 'brands', 'products','lang','page_id'));
+                
+            }else if ($id == 'auction_home') {
+                $banners = Banner::where('status', 1)->get();
+                $current_banners = BusinessSetting::whereIn('type', array('auction_home_mid_section_banner','auction_home_center_banner', 'auction_home_mid_banner'))->get()->keyBy('type');
 
-            $products = Product::select('id', 'name')->where('published',1)->get();
-            $brands = Brand::where('is_active',1)->orderBy('name', 'asc')->get();
-            $occasions = Occasion::where('is_active',1)->orderBy('name', 'asc')->get();
+                $categories = Category::where('parent_id', 0)->where('is_active',1)->with('childrenCategories')->get();
 
-            return view('backend.website_settings.pages.home_page_edit', compact('page', 'banners', 'current_banners', 'categories', 'brands', 'products','occasions','lang','page_id'));
+                $products = Product::select('id', 'name')->where('published',1)->where('type','auction')->get();
+                $brands = Brand::where('is_active',1)->orderBy('name', 'asc')->get();
+                
+                return view('backend.website_settings.pages.auction_home_page_edit', compact('page', 'banners', 'current_banners', 'categories', 'brands', 'products','lang','page_id'));
             
-          }else if ($id == 'find_us' || $id == 'news' || $id == 'faq') {
-            return view('backend.website_settings.pages.find_us', compact('page','lang','page_id'));
-          }else if ($id == 'contact_us') {
-            return view('backend.website_settings.pages.contact_us', compact('page','lang','page_id'));
-          }else if ($id == 'mortgage' || $id == 'sales') {
-            return view('backend.website_settings.pages.mortgage_sales', compact('page','lang','page_id'));
-          }else if ($id == 'about_us') {
-            return view('backend.website_settings.pages.about_us', compact('page','lang','page_id'));
-          }else{
-            return view('backend.website_settings.pages.edit', compact('page','lang','page_id'));
-          }
+            }else if ($id == 'rent_home') {
+                $banners = Banner::where('status', 1)->get();
+                $current_banners = BusinessSetting::whereIn('type', array('rent_home_mid_section_banner','rent_home_center_banner', 'rent_home_mid_banner'))->get()->keyBy('type');
+
+                $categories = Category::where('parent_id', 0)->where('is_active',1)->with('childrenCategories')->get();
+
+                $products = Product::select('id', 'name')->where('published',1)->where('type','rent')->get();
+                $brands = Brand::where('is_active',1)->orderBy('name', 'asc')->get();
+                
+                return view('backend.website_settings.pages.rent_home_page_edit', compact('page', 'banners', 'current_banners', 'categories', 'brands', 'products','lang','page_id'));
+            
+            }else if ($id == 'find_us' || $id == 'news' || $id == 'faq') {
+                return view('backend.website_settings.pages.find_us', compact('page','lang','page_id'));
+            }else if ($id == 'contact_us') {
+                return view('backend.website_settings.pages.contact_us', compact('page','lang','page_id'));
+            }else if ($id == 'mortgage' || $id == 'sales') {
+                return view('backend.website_settings.pages.mortgage_sales', compact('page','lang','page_id'));
+            }else if ($id == 'about_us') {
+                return view('backend.website_settings.pages.about_us', compact('page','lang','page_id'));
+            }else{
+                return view('backend.website_settings.pages.edit', compact('page','lang','page_id'));
+            }
         }
         abort(404);
     }

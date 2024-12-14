@@ -137,3 +137,19 @@ ALTER TABLE `bids` ADD FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELET
 ALTER TABLE `products` CHANGE `auction_start_date` `auction_start_date` DATETIME NULL DEFAULT NULL, CHANGE `auction_end_date` `auction_end_date` DATETIME NULL DEFAULT NULL;
 
 ALTER TABLE `bids` ADD `winner` TINYINT(1) NOT NULL DEFAULT '0' AFTER `amount`;
+
+ALTER TABLE `products` ADD `auction_status` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0-Not Completed, 1-Completed' AFTER `auction_end_date`, ADD `auction_winner` INT UNSIGNED NULL DEFAULT NULL AFTER `auction_status`;
+
+ALTER TABLE `products` ADD FOREIGN KEY (`auction_winner`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+INSERT INTO `business_settings` (`id`, `type`, `value`, `lang`, `created_at`, `updated_at`) VALUES (NULL, 'auction_home_mid_banner', NULL, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO `business_settings` (`id`, `type`, `value`, `lang`, `created_at`, `updated_at`) VALUES (NULL, 'auction_home_center_banner', NULL, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO `business_settings` (`id`, `type`, `value`, `lang`, `created_at`, `updated_at`) VALUES (NULL, 'auction_home_mid_section_banner', NULL, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+ALTER TABLE `pages` ADD `video` VARCHAR(255) NULL DEFAULT NULL AFTER `image`;
+
+ALTER TABLE `page_translations` ADD `title1` VARCHAR(255) NULL DEFAULT NULL AFTER `sub_title`, ADD `title2` VARCHAR(255) NULL DEFAULT NULL AFTER `title1`, ADD `title3` VARCHAR(255) NULL DEFAULT NULL AFTER `title2`;
+
+ALTER TABLE `pages` ADD `image1` VARCHAR(255) NULL DEFAULT NULL AFTER `image`, ADD `image2` VARCHAR(255) NULL DEFAULT NULL AFTER `image1`, ADD `image3` VARCHAR(255) NULL DEFAULT NULL AFTER `image2`, ADD `image4` VARCHAR(255) NULL DEFAULT NULL AFTER `image3`;

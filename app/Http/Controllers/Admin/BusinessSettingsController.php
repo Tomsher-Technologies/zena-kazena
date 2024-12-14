@@ -9,6 +9,7 @@ use App\Models\BusinessSetting;
 use App\Models\Page;
 use App\Models\PageTranslation;
 use Artisan;
+use Storage;
 // use CoreComponentRepository;
 
 class BusinessSettingsController extends Controller
@@ -77,6 +78,16 @@ class BusinessSettingsController extends Controller
                 if($request->has('title')){
                     $page_translation->title                = $request->title;
                 }
+                if($request->has('title1')){
+                    $page_translation->title1                = $request->title1;
+                }
+                if($request->has('title2')){
+                    $page_translation->title2                = $request->title2;
+                }
+                if($request->has('title3')){
+                    $page_translation->title3                = $request->title3;
+                }
+
                 if($request->has('content')){
                     $page_translation->content              = $request->content;
                 }
@@ -170,14 +181,41 @@ class BusinessSettingsController extends Controller
                     $photos[] = uploadImage('page', $file, 'image_'.$count+$key);
                 }
                 $page->image = implode(',', array_merge($old_photos, $photos));
-                $page->save();
             }
 
             if ($request->hasfile('image')) {
                 $photo = uploadImage('page', $request->image, 'image_1');
                 $page->image = $photo;
-                $page->save();
             }
+
+            if ($request->hasfile('image1')) {
+                $photo1 = uploadImage('page', $request->image1, 'auction_image_1');
+                $page->image1 = $photo1;
+            }
+
+            if ($request->hasfile('image2')) {
+                $photo2 = uploadImage('page', $request->image2, 'auction_image_2');
+                $page->image2 = $photo2;
+            }
+
+            if ($request->hasfile('image3')) {
+                $photo3 = uploadImage('page', $request->image3, 'auction_image_3');
+                $page->image3 = $photo3;
+            }
+
+            if ($request->hasfile('image4')) {
+                $photo4 = uploadImage('page', $request->image4, 'auction_image_4');
+                $page->image4 = $photo4;
+            }
+
+            if ($request->hasFile('video')) {
+                $video = $request->file('video');
+                $filename = time() . '.' . $video->getClientOriginalExtension();
+                $video->storeAs('videos', $filename, 'public');
+
+                $page->video = Storage::url('videos/'.$filename);
+            }
+            $page->save();
         }
 
         Artisan::call('cache:clear');
