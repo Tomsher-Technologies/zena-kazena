@@ -44,7 +44,7 @@ class ProductController extends Controller
         $products = Product::with('winner_auction')->orderBy('created_at', 'desc');
         $category = ($request->has('category')) ? $request->category : '';
         $product_type = ($request->has('product_type')) ? $request->product_type : '';
-        
+
         if ($request->type != null) {
             $var = explode(",", $request->type);
             $col_name = $var[0];
@@ -93,7 +93,6 @@ class ProductController extends Controller
         $products = $products->paginate(15);
         $type = 'All';
 
-      
         return view('backend.products.index', compact('category','product_type','products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
     }
 
@@ -574,6 +573,7 @@ class ProductController extends Controller
             $product->discount_end_date     = strtotime($date_var[1]);
         }
 
+
         if ($request->auction_date_range != null) {
             $auction_date_var               = explode(" to ", $request->auction_date_range);
             $product->auction_start_date = (DateTime::createFromFormat('d-m-Y H:i:s', $auction_date_var[0]));
@@ -774,6 +774,7 @@ class ProductController extends Controller
                 $product_stock->sku = $prod['sku'];
                 $product_stock->price = $prod['price'];// $prod['price'];
                 $product_stock->qty = $prod['current_stock'];
+
                 if($request->type == 'auction'){
                     $product_stock->high_bid_amount = $prod['price'];
                 }
@@ -1211,6 +1212,7 @@ class ProductController extends Controller
         }
         
     }
+
 
     public function productBidHistory ($productId){
         $bids = Bid::where('product_id', $productId)
