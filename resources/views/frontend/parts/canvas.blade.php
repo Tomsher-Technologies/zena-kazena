@@ -12,6 +12,7 @@
           <ul class="canvas-menu__nav">
             <li><a href="{{ route('wishlist.index') }}" class="canvas-nav__item"> <i class="lnr lnr-heart"></i> {{trans('messages.wishlist')}}</a></li>
             <li><a href="{{ route('orders.index') }}" class="canvas-nav__item"><i class="lnil lnil-package"></i> {{trans('messages.orders')}}</a></li>
+            <li><a href="{{ route('user.auction-products') }}" class="canvas-nav__item"><i class="lnil lnil-package"></i> {{trans('messages.auction').' '.trans('messages.history')}}</a></li>
             <li><a href="{{ route('orders.returns') }}" class="canvas-nav__item"><i class="lni lni-spinner-solid"></i> {{trans('messages.returns')}}</a></li>
             <li><a href="{{ route('address.index') }}" class="canvas-nav__item"><i class="lnil lnil-map-marker"></i> {{trans('messages.addresses')}}</a></li>
             <li><a href="{{ route('account') }}" class="canvas-nav__item"><i class="lnil lnil-user"></i> {{trans('messages.profile')}}</a></li>

@@ -3,7 +3,8 @@
 
     <div class="row">
         <div class="col-xl-10 mx-auto">
-            <h4 class="fw-600">Home Page Settings</h4>
+            <h4 class="fw-600">Auction Home Page Settings</h4>
+
 
             <div class="card">
                 <ul class="nav nav-tabs nav-fill border-light">
@@ -57,7 +58,165 @@
             </div>
 
             <div class="card">
-                
+                <form class="p-4" action="{{ route('business_settings.update') }}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="page_id" value="{{ $page_id }}">
+                        <input type="hidden" name="lang" value="{{ $lang }}">
+                    <div class="card-header px-0">
+                        <h6 class="fw-600 mb-0">How it works Section</h6>
+                    </div>
+                    <div class="card-body px-0">
+        
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-from-label" for="title">{{ trans('messages.heading') }}</label>
+                            <div class="col-sm-10">
+                                <input type="text" @if($lang == 'ae') dir="rtl" @endif  class="form-control" placeholder="{{ trans('messages.heading') }}" name="title"
+                                    value="{{ $page->getTranslation('title', $lang) }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group row @if ($lang != 'en') d-none @endif">
+                            <label class="col-md-2 col-form-label" for="signinSrEmail">{{ trans('messages.icon') }} 1</label>
+                            <div class="col-md-10">
+                                <input type="file" name="image1" class="form-control" accept="image/*">
+
+                                @if ($page->image1)
+                                    <div class="file-preview box sm">
+                                        <div  class="d-flex justify-content-between align-items-center mt-2 file-preview-item">
+                                            <div
+                                                class="align-items-center align-self-stretch d-flex justify-content-center thumb">
+                                                <img src="{{ asset($page->image1) }}" class="img-fit">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-from-label" for="sub_title">{{ trans('messages.title') }} 1</label>
+                            <div class="col-sm-10">
+                                <input type="text" @if($lang == 'ae') dir="rtl" @endif  class="form-control" placeholder="{{ trans('messages.title') }} 1" name="sub_title"
+                                    value="{{ $page->getTranslation('sub_title', $lang) }}">
+                            </div>
+                        </div>
+        
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-from-label" for="name">{{ trans('messages.content') }}1</label>
+                            <div class="col-sm-10">
+                                <textarea class="resize-off form-control" placeholder="{{ trans('messages.content') }} 1" name="content"  @if($lang == 'ae') dir="rtl" @endif >{!! $page->getTranslation('content',$lang) !!}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group row @if ($lang != 'en') d-none @endif">
+                            <label class="col-md-2 col-form-label" for="signinSrEmail">{{ trans('messages.icon') }} 2</label>
+                            <div class="col-md-10">
+                                <input type="file" name="image2" class="form-control" accept="image/*">
+
+                                @if ($page->image2)
+                                    <div class="file-preview box sm">
+                                        <div  class="d-flex justify-content-between align-items-center mt-2 file-preview-item">
+                                            <div
+                                                class="align-items-center align-self-stretch d-flex justify-content-center thumb">
+                                                <img src="{{ asset($page->image2) }}" class="img-fit">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+        
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-from-label" for="title1">{{ trans('messages.title') }} 2</label>
+                            <div class="col-sm-10">
+                                <input type="text"  @if($lang == 'ae') dir="rtl" @endif class="form-control" placeholder="{{ trans('messages.title') }} 2"
+                                    name="title1" value="{{ $page->getTranslation('title1',$lang) }}">
+                            </div>
+                        </div>
+        
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-from-label" for="content1">{{ trans('messages.content') }} 2</label>
+                            <div class="col-sm-10">
+                                <textarea class="resize-off form-control" placeholder="{{ trans('messages.content') }} 2" name="content1" @if($lang == 'ae') dir="rtl" @endif >{!! $page->getTranslation('content1',$lang) !!}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group row @if ($lang != 'en') d-none @endif">
+                            <label class="col-md-2 col-form-label" for="signinSrEmail">{{ trans('messages.icon') }} 3</label>
+                            <div class="col-md-10">
+                                <input type="file" name="image3" class="form-control" accept="image/*">
+
+                                @if ($page->image3)
+                                    <div class="file-preview box sm">
+                                        <div  class="d-flex justify-content-between align-items-center mt-2 file-preview-item">
+                                            <div
+                                                class="align-items-center align-self-stretch d-flex justify-content-center thumb">
+                                                <img src="{{ asset($page->image3) }}" class="img-fit">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+        
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-from-label" for="title2">{{ trans('messages.title') }} 3</label>
+                            <div class="col-sm-10">
+                                <input type="text"  @if($lang == 'ae') dir="rtl" @endif class="form-control" placeholder="{{ trans('messages.title') }} 3"
+                                    name="title2" value="{{ $page->getTranslation('title2',$lang) }}">
+                            </div>
+                        </div>
+        
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-from-label" for="content2">{{ trans('messages.content') }} 3</label>
+                            <div class="col-sm-10">
+                                <textarea class="resize-off form-control" placeholder="{{ trans('messages.content') }} 3" name="content2" @if($lang == 'ae') dir="rtl" @endif >{!! $page->getTranslation('content2',$lang) !!}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group row @if ($lang != 'en') d-none @endif">
+                            <label class="col-md-2 col-form-label" for="signinSrEmail">{{ trans('messages.icon') }} 4</label>
+                            <div class="col-md-10">
+                                <input type="file" name="image4" class="form-control" accept="image/*">
+
+                                @if ($page->image4)
+                                    <div class="file-preview box sm">
+                                        <div  class="d-flex justify-content-between align-items-center mt-2 file-preview-item">
+                                            <div
+                                                class="align-items-center align-self-stretch d-flex justify-content-center thumb">
+                                                <img src="{{ asset($page->image4) }}" class="img-fit">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-from-label" for="title3">{{ trans('messages.title') }} 4</label>
+                            <div class="col-sm-10">
+                                <input type="text"  @if($lang == 'ae') dir="rtl" @endif class="form-control" placeholder="{{ trans('messages.title') }} 4"
+                                    name="title3" value="{{ $page->getTranslation('title3',$lang) }}">
+                            </div>
+                        </div>
+        
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-from-label" for="content3">{{ trans('messages.content') }} 4</label>
+                            <div class="col-sm-10">
+                                <textarea class="resize-off form-control" placeholder="{{ trans('messages.content') }} 4" name="content3" @if($lang == 'ae') dir="rtl" @endif >{!! $page->getTranslation('content3',$lang) !!}</textarea>
+                            </div>
+                        </div>
+                       
+        
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-info">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Discover Section</h5>
                 </div>
@@ -75,17 +234,17 @@
                         <div class="form-group @if($lang != 'en') d-none @endif">
                             <label>Categories (Max 4)</label>
                             <div class="new_collection-categories-target">
-                                <input type="hidden" name="types[]" value="discover_categories">
+                                <input type="hidden" name="types[]" value="auction_discover_categories">
                                 <input type="hidden" name="page_type" value="new_collection">
                                 <input type="hidden" name="page_id" value="{{ $page_id }}">
                                 <input type="hidden" name="lang" value="{{ $lang }}">
                                 
-                                @if (get_setting('discover_categories') != null && get_setting('discover_categories') != 'null')
-                                    @foreach (json_decode(get_setting('discover_categories'), true) as $key => $value)
+                                @if (get_setting('auction_discover_categories') != null && get_setting('auction_discover_categories') != 'null')
+                                    @foreach (json_decode(get_setting('auction_discover_categories'), true) as $key => $value)
                                         <div class="row gutters-5">
                                             <div class="col">
                                                 <div class="form-group">
-                                                    <select class="form-control aiz-selectpicker" name="discover_categories[]" data-live-search="true" data-selected={{ $value }}
+                                                    <select class="form-control aiz-selectpicker" name="auction_discover_categories[]" data-live-search="true" data-selected={{ $value }}
                                                         required>
                                                         <option value="">Select Category</option>
                                                         @foreach ($categories as $category)
@@ -115,7 +274,7 @@
                                 data-content='<div class="row gutters-5">
 								<div class="col">
 									<div class="form-group">
-										<select class="form-control aiz-selectpicker" name="discover_categories[]" data-live-search="true" required>
+										<select class="form-control aiz-selectpicker" name="auction_discover_categories[]" data-live-search="true" required>
                                             <option value="">Select Category</option>
 											@foreach ($categories as $key => $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -155,11 +314,11 @@
                 <div class="card-body">
                     <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="types[]" value="home_mid_banner">
-                        <input type="hidden" name="name" value="home_mid_banner">
-                        <input type="hidden" name="page_type" value="home_mid_banner">
+                        <input type="hidden" name="types[]" value="auction_home_mid_banner">
+                        <input type="hidden" name="name" value="auction_home_mid_banner">
+                        <input type="hidden" name="page_type" value="auction_home_mid_banner">
                         <input type="hidden" name="lang" value="{{ $lang }}">
-                        @error('home_mid_banner')
+                        @error('auction_home_mid_banner')
                             <div class="alert alert-danger" role="alert">
                                 {{ $message }}
                             </div>
@@ -176,13 +335,13 @@
                             </div>
                         </div> --}}
                         @php
-                            $small_banners = json_decode($current_banners['home_mid_banner']->value);
+                            $small_banners = json_decode($current_banners['auction_home_mid_banner']->value);
                         @endphp
                         <div class="form-group">
                             <label>Banner 1</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_mid_banner[]" data-live-search="true">
+                                    <select class="form-control aiz-selectpicker" name="auction_home_mid_banner[]" data-live-search="true">
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -197,7 +356,7 @@
                             <label>Banner 2</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_mid_banner[]" data-live-search="true">
+                                    <select class="form-control aiz-selectpicker" name="auction_home_mid_banner[]" data-live-search="true">
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -238,10 +397,10 @@
                         <div class="form-group row @if($lang != 'en') d-none @endif">
                             <label class="col-md-2 col-from-label">{{ trans('messages.products') }} (Max 4)</label>
                             <div class="col-md-10">
-                                <input type="hidden" name="types[]" value="new_arrival_products">
-                                <input type="hidden" name="page_type" value="new_arrival_products">
-                                <select name="new_arrival_products[]" class="form-control aiz-selectpicker" multiple
-                                    data-live-search="true" title="Select Products" data-selected="{{ get_setting('new_arrival_products') }}">
+                                <input type="hidden" name="types[]" value="auction_new_arrival_products">
+                                <input type="hidden" name="page_type" value="auction_new_arrival_products">
+                                <select name="auction_new_arrival_products[]" class="form-control aiz-selectpicker" multiple
+                                    data-live-search="true" title="Select Products" data-selected="{{ get_setting('auction_new_arrival_products') }}">
                                     {{-- <option disabled value=""></option> --}}
                                     @foreach ($products as $key => $prod)
                                         <option value="{{ $prod->id }}">{{ $prod->name }}</option>
@@ -257,86 +416,6 @@
                 </div>
             </div>
 
-             {{-- Home categories --}}
-             {{-- <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Occasions</h5>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="page_id" value="{{ $page_id }}">
-                        <input type="hidden" name="lang" value="{{ $lang }}">
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-from-label" for="name">{{ trans('messages.heading') }} <span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-10">
-                                <input type="text"  @if($lang == 'ae') dir="rtl" @endif class="form-control" placeholder="{{ trans('messages.heading') }}" name="heading3" value="{{ old('heading3', $page->getTranslation('heading3', $lang)) }}" required>
-                            </div>
-                        </div>
-                      
-                        <div class="form-group @if($lang != 'en') d-none @endif">
-                            <label>Occasions (Max 6)</label>
-                            <div class="home-categories-target">
-                                <input type="hidden" name="types[]" value="home_occasions">
-                                <input type="hidden" name="page_type" value="home_occasions">
-                                
-                                @if (get_setting('home_occasions') != null && get_setting('home_occasions') != 'null') 
-                                    @foreach (json_decode(get_setting('home_occasions'), true) as $key => $value)
-                                        <div class="row gutters-5">
-                                            <div class="col">
-                                                <div class="form-group">
-                                                    <select class="form-control aiz-selectpicker" name="home_occasions[]"
-                                                        data-live-search="true"  title="Select Occasions" data-selected={{ $value }}
-                                                        required>
-                                                    
-                                                        @foreach ($occasions as $occasion)
-                                                            <option value="{{ $occasion->id }}">{{ $occasion->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <button type="button"
-                                                    class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger"
-                                                    data-toggle="remove-parent" data-parent=".row">
-                                                    <i class="las la-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @endif
-                            </div>
-                            <button type="button" class="btn btn-soft-secondary btn-sm" data-toggle="add-more"
-                                data-content='<div class="row gutters-5">
-								<div class="col">
-									<div class="form-group">
-										<select class="form-control aiz-selectpicker" name="home_occasions[]" data-live-search="true"  title="Select Occasions" required>
-                                            
-											@foreach ($occasions as $key => $occasion)
-                                            <option value="{{ $occasion->id }}">{{ $occasion->name }}</option>
-                                            @endforeach
-										</select>
-									</div>
-								</div>
-								<div class="col-auto">
-									<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-										<i class="las la-times"></i>
-									</button>
-								</div>
-							</div>'
-                                data-target=".home-categories-target">
-                                Add New
-                            </button>
-                        </div>
-                        <div class="text-right">
-                            <button type="submit" class="btn btn-info">Update</button>
-                        </div>
-                    </form>
-                </div>
-            </div> --}}
-
             <div class="card  @if($lang != 'en') d-none @endif">
                 <div class="card-header">
                     <h5 class="mb-0">Banner</h5>
@@ -344,24 +423,24 @@
                 <div class="card-body">
                     <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="types[]" value="home_center_banner">
-                        <input type="hidden" name="name" value="home_center_banner">
-                        <input type="hidden" name="page_type" value="home_center_banner">
+                        <input type="hidden" name="types[]" value="auction_home_center_banner">
+                        <input type="hidden" name="name" value="auction_home_center_banner">
+                        <input type="hidden" name="page_type" value="auction_home_center_banner">
                         <input type="hidden" name="lang" value="{{ $lang }}">
-                        @error('home_center_banner')
+                        @error('auction_home_center_banner')
                             <div class="alert alert-danger" role="alert">
                                 {{ $message }}
                             </div>
                         @enderror
 
                         @php
-                            $center_banners = json_decode($current_banners['home_center_banner']->value);
+                            $center_banners = json_decode($current_banners['auction_home_center_banner']->value);
                         @endphp
                         <div class="form-group">
                             <label>Banner</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_center_banner[]" data-live-search="true">
+                                    <select class="form-control aiz-selectpicker" name="auction_home_center_banner[]" data-live-search="true">
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -401,10 +480,10 @@
                         <div class="form-group row @if($lang != 'en') d-none @endif">
                             <label class="col-md-2 col-from-label">{{ trans('messages.products') }} (Max 4)</label>
                             <div class="col-md-10">
-                                <input type="hidden" name="types[]" value="special_products">
-                                <input type="hidden" name="page_type" value="special_products">
-                                <select name="special_products[]" class="form-control aiz-selectpicker" multiple
-                                    data-live-search="true" title="Select Products" data-selected="{{ get_setting('special_products') }}">
+                                <input type="hidden" name="types[]" value="auction_special_products">
+                                <input type="hidden" name="page_type" value="auction_special_products">
+                                <select name="auction_special_products[]" class="form-control aiz-selectpicker" multiple
+                                    data-live-search="true" title="Select Products" data-selected="{{ get_setting('auction_special_products') }}">
                                     {{-- <option disabled value=""></option> --}}
                                     @foreach ($products as $key => $prod)
                                         <option value="{{ $prod->id }}">{{ $prod->name }}</option>
@@ -427,24 +506,24 @@
                 <div class="card-body">
                     <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="types[]" value="home_mid_section_banner">
-                        <input type="hidden" name="name" value="home_mid_section_banner">
+                        <input type="hidden" name="types[]" value="auction_home_mid_section_banner">
+                        <input type="hidden" name="name" value="auction_home_mid_section_banner">
 
-                        @error('home_mid_section_banner')
+                        @error('auction_home_mid_section_banner')
                             <div class="alert alert-danger" role="alert">
                                 {{ $message }}
                             </div>
                         @enderror
 
                         @php
-                            $mid_section_banner = (isset($current_banners['home_mid_section_banner'])) ? json_decode($current_banners['home_mid_section_banner']->value) : [];
+                            $mid_section_banner = (isset($current_banners['auction_home_mid_section_banner'])) ? json_decode($current_banners['auction_home_mid_section_banner']->value) : [];
                         @endphp
 
                         <div class="form-group">
                             <label>Banner 1</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_mid_section_banner[]" data-live-search="true" required>
+                                    <select class="form-control aiz-selectpicker" name="auction_home_mid_section_banner[]" data-live-search="true" required>
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -459,7 +538,7 @@
                             <label>Banner 2</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_mid_section_banner[]" data-live-search="true" required>
+                                    <select class="form-control aiz-selectpicker" name="auction_home_mid_section_banner[]" data-live-search="true" required>
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -474,7 +553,7 @@
                             <label>Banner 3</label>
                             <div class="home-banner1-target">
                                 @if ($banners)
-                                    <select class="form-control aiz-selectpicker" name="home_mid_section_banner[]" data-live-search="true" required>
+                                    <select class="form-control aiz-selectpicker" name="auction_home_mid_section_banner[]" data-live-search="true" required>
                                         <option value="">Select Banner</option>
                                         @foreach ($banners as $banner)
                                             <option value="{{ $banner->id }}"
@@ -604,7 +683,7 @@
                 <div class="card-body">
                     <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="page_type" value="home_newsletter">
+                        <input type="hidden" name="page_type" value="auction_home_newsletter">
                         <input type="hidden" name="page_id" value="{{ $page_id }}">
                         <input type="hidden" name="lang" value="{{ $lang }}">
                         <div class="form-group row">

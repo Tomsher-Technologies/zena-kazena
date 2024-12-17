@@ -13,6 +13,115 @@
         </div>       
         <!-- End Responsive Video -->
     </div>
+
+     <!-- About page -->
+     <div class="about-page">
+        <!-- Container -->
+        <div class="container container--type-2">
+            <!-- Title -->
+            <h1 class="about-page__title">{{ $page->getTranslation('title', $lang) }}</h1>
+            <!-- End title -->
+
+            <!-- Features -->
+            <div class="about-page__features">
+                <!-- Row -->
+                <div class="row">
+                    <!-- Feature -->
+                    <div class="col-lg-3">
+                        <div class="about-feature">
+                            <!-- Icon -->
+                            <div class="about-feature__icon">
+                                <img src="{{ asset($page->image1) }}"  style="width:100% !important"/>
+                            </div>
+                            <!-- End icon -->
+                            <!-- Text -->
+                            <div class="about-feature__text">
+                                <!-- Title -->
+                                <h3 class="about-feature__title">{{ $page->getTranslation('sub_title', $lang) }}</h3>
+                                <!-- End title -->
+                                <!-- Description -->
+                                <div class="about-feature__description">{{ $page->getTranslation('content', $lang) }}</div>
+                                <!-- End description -->
+                            </div>
+                            <!-- End text -->
+                        </div>
+                    </div>
+                    <!-- End feature -->
+                    <!-- Feature -->
+                    <div class="col-lg-3">
+                        <div class="about-feature">
+                            <!-- Icon -->
+                            <div class="about-feature__icon">
+                                <img src="{{ asset($page->image2) }}"  style="width:100% !important"/>
+                            </div>
+                            <!-- End icon -->
+                            <!-- Text -->
+                            <div class="about-feature__text">
+                                <!-- Title -->
+                                <h3 class="about-feature__title">{{ $page->getTranslation('title1', $lang) }}</h3>
+                                <!-- End title -->
+                                <!-- Description -->
+                                <div class="about-feature__description">{{ $page->getTranslation('content1', $lang) }}
+                                </div>
+                                <!-- End description -->
+                            </div>
+                            <!-- End text -->
+                        </div>
+                    </div>
+                    <!-- End feature -->
+                    <!-- Feature -->
+                    <div class="col-lg-3">
+                        <div class="about-feature">
+                            <!-- Icon -->
+                            <div class="about-feature__icon">
+                                <img src="{{ asset($page->image3) }}"  style="width:100% !important"/>
+                            </div>
+                            <!-- End icon -->
+                            <!-- Text -->
+                            <div class="about-feature__text">
+                                <!-- Title -->
+                                <h3 class="about-feature__title">{{ $page->getTranslation('title2', $lang) }} </h3>
+                                <!-- End title -->
+                                <!-- Description -->
+                                <div class="about-feature__description">{{ $page->getTranslation('content2', $lang) }}</div>
+                                <!-- End description -->
+                            </div>
+                            <!-- End text -->
+                        </div>
+                    </div>
+                    <!-- End feature -->
+
+
+                    <!-- Feature -->
+                    <div class="col-lg-3">
+                        <div class="about-feature">
+                            <!-- Icon -->
+                            <div class="about-feature__icon">
+                                <img src="{{ asset($page->image4) }}"  style="width:100% !important"/>
+                            </div>
+                            <!-- End icon -->
+                            <!-- Text -->
+                            <div class="about-feature__text">
+                                <!-- Title -->
+                                <h3 class="about-feature__title">{{ $page->getTranslation('title3', $lang) }}</h3>
+                                <!-- End title -->
+                                <!-- Description -->
+                                <div class="about-feature__description">{{ $page->getTranslation('content3', $lang) }}</div>
+                                <!-- End description -->
+                            </div>
+                            <!-- End text -->
+                        </div>
+                    </div>
+                    <!-- End feature -->
+                </div>
+                <!-- End row -->
+            </div>
+            <!-- End features -->
+        </div>
+        <!-- End container -->
+    </div>
+    <!-- About company -->
+
     <!-- New in -->
     <div class="shoppable-new-in">
         <!-- Container -->
@@ -31,7 +140,7 @@
                     @foreach($data['discover_categories'] as $discover_categories)
                         <div class="col-12 col-md-6 col-lg-3">
                             <!-- Category -->
-                            <a href="{{ route('products.index',['category' => $discover_categories->getTranslation('slug', $lang)]) }}" class="shoppable-new-in__category">
+                            <a href="{{ route('auction.products',['category' => $discover_categories->getTranslation('slug', $lang)]) }}" class="shoppable-new-in__category">
                                 <img alt="Image" data-sizes="auto"
                                     data-srcset="{{ uploaded_asset($discover_categories->getTranslation('icon', $lang)) }}"
                                     src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -56,34 +165,34 @@
             <!-- Row -->
             <div class="row">
 
-                @if(!empty($data['banners']['home_mid_banner']))
-                    @foreach ($data['banners']['home_mid_banner'] as $midKey => $home_mid_banner)
+                @if(!empty($data['banners']['auction_home_mid_banner']))
+                    @foreach ($data['banners']['auction_home_mid_banner'] as $midKey => $auction_home_mid_banner)
                         <!-- Category -->
                         <div class="col-12   @if($midKey == 0) col-xl-7 @else col-xl-5  @endif">
                             <div class="shop-category shop-category--medium">
                                 <!-- Image -->
                                 <div class="shop-category__image">
                                     @php
-                                        $linktype = $home_mid_banner['type'];
+                                        $linktype = $auction_home_mid_banner['type'];
                                         $link = '#';
                                         if($linktype == 'external'){
-                                            $link = $home_mid_banner['link'];
+                                            $link = $auction_home_mid_banner['link'];
                                         }
                                         if($linktype == 'product'){
-                                            $prod_sku = getProductSkuFromSlug($home_mid_banner['link']);
+                                            $prod_sku = getProductSkuFromSlug($auction_home_mid_banner['link']);
                                             if($prod_sku != null){
-                                                $link = route('product-detail',['slug' => $home_mid_banner['link'], 'sku' => $prod_sku]);
+                                                $link = route('auction.product-detail',['slug' => $auction_home_mid_banner['link'], 'sku' => $prod_sku]);
                                             }else {
                                                 $link = '#';
                                             }
                                         }
                                         if($linktype == 'category'){
-                                            $link = route('products.index',['category' => $home_mid_banner['link']]);
+                                            $link = route('auction.products',['category' => $auction_home_mid_banner['link']]);
                                         }
                                     @endphp
                                     <a href="{{$link}}">
                                         <img alt="Image" data-sizes="auto"
-                                            data-srcset="{{ $home_mid_banner['image'] }}"
+                                            data-srcset="{{ $auction_home_mid_banner['image'] }}"
                                             src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                             class="lazyload" />
                                     </a>
@@ -95,12 +204,12 @@
                                 <!-- Heading and description -->
                                 <div class="shop-category__heading-and-description">
                                     <!-- Heading -->
-                                    <h4 class="shop-category__heading"><a href="#" style="color: #000"> {{ $home_mid_banner['title'] }}</a>
+                                    <h4 class="shop-category__heading"><a href="#" style="color: #000"> {{ $auction_home_mid_banner['title'] }}</a>
                                     </h4>
                                     <!-- End heading -->
                                     <!-- Description -->
                                     <div class="shop-category__description">
-                                        <a href="#">{{ $home_mid_banner['sub_title'] }} </a>
+                                        <a href="#">{{ $auction_home_mid_banner['sub_title'] }} </a>
                                     </div>
                                     <!-- End description -->
                                 </div>
@@ -138,15 +247,7 @@
                         <!-- Product -->
                         <div class="col-6 col-md-4 col-xl-3">
                             <div class="product-grid-item product-grid-item--type-2 product-grid-item--type-5">
-                                <!-- Product tag -->
-                                @if ($priceData['offer_tag'] != '')
-                                    <div class="product-grid-item__tag">{{ $priceData['offer_tag'] }}</div>
-                                @endif
-                                @php
-                                    $wishlistedNew = productWishlisted($new_arrival_products->sku, $new_arrival_products->slug);
-                                @endphp
-                                <div class="product-grid-item__wishlist-right-0  wishlist-btn" data-product-slug="{{ $new_arrival_products->slug }}" data-product-sku="{{ $new_arrival_products->sku }}" ><i class="lnr lnr-heart {{($wishlistedNew != 0) ? 'active' : '' }}"></i></div>
-                                <!-- End product tag -->
+                               
                                 <!-- Product images -->
                                 <div class="product-grid-item__images product-grid-item__images--ratio-100-122 js-product-grid-images"
                                     data-current-image="0">
@@ -174,7 +275,7 @@
                                         @foreach ($images as $imgkey => $img)
                                              <!-- Product image -->
                                             <div class="product-grid-item__image js-product-grid-image @if($imgkey == 0) active @endif">
-                                                <a href="{{ route('product-detail',['slug' => $new_arrival_products->slug, 'sku' => $new_arrival_products->sku]) }}">
+                                                <a href="{{ route('auction.product-detail',['slug' => $new_arrival_products->slug, 'sku' => $new_arrival_products->sku]) }}">
                                                     <img alt="Image" data-sizes="auto"
                                                         data-srcset="{{get_product_image($img,'300')}}"
                                                         src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -187,7 +288,7 @@
                                     
                                     <!-- Quick shop -->
                                     <div class="product-grid-item__quick-shop">
-                                        <a href="#" class="add-to-cart-btn" data-product-slug="{{$new_arrival_products->slug}}" data-product-sku="{{ $new_arrival_products->sku}}">{{ trans('messages.add_to_cart') }}</a>
+                                        <a href="{{ route('auction.product-detail',['slug' => $new_arrival_products->slug, 'sku' => $new_arrival_products->sku]) }}" >{{ trans('messages.view') }} {{ trans('messages.details') }}</a>
                                     </div>
                                     <!-- End quick shop -->
                                 </div>
@@ -197,26 +298,27 @@
                                 <!-- End product feature -->
                                 <!-- Product name -->
                                 <div class="product-grid-item__name">
-                                    <a href="{{ route('product-detail',['slug' => $new_arrival_products->slug, 'sku' => $new_arrival_products->sku]) }}">{{ $new_arrival_products->getTranslation('name', $lang) }}</a>
+                                    <a href="{{ route('auction.product-detail',['slug' => $new_arrival_products->slug, 'sku' => $new_arrival_products->sku]) }}">{{ $new_arrival_products->getTranslation('name', $lang) }}</a>
                                 </div>
-                                <!-- End product name -->
-                                <div class="product__reviews" bis_skin_checked="1">
-                                    <i class="lnr lnr-star lnir active"></i>
-                                    <i class="lnr lnr-star lnir active"></i>
-                                    <i class="lnr lnr-star lnir active"></i>
-                                    <i class="lnr lnr-star lnir active"></i>
-                                    <i class="lnr lnr-star lnir"></i>
-                                    <span>3 reviews</span>
-                                </div>
+                                
                                 <!-- Product price -->
                                 <div class="product-grid-item__price">
                                     <!-- Price new -->
-                                    <span class="product-grid-item__price-new">{{ env('DEFAULT_CURRENCY').' '.$priceData['discounted_price'] }}</span>
+                                    @php
+                                        if ($new_arrival_products->stocks[0]?->price > $new_arrival_products->stocks[0]?->high_bid_amount){
+                                            $price = $new_arrival_products->stocks[0]?->price;
+                                        }else {
+                                            $price = $new_arrival_products->stocks[0]?->high_bid_amount;
+                                        }
+                                    @endphp
+
+                                    <span class="product-grid-item__price-new">{{ env('DEFAULT_CURRENCY').' '.$price }}</span>
                                     <!-- End price new -->
                                     <!-- Price old -->
-                                    @if ($priceData['discounted_price'] != $priceData['original_price'])
-                                        <span class="product-grid-item__price-old">{{ env('DEFAULT_CURRENCY').' '.$priceData['original_price'] }}</span>
+                                    @if ($new_arrival_products->stocks[0]?->price != $new_arrival_products->stocks[0]?->high_bid_amount && $new_arrival_products->stocks[0]?->high_bid_amount != 0)
+                                        <span class="product-grid-item__price-old">{{ env('DEFAULT_CURRENCY').' '.$new_arrival_products->stocks[0]?->price }}</span>
                                     @endif
+                                   
                                     <!-- End price old -->
                                 </div>
                                 <!-- End product price -->
@@ -271,30 +373,30 @@
     <!-- End new in -->
     <!-- Deal week -->
    
-    @if(!empty($data['banners']['home_center_banner']) && isset($data['banners']['home_center_banner'][0]))
+    @if(!empty($data['banners']['auction_home_center_banner']) && isset($data['banners']['auction_home_center_banner'][0]))
         <div class="explore-banner mt-3">
             @php
-                $linktype = $data['banners']['home_center_banner'][0]['type'];
+                $linktype = $data['banners']['auction_home_center_banner'][0]['type'];
                 $link = '#';
                 if($linktype == 'external'){
-                    $link = $data['banners']['home_center_banner'][0]['link'];
+                    $link = $data['banners']['auction_home_center_banner'][0]['link'];
                 }
                 if($linktype == 'product'){
-                    $prod_sku = getProductSkuFromSlug($data['banners']['home_center_banner'][0]['link']);
+                    $prod_sku = getProductSkuFromSlug($data['banners']['auction_home_center_banner'][0]['link']);
                     if($prod_sku != null){
-                        $link = route('product-detail',['slug' => $data['banners']['home_center_banner'][0]['link'], 'sku' => $prod_sku]);
+                        $link = route('auction.product-detail',['slug' => $data['banners']['auction_home_center_banner'][0]['link'], 'sku' => $prod_sku]);
                     }else {
                         $link = '#';
                     }
                 }
                 if($linktype == 'category'){
-                    $link = route('products.index',['category' => $data['banners']['home_center_banner'][0]['link']]);
+                    $link = route('auction.products',['category' => $data['banners']['auction_home_center_banner'][0]['link']]);
                 }
             @endphp
 
             <!-- Container -->
             <div class="container-fluid p-0">
-                <a href="{{$link}}"><img src="{{$data['banners']['home_center_banner'][0]['image']}}" alt=""></a>
+                <a href="{{$link}}"><img src="{{$data['banners']['auction_home_center_banner'][0]['image']}}" alt=""></a>
             </div>
             <!-- End container -->
         </div>
@@ -325,16 +427,7 @@
                         <!-- Product -->
                         <div class="col-6 col-md-4 col-xl-3">
                             <div class="product-grid-item product-grid-item--type-2 product-grid-item--type-5">
-                                <!-- Product tag -->
-                                @if ($priceData['offer_tag'] != '')
-                                    <div class="product-grid-item__tag">{{ $priceData['offer_tag'] }}</div>
-                                @endif
-                                @php
-                                    $wishlistedSpecial = productWishlisted($special_products->sku, $special_products->slug);
-                                @endphp
-
-                                <div class="product-grid-item__wishlist-right-0  wishlist-btn" data-product-slug="{{ $special_products->slug }}" data-product-sku="{{ $special_products->sku }}"><i class="lnr lnr-heart {{($wishlistedSpecial != 0) ? 'active' : '' }}"></i></div>
-                                <!-- End product tag -->
+                               
                                 <!-- Product images -->
                                 <div class="product-grid-item__images product-grid-item__images--ratio-100-122 js-product-grid-images"
                                     data-current-image="0">
@@ -362,7 +455,7 @@
                                         @foreach ($images as $imgkey => $img)
                                             <!-- Product image -->
                                             <div class="product-grid-item__image js-product-grid-image @if($imgkey == 0) active @endif">
-                                                <a href="{{ route('product-detail',['slug' => $special_products->slug, 'sku' => $special_products->sku]) }}">
+                                                <a href="{{ route('auction.product-detail',['slug' => $special_products->slug, 'sku' => $special_products->sku]) }}">
                                                     <img alt="Image" data-sizes="auto"
                                                         data-srcset="{{get_product_image($img,'300')}}"
                                                         src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -372,11 +465,11 @@
                                             <!-- End product image -->
                                         @endforeach
                                     @endif
-                                    
+                                     
 
                                     <!-- Quick shop -->
                                     <div class="product-grid-item__quick-shop">
-                                        <a href="#" class="add-to-cart-btn" data-product-slug="{{$special_products->slug}}" data-product-sku="{{ $special_products->sku}}">{{ trans('messages.add_to_cart') }}</a>
+                                        <a href="{{ route('auction.product-detail',['slug' => $special_products->slug, 'sku' => $special_products->sku]) }}">{{ trans('messages.view') }} {{ trans('messages.details') }}
                                     </div>
                                     <!-- End quick shop -->
                                 </div>
@@ -386,26 +479,28 @@
                                 <!-- End product feature -->
                                 <!-- Product name -->
                                 <div class="product-grid-item__name">
-                                    <a href="{{ route('product-detail',['slug' => $special_products->slug, 'sku' => $special_products->sku]) }}">{{ $special_products->getTranslation('name', $lang) }}</a>
+                                    <a href="{{ route('auction.product-detail',['slug' => $special_products->slug, 'sku' => $special_products->sku]) }}">{{ $special_products->getTranslation('name', $lang) }}</a>
                                 </div>
                                 <!-- End product name -->
-                                <div class="product__reviews" bis_skin_checked="1">
-                                    <i class="lnr lnr-star lnir active"></i>
-                                    <i class="lnr lnr-star lnir active"></i>
-                                    <i class="lnr lnr-star lnir active"></i>
-                                    <i class="lnr lnr-star lnir active"></i>
-                                    <i class="lnr lnr-star lnir"></i>
-                                    <span>3 reviews</span>
-                                </div>
+                                
                                 <!-- Product price -->
                                 <div class="product-grid-item__price">
                                     <!-- Price new -->
-                                    <span class="product-grid-item__price-new">{{ env('DEFAULT_CURRENCY').' '.$priceData['discounted_price'] }}</span>
+                                    @php
+                                        if ($special_products->stocks[0]?->price > $special_products->stocks[0]?->high_bid_amount){
+                                            $price = $special_products->stocks[0]?->price;
+                                        }else {
+                                            $price = $special_products->stocks[0]?->high_bid_amount;
+                                        }
+                                    @endphp
+
+                                    <span class="product-grid-item__price-new">{{ env('DEFAULT_CURRENCY').' '.$price }}</span>
                                     <!-- End price new -->
                                     <!-- Price old -->
-                                    @if ($priceData['discounted_price'] != $priceData['original_price'])
-                                        <span class="product-grid-item__price-old">{{ env('DEFAULT_CURRENCY').' '.$priceData['original_price'] }}</span>
+                                    @if ($special_products->stocks[0]?->price != $special_products->stocks[0]?->high_bid_amount && $special_products->stocks[0]?->high_bid_amount != 0)
+                                        <span class="product-grid-item__price-old">{{ env('DEFAULT_CURRENCY').' '.$special_products->stocks[0]?->price }}</span>
                                     @endif
+                                   
                                     <!-- End price new -->
                                     
                                 </div>
@@ -429,25 +524,25 @@
         <div class="container-fluid">
             <!-- Row -->
             <div class="row">
-                @if(!empty($data['banners']['home_mid_section_banner']))
-                    @foreach ($data['banners']['home_mid_section_banner'] as $midKey => $home_mid_section_banner)
+                @if(!empty($data['banners']['auction_home_mid_section_banner']))
+                    @foreach ($data['banners']['auction_home_mid_section_banner'] as $midKey => $auction_home_mid_section_banner)
                         <!-- Post -->
                         @php
-                            $linktype = $home_mid_section_banner['type'];
+                            $linktype = $auction_home_mid_section_banner['type'];
                             $link = '#';
                             if($linktype == 'external'){
-                                $link = $home_mid_section_banner['link'];
+                                $link = $auction_home_mid_section_banner['link'];
                             }
                             if($linktype == 'product'){
-                                $prod_sku = getProductSkuFromSlug($home_mid_section_banner['link']);
+                                $prod_sku = getProductSkuFromSlug($auction_home_mid_section_banner['link']);
                                 if($prod_sku != null){
-                                    $link = route('product-detail',['slug' => $home_mid_section_banner['link'], 'sku' => $prod_sku]);
+                                    $link = route('auction.product-detail',['slug' => $auction_home_mid_section_banner['link'], 'sku' => $prod_sku]);
                                 }else {
                                     $link = '#';
                                 }
                             }
                             if($linktype == 'category'){
-                                $link = route('products.index',['category' => $home_mid_section_banner['link']]);
+                                $link = route('auction.products',['category' => $auction_home_mid_section_banner['link']]);
                             }
                         @endphp
 
@@ -456,7 +551,7 @@
                                 <div class="full-width-post__image">
                                     <a href="{{$link}}">
                                         <img alt="Image" data-sizes="auto"
-                                        data-srcset="{{$home_mid_section_banner['image']}}"
+                                        data-srcset="{{$auction_home_mid_section_banner['image']}}"
                                         src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                         class="lazyload" />
                                     </a>
@@ -483,7 +578,7 @@
                     @foreach ($data['shop_by_brands'] as $shop_by_brands)
                         <!-- Item -->
                         <div class="home-brand-item">
-                            <a href="{{ route('products.index',['brand' => [$shop_by_brands->getTranslation('slug', $lang)]]) }}">
+                            <a href="{{ route('auction.products',['brand' => [$shop_by_brands->getTranslation('slug', $lang)]]) }}">
                                 <img alt="Image" src="{{ uploaded_asset($shop_by_brands->getTranslation('logo',$lang)) }}" class="lazyload" />
                             </a>
                             

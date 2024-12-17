@@ -50,6 +50,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/banners/edit/{id}', [Bannercontroller::class, 'edit'])->name('banners.edit');
 
     Route::get('/enquiries-contact', [PageController::class, 'enquiries'])->name('enquiries.contact');
+
+    Route::get('/enquiries-mortgage', [PageController::class, 'enquiriesMortgage'])->name('enquiries.mortgage');
+    Route::get('/enquiries-sales', [PageController::class, 'enquiriesSales'])->name('enquiries.sales');
+
     // website setting
     Route::group(['prefix' => 'website'], function () {
         Route::get('/footer', [WebsiteController::class, 'footer'])->name('website.footer');
@@ -133,6 +137,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/products/delete-variant-image', [ProductController::class, 'delete_variant_image'])->name('products.delete_varient_image');
     Route::post('/products/delete-thumbnail', [ProductController::class, 'delete_thumbnail'])->name('products.delete_thumbnail');
     Route::post('/products/delete_gallery', [ProductController::class, 'delete_gallery'])->name('products.delete_gallery');
+
+    Route::get('/product/{productId}/bid-history', [ProductController::class, 'productBidHistory'])->name('product.bid-history');
 
     //Reviews
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');

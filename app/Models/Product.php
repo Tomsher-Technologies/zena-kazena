@@ -54,6 +54,16 @@ class Product extends Model
         return $this->hasMany(ProductTranslation::class);
     }
 
+    public function bids()
+    {
+        return $this->hasMany(Bid::class);
+    }
+
+    public function latestBid()
+    {
+        return $this->bids()->orderBy('amount', 'desc')->first();
+    }
+
     public function seo()
     {
         return $this->hasMany(ProductSeo::class);
@@ -107,6 +117,12 @@ class Product extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function winner_auction()
+    {
+        return $this->belongsTo(User::class,'auction_winner','id');
+    }
+
+
     public function orderDetails()
     {
         return $this->hasMany(OrderDetail::class);
@@ -135,11 +151,6 @@ class Product extends Model
     public function flash_deal_product()
     {
         return $this->hasOne(FlashDealProduct::class);
-    }
-
-    public function bids()
-    {
-        return $this->hasMany(AuctionProductBid::class);
     }
 
     public function scopePhysical($query)

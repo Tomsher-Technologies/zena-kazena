@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Upload;
 use App\Models\User;
 use App\Models\Wishlist;
 use App\Models\OrderTracking;
 use Illuminate\Http\Request;
 use App\Models\Cart;
+use App\Models\Bid;
 use App\Models\RentOrder;
 use App\Models\RentOrderTracking;
 use Hash;
@@ -452,5 +454,31 @@ class ProfileController extends Controller
         // die;
 
         return view('frontend.rentorder_details', compact('lang', 'order', 'track_list', 'dataByStatus'));
+    }
+
+    public function auctionProducts()
+    {
+        $lang = getActiveLanguage();
+        // Get the authenticated user
+        $user = auth()->user();
+        
+        // Fetch products that the user has bid on
+        $products = Product::whereHas('bids', function ($query) use ($user) {
+            $query->where('user_id', $user->id); // Filter by user ID
+        })->get();
+
+        // Return the products, or pass them to a view
+        return view('frontend.auction_history', compact('products','lang','user'));
+    }
+
+    public function userBidHistory($productId, $userId)
+    {
+        // Fetch the bids for the specific user and product
+        $bids = Bid::where('product_id', $productId)
+                    ->where('user_id', $userId)
+                    ->orderBy('created_at', 'desc') // Or use any other ordering
+                    ->get();
+
+        return view('frontend.user_bid_history', compact('bids'));
     }
 }

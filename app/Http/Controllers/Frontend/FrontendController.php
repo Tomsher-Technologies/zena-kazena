@@ -92,6 +92,7 @@ class FrontendController extends Controller
     }
     public function home()
     {
+        session(['active_section' => 'shop']);
         $page = Page::where('type','home')->first();
         $lang = getActiveLanguage();
         $seo = [
@@ -205,6 +206,206 @@ class FrontendController extends Controller
         return view('frontend.home',compact('page','data','lang'));
     }
 
+    public function auctionHome()
+    {
+        session(['active_section' => 'auction']);
+        $page = Page::where('type','auction_home')->first();
+        $lang = getActiveLanguage();
+        $seo = [
+            'title'                 => $page->getTranslation('title', $lang),
+            'meta_title'            => $page->getTranslation('meta_title', $lang),
+            'meta_description'      => $page->getTranslation('meta_description', $lang),
+            'keywords'              => $page->getTranslation('keywords', $lang),
+            'og_title'              => $page->getTranslation('og_title', $lang),
+            'og_description'        => $page->getTranslation('og_description', $lang),
+            'twitter_title'         => $page->getTranslation('twitter_title', $lang),
+            'twitter_description'   => $page->getTranslation('twitter_description', $lang),
+        ];
+        
+        $this->loadSEO($seo);
+
+        $data['discover_categories'] = Cache::rememberForever('auction_discover_categories', function () {
+            $categories = get_setting('auction_discover_categories');
+            if ($categories) {
+                $details = Category::whereIn('id', json_decode($categories))->where('is_active', 1)
+                    ->get();
+                return $details;
+            }
+        });
+
+       
+
+        $home_banners = BusinessSetting::whereIn('type', array('auction_home_mid_section_banner','auction_home_center_banner', 'auction_home_mid_banner'))->get()->keyBy('type');
+        
+        $banners = [];
+        $all_banners = Banner::where('status', 1);
+        if(!empty($home_banners)){
+            foreach($home_banners as $key => $hb){
+                $bannerid = json_decode($hb->value);
+                
+                $bannerData = [];
+                if(!empty($bannerid)){
+                    $bannerData = Banner::where('status', 1)->whereIn('id', $bannerid)->get();
+                }
+                
+                if(!empty($bannerData)){
+                    foreach($bannerData as $bData){
+                        
+                        $banners[$key][] = array(
+                            'type' => $bData->link_type ?? '',
+                            'link' => $bData->link_type == 'external' ? $bData->link : $bData->getBannerLink(),
+                            'type_id' => $bData->link_ref_id,
+                            'image' => ($bData->getTranslation('image', $lang)) ? uploaded_asset($bData->getTranslation('image', $lang)) : '',
+                            'mob_image' => ($bData->getTranslation('mobile_image', $lang)) ? uploaded_asset($bData->getTranslation('mobile_image', $lang)) : '',
+                            'title' => $bData->getTranslation('title', $lang),
+                            'sub_title' => $bData->getTranslation('sub_title', $lang),
+                            'btn_text' => $bData->getTranslation('btn_text', $lang) 
+                        );
+                        
+                    }
+                }else{
+                    $banners[$key] = array();
+                }
+            }
+        }
+       
+       
+        $data['banners'] = $banners;
+
+        $data['new_arrival_products'] = Cache::remember('auction_new_arrival_products', 3600, function () {
+            $product_ids = get_setting('auction_new_arrival_products');
+            if ($product_ids) {
+                $products =  Product::where('published', 1)->whereIn('id', json_decode($product_ids))->with('brand')->get();
+                return $products;
+            }
+        });
+
+        $data['special_products'] = Cache::remember('auction_special_products', 3600, function () {
+            $product_ids = get_setting('auction_special_products');
+            if ($product_ids) {
+                $products =  Product::where('published', 1)->whereIn('id', json_decode($product_ids))->with('brand')->get();
+                return $products;
+            }
+        });
+
+        $data['shop_by_brands'] = Cache::rememberForever('auction_shop_by_brands', function () {
+            $details = Brand::where('is_active', 1)->get();
+            return $details;
+        });
+
+        $data['partners'] = Cache::rememberForever('auction_partners', function () {
+            $details = Partners::where('status', 1)->get();
+            return $details;
+        });
+
+        // echo '<pre>';
+        // print_r($data);
+        // die;
+
+
+        return view('frontend.auction_home',compact('page','data','lang'));
+    }
+
+    public function rentHome()
+    {
+        session(['active_section' => 'rent']);
+        $page = Page::where('type','rent_home')->first();
+        $lang = getActiveLanguage();
+        $seo = [
+            'title'                 => $page->getTranslation('title', $lang),
+            'meta_title'            => $page->getTranslation('meta_title', $lang),
+            'meta_description'      => $page->getTranslation('meta_description', $lang),
+            'keywords'              => $page->getTranslation('keywords', $lang),
+            'og_title'              => $page->getTranslation('og_title', $lang),
+            'og_description'        => $page->getTranslation('og_description', $lang),
+            'twitter_title'         => $page->getTranslation('twitter_title', $lang),
+            'twitter_description'   => $page->getTranslation('twitter_description', $lang),
+        ];
+        
+        $this->loadSEO($seo);
+
+        $data['discover_categories'] = Cache::rememberForever('rent_discover_categories', function () {
+            $categories = get_setting('rent_discover_categories');
+            if ($categories) {
+                $details = Category::whereIn('id', json_decode($categories))->where('is_active', 1)
+                    ->get();
+                return $details;
+            }
+        });
+
+       
+
+        $home_banners = BusinessSetting::whereIn('type', array('rent_home_mid_section_banner','rent_home_center_banner', 'rent_home_mid_banner'))->get()->keyBy('type');
+        
+        $banners = [];
+        $all_banners = Banner::where('status', 1);
+        if(!empty($home_banners)){
+            foreach($home_banners as $key => $hb){
+                $bannerid = json_decode($hb->value);
+                
+                $bannerData = [];
+                if(!empty($bannerid)){
+                    $bannerData = Banner::where('status', 1)->whereIn('id', $bannerid)->get();
+                }
+                
+                if(!empty($bannerData)){
+                    foreach($bannerData as $bData){
+                        
+                        $banners[$key][] = array(
+                            'type' => $bData->link_type ?? '',
+                            'link' => $bData->link_type == 'external' ? $bData->link : $bData->getBannerLink(),
+                            'type_id' => $bData->link_ref_id,
+                            'image' => ($bData->getTranslation('image', $lang)) ? uploaded_asset($bData->getTranslation('image', $lang)) : '',
+                            'mob_image' => ($bData->getTranslation('mobile_image', $lang)) ? uploaded_asset($bData->getTranslation('mobile_image', $lang)) : '',
+                            'title' => $bData->getTranslation('title', $lang),
+                            'sub_title' => $bData->getTranslation('sub_title', $lang),
+                            'btn_text' => $bData->getTranslation('btn_text', $lang) 
+                        );
+                        
+                    }
+                }else{
+                    $banners[$key] = array();
+                }
+            }
+        }
+       
+       
+        $data['banners'] = $banners;
+
+        $data['new_arrival_products'] = Cache::remember('rent_new_arrival_products', 3600, function () {
+            $product_ids = get_setting('rent_new_arrival_products');
+            if ($product_ids) {
+                $products =  Product::where('published', 1)->whereIn('id', json_decode($product_ids))->with('brand')->get();
+                return $products;
+            }
+        });
+
+        $data['special_products'] = Cache::remember('rent_special_products', 3600, function () {
+            $product_ids = get_setting('rent_special_products');
+            if ($product_ids) {
+                $products =  Product::where('published', 1)->whereIn('id', json_decode($product_ids))->with('brand')->get();
+                return $products;
+            }
+        });
+
+        $data['shop_by_brands'] = Cache::rememberForever('rent_shop_by_brands', function () {
+            $details = Brand::where('is_active', 1)->get();
+            return $details;
+        });
+
+        $data['partners'] = Cache::rememberForever('rent_partners', function () {
+            $details = Partners::where('status', 1)->get();
+            return $details;
+        });
+
+        // echo '<pre>';
+        // print_r($data);
+        // die;
+
+
+        return view('frontend.rent_home',compact('page','data','lang'));
+    }
+
     public function about()
     {
         $page = Page::where('type','about_us')->first();
@@ -299,6 +500,7 @@ class FrontendController extends Controller
     }
 
     public function mortgage(){
+        session(['active_section' => 'mortgage']);
         $page = Page::where('type','mortgage')->first();
         $lang = getActiveLanguage();
         $seo = [
@@ -383,6 +585,7 @@ class FrontendController extends Controller
     }
 
     public function sales(){
+        session(['active_section' => 'sale']);
         $page = Page::where('type','sales')->first();
         $lang = getActiveLanguage();
         $seo = [
@@ -535,4 +738,5 @@ class FrontendController extends Controller
         return response()->json(['success' => trans('messages.newsletter_success')]);
     }
 
+   
 }

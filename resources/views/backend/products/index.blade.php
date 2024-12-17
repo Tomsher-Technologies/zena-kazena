@@ -57,8 +57,7 @@
                         name="category" id="" data-selected={{ $category }}>
                         <option value="0">All</option>
                         @foreach (getAllCategories()->where('parent_id', 0) as $item)
-                            <option value="{{ $item->id }}" @if ($category == $item->id) {{ 'selected' }} @endif
-                                )>{{ $item->name }}</option>
+                            <option value="{{ $item->id }}" @if ($category == $item->id) {{ 'selected' }} @endif>{{ $item->name }}</option>
                             @if ($item->child)
                                 @foreach ($item->child as $cat)
                                     @include('backend.categories.menu_child_category', [
@@ -71,7 +70,7 @@
                     </select>
                 </div>
                 <div class="col-md-2 ml-auto bootstrap-select">
-                    <select class="form-control form-control-sm aiz-selectpicker mb-2 mb-md-0" name="type" id="type"
+                    <select class="form-control form-control-sm aiz-selectpicker  mb-md-0" name="type" id="type"
                         onchange="sort_products()">
                         <option value="">Sort By</option>
                         <option value="rating,desc"
@@ -100,6 +99,14 @@
                             Unpublished</option>
                     </select>
                 </div>
+                <div class="col-md-2 ml-auto bootstrap-select">
+                    <select class="form-control form-control-sm aiz-selectpicker  mb-md-0" name="product_type" id="product_type">
+                        <option value="">Select Product Type</option>
+                        <option value="auction" @if ($product_type == 'auction') selected @endif >Auction</option>
+                        <option value="rent" @if ($product_type == 'rent') selected @endif >Rent</option>
+                        <option value="sale" @if ($product_type == 'sale') selected @endif >Sale</option>
+                    </select>
+                </div>
                 <div class="col-md-2">
                     <div class="form-group mb-0">
                         <input type="text" class="form-control form-control-sm" id="search"
@@ -107,7 +114,7 @@
                             placeholder="Type & Enter">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <button class="btn btn-info " type="submit">Filter</button>
                     <a href="{{ route('products.all') }}" class="btn btn-warning">Reset</a>
                 </div>
@@ -182,23 +189,35 @@
                                     </div>
                                 </td>
                                 <td class="bread">
-                                    <span class="text-muted text-truncate-2">{{ $product->type }}</span>
+                                    <span class="text-muted text-truncate-2">{{ ucfirst($product->type) }}</span>
                                 </td>
 
                                 <td class="bread">
                                     {{ Breadcrumbs::render('product_admin', $product) }}
                                 </td>
                                 <td>
-                                    @if ($product->type != 'rent')
-                                        <strong>{{ trans('messages.no_of_sale') }}:</strong> {{ $product->num_of_sale }}
-                                        {{ trans('messages.times') }} <br>
+                                    @if ($product->type == 'auction')
+                                        @php
+                                            $product->auction_status == 1 ? $auction_status = '<span class="badge badge-inline badge-success text-capitalize">Completed</span>' : $auction_status = '<span class="badge badge-inline badge-warning text-capitalize">Ongoing</span>';
+                                        @endphp
+                                        <strong>{{ trans('messages.sku') }}:</strong> {{ $product->sku }} <br>
+                                        <strong>{{ trans('messages.auction') }} {{ trans('messages.status') }}: </strong>{!! $auction_status !!}  <br>
+                                        @if ($product->auction_status == 1)
+                                            <strong>{{ trans('messages.winner') }}:</strong> {{ $product->winner_auction?->name }} <br>
+                                        @endif
                                     @else
-                                        <strong>{{ trans('messages.refundable_deposit') }}:</strong>
-                                        {{ $product->deposit }}
-                                        DHS <br>
+                                        @if ($product->type != 'rent')
+                                            <strong>{{ trans('messages.no_of_sale') }}:</strong> {{ $product->num_of_sale }}
+                                            {{ trans('messages.times') }} <br>
+                                        @else
+                                            <strong>{{ trans('messages.refundable_deposit') }}:</strong>
+                                            {{ $product->deposit }}
+                                            DHS <br>
+                                        @endif
+                                        <strong>{{ trans('messages.rating') }}:</strong> {{ $product->rating }} <br>
+                                        <strong>{{ trans('messages.sku') }}:</strong> {{ $product->sku }} <br>
                                     @endif
-                                    <strong>{{ trans('messages.rating') }}:</strong> {{ $product->rating }} <br>
-                                    <strong>{{ trans('messages.sku') }}:</strong> {{ $product->sku }} <br>
+                                    
                                 </td>
                                 <td class="text-center">
                                     @php
@@ -218,14 +237,7 @@
                                         <span class="badge badge-inline badge-danger">Low</span>
                                     @endif
                                 </td>
-                                {{-- <td>
-                            <label class="aiz-switch aiz-switch-success mb-0">
-                                <input onchange="update_todays_deal(this)" value="{{ $product->id }}" type="checkbox" <?php if ($product->todays_deal == 1) {
-                                    echo 'checked';
-                                } ?> >
-                                <span class="slider round"></span>
-                            </label>
-                        </td> --}}
+                               
                                 <td class="text-center">
                                     <label class="aiz-switch aiz-switch-success mb-0">
                                         <input onchange="update_published(this)" value="{{ $product->id }}"
@@ -235,19 +247,15 @@
                                         <span class="slider round"></span>
                                     </label>
                                 </td>
-                                {{-- <td>
-                            <label class="aiz-switch aiz-switch-success mb-0">
-                                <input onchange="update_featured(this)" value="{{ $product->id }}" type="checkbox" <?php if ($product->featured == 1) {
-                                    echo 'checked';
-                                } ?> >
-                                <span class="slider round"></span>
-                            </label>
-                        </td> --}}
+                         
                                 <td class="text-center">
-                                    {{-- <a class="btn btn-soft-success btn-icon btn-circle btn-sm"
-                                        href="{{ route('product', $product->slug) }}" target="_blank" title="View">
-                                        <i class="las la-eye"></i>
-                                    </a> --}}
+                                    @if ($product->type == 'auction')
+                                        <a class="btn btn-soft-success btn-icon btn-circle btn-sm"
+                                            href="{{ route('product.bid-history', $product->id) }}" title="View Bid History">
+                                            <i class="las la-eye"></i>
+                                        </a>
+                                    @endif
+
                                     <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
                                         href="{{ route('products.edit', ['id' => $product->id, 'lang' => env('DEFAULT_LANGUAGE')]) }}"
                                         title="Edit">
