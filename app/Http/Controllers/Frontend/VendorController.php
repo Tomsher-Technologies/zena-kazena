@@ -40,6 +40,7 @@ class VendorController extends Controller
     {
         return view('frontend.vendor.auth.register');
     }
+    
     public function saveRegistration(Request $request)
     {
         // Validate the incoming request data
@@ -47,7 +48,7 @@ class VendorController extends Controller
             'name'              => 'required|string|max:255',
             'email'             => 'required|email|unique:vendors,email',
             'phone'             => 'required|string|max:15',
-            'password'          => 'required|string|min:8|confirmed', // Make sure the password is confirmed
+            'password'          => 'required|string|min:8|confirmed',
             'business_name'     => 'required|string|max:255',
             'business_type'     => 'required|string|max:255',
             'registration_number' => 'required|string|max:255',
@@ -55,6 +56,9 @@ class VendorController extends Controller
             'address'           => 'required|string|max:500',
             'business_logo'     => 'required|file|mimes:jpg,png,jpeg', // Assuming business logo is a file
         ]);
+        if ($request->password !== $request->password_confirmation) {
+            return back()->withErrors(['password_confirmation' => 'Passwords do not match.']);
+        }
         // Save vendor details to the database
         $vendor = new Vendor();
         $vendor->name = $request->name;
@@ -96,27 +100,28 @@ class VendorController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
+    
         if ($validator->fails()) {
-            return redirect()->route('vendor.login')
+            return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
         }
         $credentials = $request->only('email', 'password');
-        // Attempt to log the user in
+      
         if (Auth::guard('vendor')->attempt($credentials)) {
-
             $vendor = Auth::guard('vendor')->user();
+    
             if ($vendor->is_active == 0) {
-                Auth::guard('vendor')->logout(); // Log out the vendor
-                return redirect()->route('vendor.login')
+                Auth::guard('vendor')->logout(); 
+                return redirect()->back()
                     ->withErrors(['email' => 'Your account is inactive. Please contact support.'])
                     ->withInput();
             }
-            return redirect()->route('vendor.myaccount'); // Redirect to home page if login is successful
+    
+            return redirect()->route('vendor.myaccount');
         }
-
-        // If authentication fails
-        return redirect('vendor.login')->withErrors(['email' => 'Invalid credentials'])->withInput();
+    
+        return redirect()->back()->withErrors(['email' => 'Invalid credentials'])->withInput();
     }
     public function vendorAccount(Request $request)
     {
