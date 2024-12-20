@@ -153,6 +153,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/orders/update_payment_status', [OrderController::class, 'update_payment_status'])->name('orders.update_payment_status'); 
     Route::post('/orders/update_tracking_code', [OrderController::class, 'update_tracking_code'])->name('orders.update_tracking_code');
 
+    Route::get('/auctions/all', [ProductController::class, 'all_auction_products'])->name('auctions.all');
+
     Route::get('/rent/all_orders', [OrderController::class, 'rentAll_orders'])->name('rent.all_orders.index');
     Route::get('/rent/all_orders/{id}/show', [OrderController::class, 'rentAll_orders_show'])->name('rent.all_orders.show');
     Route::get('/rent/cancel_requests', [OrderController::class, 'rentAllCancelRequests'])->name('rent.cancel_requests.index');

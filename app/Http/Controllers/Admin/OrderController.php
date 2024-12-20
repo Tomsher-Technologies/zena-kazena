@@ -544,7 +544,7 @@ class OrderController extends Controller
     {
         // Validate incoming data
         $request->validate([
-            'order_id' => 'required|integer',
+            'order_id' => 'nullable|integer',
             'product_id' => 'required|integer',
             'vendor_id' => 'required|integer',
             'total_amount' => 'required|numeric',

@@ -148,7 +148,16 @@
                         </li>
                     </ul>
                 </li>
+                
+                <li class="aiz-side-nav-item">
+                    <a href="{{ route('auctions.all') }}"
+                        class="aiz-side-nav-link {{ areActiveRoutes(['auctions.all']) }}">
+                        <i class="las la-folder-open aiz-side-nav-icon"></i>
+                        <span class="aiz-side-nav-text">Auctions Completed</span>
+                    </a>
+                </li>
                 @endcanany
+
 
 
                 @canany(['upload_files'])
