@@ -153,3 +153,36 @@ ALTER TABLE `pages` ADD `video` VARCHAR(255) NULL DEFAULT NULL AFTER `image`;
 ALTER TABLE `page_translations` ADD `title1` VARCHAR(255) NULL DEFAULT NULL AFTER `sub_title`, ADD `title2` VARCHAR(255) NULL DEFAULT NULL AFTER `title1`, ADD `title3` VARCHAR(255) NULL DEFAULT NULL AFTER `title2`;
 
 ALTER TABLE `pages` ADD `image1` VARCHAR(255) NULL DEFAULT NULL AFTER `image`, ADD `image2` VARCHAR(255) NULL DEFAULT NULL AFTER `image1`, ADD `image3` VARCHAR(255) NULL DEFAULT NULL AFTER `image2`, ADD `image4` VARCHAR(255) NULL DEFAULT NULL AFTER `image3`;
+
+ALTER TABLE `order_details` ADD `return_expiry_date` DATETIME NULL DEFAULT NULL AFTER `delivery_status`;
+
+ALTER TABLE `vendors` CHANGE `profit_share` `profit_share` DECIMAL(5,2) NULL DEFAULT '0';
+
+CREATE TABLE IF NOT EXISTS `commissions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `order_id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `vendor_id` bigint UNSIGNED NOT NULL,
+  `total_amount` double(20,2) NOT NULL DEFAULT '0.00',
+  `admin_amount` double(20,2) NOT NULL DEFAULT '0.00',
+  `vendor_amount` double(20,2) NOT NULL DEFAULT '0.00',
+  `share_percentage` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `paid_status` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `order_id` (`order_id`),
+  KEY `product_id` (`product_id`),
+  KEY `vendor_id` (`vendor_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `commissions`
+  ADD CONSTRAINT `commissions_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `commissions_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `commissions_ibfk_3` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+  ALTER TABLE `commissions` CHANGE `order_id` `order_id` INT NULL DEFAULT NULL;
+
+  ALTER TABLE `commissions` ADD `order_type` VARCHAR(11) NULL DEFAULT 'sales' AFTER `id`;
+
+  ALTER TABLE `rent_orders` ADD `variation` LONGTEXT NULL DEFAULT NULL AFTER `product_stock_id`;

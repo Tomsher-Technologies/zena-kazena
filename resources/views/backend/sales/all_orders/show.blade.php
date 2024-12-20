@@ -2,6 +2,7 @@
 
 @section('content')
 
+
     <div class="card">
         <div class="card-header">
             <h1 class="h2 fs-16 mb-0">Order Details</h1>
@@ -239,6 +240,108 @@
 
         </div>
     </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h1 class="h2 fs-16 mb-0">Vendor Commissions</h1>
+        </div>
+        <div class="card-body">
+            <div class="row gutters-5">
+                <div class="col-sm-12">
+                    <table class="table table-bordered aiz-table invoice-summary">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Product</th>
+                                <th>Vendor</th>
+                                <th class="text-center">Admin Profit Percentage</th>
+                                <th class="text-center">Product Total Price</th>
+                                <th class="text-center">Vendor Amount</th>
+                                <th class="text-center">Admin Amount</th>
+                                <th class="text-center">Payment Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $i = 0;
+                            @endphp
+                            @foreach ($order->orderDetails as $key => $orderDetail)
+                                @if ($orderDetail->product->vendor_id != null && checkDateExpired($orderDetail->return_expiry_date) == 1)
+                                    @php
+                                        $i++;
+                                        $commission = getCommissionDetails($order->id, $orderDetail->product_id,$orderDetail->product->vendor_id);
+
+                                        $profit_share = ($orderDetail->product->vendor) ? $orderDetail->product->vendor->profit_share : 0;
+
+                                        $admin_amount = calculateAdminCommission($profit_share, $orderDetail->price);
+
+                                        $vendor_amount = ($commission) ? $commission->vendor_amount : ($orderDetail->price - $admin_amount);
+
+                                        $admin_amount = ($commission) ? $commission->admin_amount : $admin_amount;
+                                    @endphp
+                                    <tr>
+                                        <td class="text-center">{{ $i }}</td>
+                                        <td>
+                                            @if ($orderDetail->product != null)
+                                                <img height="50" src="{{ get_product_image($orderDetail->product->thumbnail_img, '300') }}">
+                                            @else
+                                                <strong>N/A</strong>
+                                            @endif
+
+                                            @if ($orderDetail->product != null)
+                                                <strong class="text-muted fs-13">{{ $orderDetail->product->name }}</strong>
+                                                {{-- <small> --}}
+                                                    @if ($orderDetail->variation != null)
+                                                        @php
+                                                            $variations = json_decode($orderDetail->variation);
+                                                        
+                                                        @endphp
+                                                        <ul>
+                                                            @foreach($variations as $var)
+                                                            <li> {{ $var->name ?? '' }} : <b>{{ $var->value ?? '' }}</b></li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @endif
+                                                {{-- </small> --}}
+                                            @else
+                                                <strong>Product Unavailable</strong>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {{ $orderDetail->product->vendor->name }}
+                                        </td>
+                                    
+                                        <td class="text-center">{{ $profit_share }}%</td>
+                                        <td class="text-center">
+                                            {{ $orderDetail->price }}
+                                        </td>
+                                        <td class="text-center"> {{ $vendor_amount }} </td>
+                                        <td class="text-center"> {{ $admin_amount }} </td>
+                                        <td class="text-center">
+                                            @if ($commission)
+                                                Paid
+                                            @else
+                                                <button class="btn btn-success" onclick="confirmPayment({{ $order->id }}, {{ $orderDetail->product_id }}, {{ $orderDetail->product->vendor_id }}, {{ $orderDetail->price }}, {{ $admin_amount }}, {{ $vendor_amount }}, {{ $profit_share }},1)">
+                                                Mark as Paid
+                                                </button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmation-popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0,0,0,0.8); padding: 20px; border-radius: 8px; color: #fff; z-index: 1000;">
+        <p>Are you sure you want to change payment status?</p>
+        
+        <button onclick="submitPayment()" style="padding: 10px 20px; margin: 10px; background-color: green; color: white; border: none; cursor: pointer;">Confirm</button>
+        <button onclick="closePopup()" style="padding: 10px 20px; margin: 10px; background-color: red; color: white; border: none; cursor: pointer;">Cancel</button>
+    </div>
 @endsection
 
 @section('script')
@@ -280,5 +383,67 @@
                 AIZ.plugins.notify('success', 'Order tracking code has been updated');
             });
         });
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        let orderData = {};
+
+        function confirmPayment(order_id, product_id, vendor_id, total_amount, admin_amount, vendor_amount, share_percentage, status) {
+            // Store the order data in a global variable
+            orderData = {
+                order_id: order_id,
+                product_id: product_id,
+                vendor_id: vendor_id,
+                total_amount: total_amount,
+                admin_amount: admin_amount,
+                vendor_amount: vendor_amount,
+                share_percentage: share_percentage,
+                paid_status: status
+            };
+            
+            document.getElementById('confirmation-popup').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('confirmation-popup').style.display = 'none';
+        }
+
+        function submitPayment() {
+            // Hide the popup after confirmation
+            document.getElementById('confirmation-popup').style.display = 'none';
+
+            // Send the data to the Laravel controller via AJAX
+            $.ajax({
+                url: '{{ route('saveCommission') }}', // Laravel route
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    order_id: orderData.order_id,
+                    product_id: orderData.product_id,
+                    vendor_id: orderData.vendor_id,
+                    total_amount: orderData.total_amount,
+                    admin_amount: orderData.admin_amount,
+                    vendor_amount: orderData.vendor_amount,
+                    share_percentage: orderData.share_percentage,
+                    paid_status: orderData.paid_status,
+                    order_type:'sales'
+                },
+                success: function(response) {
+                   
+                    AIZ.plugins.notify('success', response.message);
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 3000);
+
+                },
+                error: function(error) {
+                    AIZ.plugins.notify('success', 'There was an error processing your request.');
+                }
+            });
+        }
     </script>
 @endsection

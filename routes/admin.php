@@ -192,4 +192,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/vendors/update/{id}', [VendorController::class, 'update'])->name('vendors.update');
     Route::post('/bulk-vendor-delete', [VendorController::class, 'bulk_vendor_delete'])->name('bulk-vendor-delete');
     Route::get('/download/{id}', [VendorController::class, 'downloadTradeLicense'])->name('vendor.download');
+
+    //Shipping Configuration
+    Route::get('/configuration', [BusinessSettingsController::class, 'shipping_configuration'])->name('shipping_configuration.index');
+    Route::post('/configuration/update', [BusinessSettingsController::class, 'shipping_configuration_update'])->name('shipping_configuration.update');
+    Route::post('/shipping_configuration/free_shipping', [BusinessSettingsController::class, 'freeshipping_settings'])->name('shipping_configuration.free_shipping');
+    Route::post('/configuration/return', [BusinessSettingsController::class, 'return_settings'])->name('configuration.return_settings');
+
+    Route::post('/save-commission', [OrderController::class, 'saveCommission'])->name('saveCommission');
 });

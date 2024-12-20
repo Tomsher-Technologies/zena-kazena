@@ -42,7 +42,7 @@
                                     </a>
                                 </li>
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{ route('products.all') }}" class="aiz-side-nav-link {{ areActiveRoutes(['products.all','products.admin.edit','product.bid-history']) }}">
+                                    <a href="{{ route('products.all') }}" class="aiz-side-nav-link {{ areActiveRoutes(['products.all','products.edit','product.bid-history']) }}">
                                         <span class="aiz-side-nav-text">{{  trans('messages.all_Products') }}</span>
                                     </a>
                                 </li>
@@ -293,6 +293,24 @@
                 </li>
                 
                 @endcanany
+
+                @canany(['website_setup'])
+                    <li class="aiz-side-nav-item">
+                        <a href="#" class="aiz-side-nav-link">
+                            <i class="las la-dharmachakra aiz-side-nav-icon"></i>
+                            <span class="aiz-side-nav-text">Setup & Configurations</span>
+                            <span class="aiz-side-nav-arrow"></span>
+                        </a>
+                        <ul class="aiz-side-nav-list level-2">
+                            <li class="aiz-side-nav-item">
+                                <a href="{{ route('shipping_configuration.index') }}" class="aiz-side-nav-link">
+                                    <span class="aiz-side-nav-text">Shipping and Return</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endcanany
+
                 <!-- Staffs -->
                 @canany(['manage_staffs'])
                     <li class="aiz-side-nav-item">

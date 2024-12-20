@@ -226,14 +226,59 @@ class BusinessSettingsController extends Controller
 
     
 
-    public function shipping_configuration(Request $request){
+    public function shipping_configuration(Request $request)
+    {
         return view('backend.setup_configurations.shipping_configuration.index');
     }
 
-    public function shipping_configuration_update(Request $request){
-        $business_settings = BusinessSetting::where('type', $request->type)->first();
-        $business_settings->value = $request[$request->type];
-        $business_settings->save();
+    public function shipping_configuration_update(Request $request)
+    {
+        BusinessSetting::updateOrCreate([
+            'type' => $request->type
+        ], [
+            'value' => $request[$request->type]
+        ]);
+
+        Artisan::call('cache:clear');
+        return back();
+    }
+
+    public function freeshipping_settings(Request $request)
+    {
+       
+        BusinessSetting::updateOrCreate([
+            'type' => 'free_shipping_status'
+        ], [
+            'value' => $request->free_shipping_status ? 1 : 0
+        ]);
+
+        BusinessSetting::updateOrCreate([
+            'type' => 'free_shipping_min_amount'
+        ], [
+            'value' => $request->free_shipping_min_amount ?? 0
+        ]);
+
+        BusinessSetting::updateOrCreate([
+            'type' => 'default_shipping_amount'
+        ], [
+            'value' => $request->default_shipping_amount ?? 0
+        ]);
+
+        flash(trans("messages.settings").' '.trans("messages.updated_msg"))->success();
+
+        Artisan::call('cache:clear');
+        return back();
+    }
+
+    public function return_settings(Request $request)
+    {
+        BusinessSetting::updateOrCreate([
+            'type' => 'default_return_time'
+        ], [
+            'value' => $request->default_return_time ?? 0
+        ]);
+
+        flash(trans("messages.settings").' '.trans("messages.updated_msg"))->success();
 
         Artisan::call('cache:clear');
         return back();
