@@ -17,6 +17,7 @@ class RentOrder extends Model
         'user_id',
         'product_id',
         'product_stock_id',
+        'variation',
         'sku',
         'quantity',
         'shipping_address',

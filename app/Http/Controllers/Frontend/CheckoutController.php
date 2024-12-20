@@ -601,6 +601,7 @@ class CheckoutController
             'product_stock_id' => $product_stock->id,
             'sku' => $request->sku,
             'quantity' => $request->product_quantity,
+            'variation' => json_encode(getProductAttributes($product_stock->attributes)),
             // 'shipping_address' => $shipping_address_json,
             // 'billing_address' => $billing_address_json,
             // 'order_notes' => $request->order_note ?? '',

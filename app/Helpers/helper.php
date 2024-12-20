@@ -12,6 +12,7 @@ use App\Models\Occasion;
 use App\Models\Page;
 use App\Models\Bid;
 use App\Models\Wishlist;
+use App\Models\Commission;
 use App\Models\Cart;
 use App\Models\RecentlyViewedProduct;
 use Illuminate\Support\Str;
@@ -675,4 +676,38 @@ function winningStatus($product_id, $user_id){
                 ->limit(1)
                 ->pluck('winner')->toArray();
     return (!empty($bids) ? $bids[0] : 0);
+}
+
+function getProductReturnRefundStatus($product_id){
+    $product = Product::find($product_id);
+    return ($product) ? $product->return_refund : 0;
+}
+
+function checkDateExpired($date){
+    $expirationDate = new DateTime($date);
+    $currentDate = new DateTime();
+    
+    // Compare the two DateTime objects
+    if ($currentDate > $expirationDate) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+function getCommissionDetails($order_id, $product_id,$vendor_id){
+    $com = Commission::where('order_id',$order_id)
+                        ->where('product_id',$product_id)
+                        ->where('vendor_id',$vendor_id)
+                        ->first();
+    return $com;
+}
+
+function calculateAdminCommission($percentage, $amount){
+    $percentageValue = ($percentage / 100) * $amount;
+
+    // Format the result to 2 decimal places
+    $formattedPercentageValue = number_format($percentageValue, 2, '.', '');
+    
+    return $formattedPercentageValue;
 }

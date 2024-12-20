@@ -1143,6 +1143,65 @@ class ProductController extends Controller
         }
     }
 
+    public function all_auction_products(Request $request){
+        $request->session()->put('product_list_last_url', url()->full());
+        $col_name = null;
+        $query = null;
+        $seller_id = null;
+        $sort_search = null;
+        $products = Product::with(['winner_auction','stocks'])
+                            ->where('type', 'auction')
+                            ->where('auction_status', 1)
+                            ->orderBy('auction_end_date', 'desc');
+
+        $category = ($request->has('category')) ? $request->category : '';
+        
+        if ($request->type != null) {
+            $var = explode(",", $request->type);
+            $col_name = $var[0];
+            $query = $var[1];
+            if ($col_name == 'status') {
+                $products = $products->where('published', $query);
+            } else {
+                $products = $products->orderBy($col_name, $query);
+            }
+
+            $sort_type = $request->type;
+        }
+        if ($request->has('category') && $request->category !== '0') {
+            $childIds = [];
+            $categoryfilter = $request->category;
+            $childIds[] = array($request->category);
+            
+            if($categoryfilter != ''){
+                $childIds[] = getChildCategoryIds($categoryfilter);
+            }
+
+            if(!empty($childIds)){
+                $childIds = array_merge(...$childIds);
+                $childIds = array_unique($childIds);
+            }
+            
+            $products = $products->whereHas('category', function ($q) use ($childIds) {
+                $q->whereIn('id', $childIds);
+            });
+        }
+
+        if ($request->search != null) {
+            $sort_search = $request->search;
+            $products = $products
+                ->where('name', 'like', '%' . $sort_search . '%')
+                ->orWhereHas('stocks', function ($q) use ($sort_search) {
+                    $q->where('sku', 'like', '%' . $sort_search . '%');
+                });
+        }
+
+        $products = $products->paginate(15);
+        $type = 'All';
+
+        return view('backend.products.auction', compact('category','products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
+    }
+
     public function updateAllPrices(){
         $today_gold_rate    = GoldPrices::first()->toArray();
         $gold_purity        = [18 => '18_k', 21 => '21_k', 22 => '22_k', 24 => '24_k'];

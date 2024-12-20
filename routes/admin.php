@@ -153,6 +153,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/orders/update_payment_status', [OrderController::class, 'update_payment_status'])->name('orders.update_payment_status'); 
     Route::post('/orders/update_tracking_code', [OrderController::class, 'update_tracking_code'])->name('orders.update_tracking_code');
 
+    Route::get('/auctions/all', [ProductController::class, 'all_auction_products'])->name('auctions.all');
+
     Route::get('/rent/all_orders', [OrderController::class, 'rentAll_orders'])->name('rent.all_orders.index');
     Route::get('/rent/all_orders/{id}/show', [OrderController::class, 'rentAll_orders_show'])->name('rent.all_orders.show');
     Route::get('/rent/cancel_requests', [OrderController::class, 'rentAllCancelRequests'])->name('rent.cancel_requests.index');
@@ -192,4 +194,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/vendors/update/{id}', [VendorController::class, 'update'])->name('vendors.update');
     Route::post('/bulk-vendor-delete', [VendorController::class, 'bulk_vendor_delete'])->name('bulk-vendor-delete');
     Route::get('/download/{id}', [VendorController::class, 'downloadTradeLicense'])->name('vendor.download');
+
+    //Shipping Configuration
+    Route::get('/configuration', [BusinessSettingsController::class, 'shipping_configuration'])->name('shipping_configuration.index');
+    Route::post('/configuration/update', [BusinessSettingsController::class, 'shipping_configuration_update'])->name('shipping_configuration.update');
+    Route::post('/shipping_configuration/free_shipping', [BusinessSettingsController::class, 'freeshipping_settings'])->name('shipping_configuration.free_shipping');
+    Route::post('/configuration/return', [BusinessSettingsController::class, 'return_settings'])->name('configuration.return_settings');
+
+    Route::post('/save-commission', [OrderController::class, 'saveCommission'])->name('saveCommission');
 });

@@ -122,6 +122,11 @@ class Product extends Model
         return $this->belongsTo(User::class,'auction_winner','id');
     }
 
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
 
     public function orderDetails()
     {

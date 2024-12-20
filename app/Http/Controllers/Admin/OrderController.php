@@ -17,10 +17,12 @@ use App\Models\OrderTracking;
 use App\Models\BusinessSetting;
 use App\Models\RentOrder;
 use App\Models\RentOrderTracking;
+use App\Models\Commission;
 use Auth;
 use Session;
 use DB;
 use Mail;
+use DateTime;
 
 class OrderController extends Controller
 {
@@ -270,6 +272,10 @@ class OrderController extends Controller
         $order = Order::findOrFail($request->order_id);
         // $order->delivery_viewed = '0';
         $order->delivery_status = $request->status;
+        $return_days = get_setting('default_return_time') ?? 0;
+        if ($request->status == 'delivered') {
+            $order->delivery_completed_date = date('Y-m-d H:i:s');
+        }
         $order->save();
 
         $track              = new OrderTracking;
@@ -310,6 +316,18 @@ class OrderController extends Controller
             foreach ($order->orderDetails as $key => $orderDetail) {
 
                 $orderDetail->delivery_status = $request->status;
+
+                $return_status = getProductReturnRefundStatus($orderDetail->product_id);
+              
+                if ($request->status === 'delivered') {
+                    if($return_status == 1){
+                        $return_expiry_date = (new DateTime('today midnight'))->modify("+$return_days days")->setTime(23, 59, 59)->format('Y-m-d H:i:s');
+                    }else{
+                        $return_expiry_date = date('Y-m-d H:i:s');
+                    }
+                    $orderDetail->return_expiry_date = $return_expiry_date;
+                }
+               
                 $orderDetail->save();
 
                 $product_stock = ProductStock::where('id', $orderDetail->product_stock_id)
@@ -520,5 +538,35 @@ class OrderController extends Controller
     {
         $order = RentOrder::findOrFail(decrypt($id));
         return view('backend.sales.rentcancel_orders_show', compact('order'));
+    }
+
+    public function saveCommission(Request $request)
+    {
+        // Validate incoming data
+        $request->validate([
+            'order_id' => 'nullable|integer',
+            'product_id' => 'required|integer',
+            'vendor_id' => 'required|integer',
+            'total_amount' => 'required|numeric',
+            'admin_amount' => 'required|numeric',
+            'vendor_amount' => 'required|numeric',
+            'share_percentage' => 'required|numeric',
+        ]);
+
+        // Create a new commission record
+        $commission = Commission::create([
+            'order_id' => $request->order_id,
+            'product_id' => $request->product_id,
+            'vendor_id' => $request->vendor_id,
+            'total_amount' => $request->total_amount,
+            'admin_amount' => $request->admin_amount,
+            'vendor_amount' => $request->vendor_amount,
+            'share_percentage' => $request->share_percentage,
+            'paid_status' => $request->paid_status,
+            'order_type' => $request->order_type
+        ]);
+
+        // Return success message
+        return response()->json(['message' => 'Payment has been successfully processed!']);
     }
 }

@@ -86,7 +86,7 @@
                             </div>
                         </th> --}}
                         <th>Order Code</th>
-                        <th >Num. of Products</th>
+                        <th  class="text-center">Num. of Products</th>
                         <th >Customer</th>
                         <th >Amount</th>
                         <th >Delivery Status</th>
@@ -104,7 +104,7 @@
                         <td>
                             {{ $order->code }}
                         </td>
-                        <td>
+                        <td  class="text-center">
                             {{ count($order->orderDetails) }}
                         </td>
                         <td>
@@ -115,7 +115,7 @@
                             @endif
                         </td>
                         <td>
-                            {{ single_price($order->grand_total) }}
+                            {{ env('DEFAULT_CURRENCY').' '.single_price($order->grand_total) }}
                         </td>
                         <td>
                             @php
